@@ -8,4 +8,6 @@ use Laravel\Paddle\Billable;
 class User extends Model
 {
     use Billable;
+
+    protected $guarded = [];
 }

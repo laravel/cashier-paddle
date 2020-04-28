@@ -18,6 +18,13 @@ class Cashier
     const VERSION = '1.0.0-dev';
 
     /**
+     * The Paddle base endpoint for API calls.
+     *
+     * @var string
+     */
+    const API_ENDPOINT = 'https://vendors.paddle.com/api/2.0/product';
+
+    /**
      * The custom currency formatter.
      *
      * @var callable

@@ -2,6 +2,7 @@
 
 namespace Laravel\Paddle\Concerns;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 
@@ -14,22 +15,52 @@ trait PerformsCharges
      * @param  string  $title
      * @param  array  $options
      * @return string
+     *
+     * @throws \Exception
      */
     public function charge($amount, $title, array $options = [])
     {
-        $options = array_merge([
-            'title' => $title,
-            'webhook_url' => Cashier::webhookUrl(),
-            'prices' => [
-                'EUR:'.$amount,
+        if (strlen($title) > 100) {
+            throw new Exception('Charge title has a maximum length of 100 characters.');
+        }
+
+        return $this->generatePayLink(array_merge(
+            [
+                'title' => $title,
+                'webhook_url' => Cashier::webhookUrl(),
+                'prices' => [
+                    'EUR:'.$amount,
+                ],
             ],
-        ], $options, $this->paddleOptions());
+            $options,
+            $this->paddleOptions()
+        ));
+    }
 
-        $response = Http::post("https://vendors.paddle.com/api/2.0/product/generate_pay_link", $options)
-            ->body();
+    /**
+     * Make a "one off" charge on the customer for a given product.
+     *
+     * @param  int  $productId
+     * @param  array  $options
+     * @return string
+     */
+    public function chargeProduct($productId, array $options = [])
+    {
+        return $this->generatePayLink(array_merge(
+            ['product_id' => $productId],
+            $options,
+            $this->paddleOptions()
+        ));
+    }
 
-        // dd(json_decode($response, true));
-
-        return json_decode($response, true)['response']['url'];
+    /**
+     * Generate a new pay link.
+     *
+     * @param  array  $options
+     * @return string
+     */
+    protected function generatePayLink(array $options)
+    {
+        return Http::post(Cashier::API_ENDPOINT.'/generate_pay_link', $options)['response']['url'];
     }
 }
