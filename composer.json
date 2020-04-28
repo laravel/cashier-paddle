@@ -1,0 +1,68 @@
+{
+    "name": "laravel/cashier-paddle",
+    "description": "Cashier Paddle provides an expressive, fluent interface to Paddle's subscription billing services.",
+    "keywords": ["laravel", "paddle", "billing"],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/laravel/cashier-paddle/issues",
+        "source": "https://github.com/laravel/cashier-paddle"
+    },
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        },
+        {
+            "name": "Dries Vints",
+            "email": "dries@vints.io"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "illuminate/contracts": "^s7.0",
+        "illuminate/database": "^7.0",
+        "illuminate/http": "^7.0",
+        "illuminate/routing": "^7.0",
+        "illuminate/support": "^7.0",
+        "illuminate/view": "^7.0",
+        "moneyphp/money": "^3.2",
+        "nesbot/carbon": "^2.0",
+        "symfony/http-kernel": "^5.0",
+        "symfony/intl": "^5.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.0",
+        "orchestra/testbench": "^5.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "suggest": {
+        "ext-intl": "Allows for more locales besides the default \"en\" when formatting money values."
+    },
+    "autoload": {
+        "psr-4": {
+            "Laravel\\Paddle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Laravel\\Paddle\\CashierServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
