@@ -24,17 +24,13 @@ trait PerformsCharges
             throw new Exception('Charge title has a maximum length of 100 characters.');
         }
 
-        return $this->generatePayLink(array_merge(
-            [
-                'title' => $title,
-                'webhook_url' => Cashier::webhookUrl(),
-                'prices' => [
-                    'EUR:'.$amount,
-                ],
+        return $this->generatePayLink(array_merge([
+            'title' => $title,
+            'webhook_url' => Cashier::webhookUrl(),
+            'prices' => [
+                'EUR:'.$amount,
             ],
-            $options,
-            $this->paddleOptions()
-        ));
+        ], $options, $this->paddleOptions()));
     }
 
     /**
@@ -46,11 +42,9 @@ trait PerformsCharges
      */
     public function chargeProduct($productId, array $options = [])
     {
-        return $this->generatePayLink(array_merge(
-            ['product_id' => $productId],
-            $options,
-            $this->paddleOptions()
-        ));
+        return $this->generatePayLink(array_merge([
+            'product_id' => $productId,
+        ], $options, $this->paddleOptions()));
     }
 
     /**
