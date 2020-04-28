@@ -2,6 +2,7 @@
 
 namespace Laravel\Paddle;
 
+use Illuminate\Support\Facades\Http;
 use Money\Currencies\ISOCurrencies;
 use Money\Currency;
 use Money\Formatter\IntlMoneyFormatter;
@@ -22,7 +23,7 @@ class Cashier
      *
      * @var string
      */
-    const API_ENDPOINT = 'https://vendors.paddle.com/api/2.0/product';
+    const API_ENDPOINT = 'https://vendors.paddle.com/api/2.0';
 
     /**
      * The custom currency formatter.
@@ -77,6 +78,18 @@ class Cashier
     public static function webhookUrl()
     {
         return config('cashier.webhook') ?? route('cashier.webhook');
+    }
+
+    /**
+     * Perform a Paddle API call.
+     *
+     * @param  string  $url
+     * @param  array  $options
+     * @return \Illuminate\Http\Client\Response
+     */
+    public static function makeApiCall($url, array $options)
+    {
+        return Http::post(Cashier::API_ENDPOINT.$url, $options);
     }
 
     /**

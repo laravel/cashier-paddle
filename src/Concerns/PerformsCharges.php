@@ -3,7 +3,6 @@
 namespace Laravel\Paddle\Concerns;
 
 use Exception;
-use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 
 trait PerformsCharges
@@ -55,6 +54,28 @@ trait PerformsCharges
      */
     protected function generatePayLink(array $options)
     {
-        return Http::post(Cashier::API_ENDPOINT.'/generate_pay_link', $options)['response']['url'];
+        return Cashier::makeApiCall('/product/generate_pay_link', $options)['response']['url'];
+    }
+
+    /**
+     * Request a refund of a given order.
+     *
+     * @param  int  $orderId
+     * @param  int|null  $amount
+     * @param  string  $reason
+     * @return bool
+     */
+    public function refund($orderId, $amount = null, $reason = '')
+    {
+        $options = array_merge([
+            'order_id' => $orderId,
+            'reason' => $reason,
+        ], $this->paddleOptions());
+
+        if ($amount) {
+            $options['amount'] = $amount;
+        }
+
+        return Cashier::makeApiCall('/payment/refund', $options)['success'];
     }
 }
