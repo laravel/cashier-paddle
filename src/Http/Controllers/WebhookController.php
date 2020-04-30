@@ -32,17 +32,17 @@ class WebhookController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request)
     {
-        $payload = json_decode($request->getContent(), true);
-        $method = 'handle'.Str::studly($payload['object']['alert_name']);
+        $payload = $request->all();
+        $method = 'handle'.Str::studly($payload['alert_name']);
 
         WebhookReceived::dispatch($payload);
 
         if (method_exists($this, $method)) {
             $this->{$method}($payload);
 
-            WebhookHandled::dispatch($payload['object']);
+            WebhookHandled::dispatch($payload);
 
             return new Response('Webhook Handled');
         }
@@ -53,29 +53,29 @@ class WebhookController extends Controller
     /**
      * Handle subscription updated.
      *
-     * @param  array  $object
+     * @param  array  $payload
      * @return void
      */
-    protected function handleSubscriptionUpdated(array $object)
+    protected function handleSubscriptionUpdated(array $payload)
     {
-        if (! $user = Cashier::findBillable($object['user_id'])) {
+        if (! $user = Cashier::findBillable($payload['user_id'])) {
             return;
         }
 
-        if (! $subscription = $user->subscriptions()->where('paddle_id', $object['subscription_id'])->first()) {
+        if (! $subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
             // Quantity...
-            if (isset($object['quantity'])) {
-                $subscription->quantity = $object['quantity'];
+            if (isset($payload['quantity'])) {
+                $subscription->quantity = $payload['quantity'];
             }
 
             // Plan...
-            if (isset($object['subscription_plan_id'])) {
-                $subscription->paddle_plan = $object['subscription_plan_id'];
+            if (isset($payload['subscription_plan_id'])) {
+                $subscription->paddle_plan = $payload['subscription_plan_id'];
             }
 
             // Status...
-            if (isset($object['status'])) {
-                $subscription->paddle_status = $object['status'];
+            if (isset($payload['status'])) {
+                $subscription->paddle_status = $payload['status'];
             }
 
             $subscription->save();
@@ -85,30 +85,30 @@ class WebhookController extends Controller
     /**
      * Handle subscription cancelled.
      *
-     * @param  array  $object
+     * @param  array  $payload
      * @return void
      */
-    protected function handleSubscriptionCancelled(array $object): void
+    protected function handleSubscriptionCancelled(array $payload)
     {
-        if (! $user = Cashier::findBillable($object['user_id'])) {
+        if (! $user = Cashier::findBillable($payload['user_id'])) {
             return;
         }
 
-        if (! $subscription = $user->subscriptions()->where('paddle_id', $object['subscription_id'])->first()) {
+        if (! $subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
             // Cancellation date...
-            if (isset($object['cancellation_effective_date'])) {
-                if ($object['cancellation_effective_date']) {
+            if (isset($payload['cancellation_effective_date'])) {
+                if ($payload['cancellation_effective_date']) {
                     $subscription->ends_at = $subscription->onTrial()
                         ? $subscription->trial_ends_at
-                        : Carbon::createFromTimestamp($object['cancellation_effective_date']);
+                        : Carbon::createFromTimestamp($payload['cancellation_effective_date']);
                 } else {
                     $subscription->ends_at = null;
                 }
             }
 
             // Status...
-            if (isset($object['status'])) {
-                $subscription->paddle_status = $object['status'];
+            if (isset($payload['status'])) {
+                $subscription->paddle_status = $payload['status'];
             }
 
             $subscription->save();

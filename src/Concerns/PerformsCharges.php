@@ -8,7 +8,7 @@ use Laravel\Paddle\Cashier;
 trait PerformsCharges
 {
     /**
-     * Make a "one off" charge on the customer for the given amount.
+     * Generate a pay link for a "one off" charge on the customer for the given amount.
      *
      * @param  int  $amount
      * @param  string  $title
@@ -33,7 +33,7 @@ trait PerformsCharges
     }
 
     /**
-     * Make a "one off" charge on the customer for a given product.
+     * Generate a pay link for a product.
      *
      * @param  int  $productId
      * @param  array  $options
@@ -58,7 +58,7 @@ trait PerformsCharges
     }
 
     /**
-     * Request a refund of a given order.
+     * Refund a given order.
      *
      * @param  int  $orderId
      * @param  int|null  $amount

@@ -34,16 +34,6 @@ class Subscription extends Model
     ];
 
     /**
-     * Get the user that owns the subscription.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user()
-    {
-        return $this->owner();
-    }
-
-    /**
      * Get the model related to the subscription.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

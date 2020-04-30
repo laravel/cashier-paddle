@@ -25,7 +25,7 @@ class CreateSubscriptionsTable extends Migration
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();
 
-            $table->index(['user_id', 'paddle_id']);
+            $table->unique(['user_id', 'paddle_id']);
         });
     }
 
