@@ -3,6 +3,7 @@
 namespace Laravel\Paddle;
 
 use Illuminate\Support\Facades\Http;
+use Laravel\Paddle\Exceptions\PaddleException;
 use Money\Currencies\ISOCurrencies;
 use Money\Currency;
 use Money\Formatter\IntlMoneyFormatter;
@@ -83,13 +84,21 @@ class Cashier
     /**
      * Perform a Paddle API call.
      *
-     * @param  string  $url
-     * @param  array  $options
+     * @param  string  $uri
+     * @param  array  $payload
      * @return \Illuminate\Http\Client\Response
+     *
+     * @throws \Laravel\Paddle\Exceptions\PaddleException
      */
-    public static function makeApiCall($url, array $options)
+    public static function makeApiCall($uri, array $payload)
     {
-        return Http::post(Cashier::API_ENDPOINT.$url, $options);
+        $response = Http::post(Cashier::API_ENDPOINT.$uri, $payload);
+
+        if ($response['success'] === false) {
+            throw new PaddleException($response['error']['message'], $response['error']['code']);
+        }
+
+        return $response;
     }
 
     /**

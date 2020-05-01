@@ -2,7 +2,6 @@
 
 namespace Laravel\Paddle\Concerns;
 
-use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Subscription;
 use Laravel\Paddle\SubscriptionBuilder;
 
@@ -31,16 +30,17 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Cancel the subscription.
+     * Get a subscription instance by name.
      *
-     * @return bool
+     * @param  string  $name
+     * @return \Laravel\Paddle\Subscription|null
      */
-    public function cancel()
+    public function subscription($name = 'default')
     {
-        $options = array_merge([
-            'subscription_id' => $this->paddle_id,
-        ], $this->paddleOptions());
-
-        return Cashier::makeApiCall('/subscription/users_cancel', $options)['success'];
+        return $this->subscriptions->sortByDesc(function (Subscription $subscription) {
+            return $subscription->created_at->getTimestamp();
+        })->first(function (Subscription $subscription) use ($name) {
+            return $subscription->name === $name;
+        });
     }
 }

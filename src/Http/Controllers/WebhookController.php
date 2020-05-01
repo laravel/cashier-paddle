@@ -51,6 +51,35 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle subscription created.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    protected function handleSubscriptionCreated(array $payload)
+    {
+        [$userId, $name] = explode(',', $payload['passthrough']);
+
+        $model = config('cashier.model');
+
+        if (! $user = (new $model)->find($userId)) {
+            return;
+        }
+
+        $user->fill([
+            'paddle_id' => $payload['user_id'],
+        ])->save();
+
+        $user->subscriptions()->create([
+            'name' => $name,
+            'paddle_id' => $payload['subscription_id'],
+            'paddle_plan' => $payload['subscription_plan_id'],
+            'paddle_status' => $payload['status'],
+            'quantity' => $payload['quantity'],
+        ]);
+    }
+
+    /**
      * Handle subscription updated.
      *
      * @param  array  $payload

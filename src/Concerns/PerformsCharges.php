@@ -49,16 +49,16 @@ trait PerformsCharges
     /**
      * Generate a new pay link.
      *
-     * @param  array  $options
+     * @param  array  $payload
      * @return string
      */
-    protected function generatePayLink(array $options)
+    protected function generatePayLink(array $payload)
     {
-        $options['customer_email'] = (string) $this->paddleEmail();
-        $options['customer_country'] = (string) $this->paddleCountry();
-        $options['customer_postcode'] = (string) $this->paddlePostcode();
+        $payload['customer_email'] = (string) $this->paddleEmail();
+        $payload['customer_country'] = (string) $this->paddleCountry();
+        $payload['customer_postcode'] = (string) $this->paddlePostcode();
 
-        return Cashier::makeApiCall('/product/generate_pay_link', $options)['response']['url'];
+        return Cashier::makeApiCall('/product/generate_pay_link', $payload)['response']['url'];
     }
 
     /**
@@ -67,19 +67,21 @@ trait PerformsCharges
      * @param  int  $orderId
      * @param  int|null  $amount
      * @param  string  $reason
-     * @return bool
+     * @return $this
      */
     public function refund($orderId, $amount = null, $reason = '')
     {
-        $options = array_merge([
+        $payload = array_merge([
             'order_id' => $orderId,
             'reason' => $reason,
         ], $this->paddleOptions());
 
         if ($amount) {
-            $options['amount'] = $amount;
+            $payload['amount'] = $amount;
         }
 
-        return Cashier::makeApiCall('/payment/refund', $options)['success'];
+        Cashier::makeApiCall('/payment/refund', $payload);
+
+        return $this;
     }
 }

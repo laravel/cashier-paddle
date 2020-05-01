@@ -4,7 +4,6 @@ namespace Laravel\Paddle;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Http;
 
 class Subscription extends Model
 {
@@ -22,6 +21,17 @@ class Subscription extends Model
     protected $guarded = [];
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'paddle_id' => 'integer',
+        'paddle_plan' => 'integer',
+        'quantity' => 'integer',
+    ];
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -32,6 +42,13 @@ class Subscription extends Model
         'created_at',
         'updated_at',
     ];
+
+    /**
+     * Indicates if the plan change should be prorated.
+     *
+     * @var bool
+     */
+    protected $prorate = true;
 
     /**
      * Get the model related to the subscription.
@@ -46,13 +63,15 @@ class Subscription extends Model
     }
 
     /**
-     * Make a "one off" charge on the subscription for the given amount.
+     * Perform a "one off" charge on top of the subscription for the given amount.
      *
      * @param  int  $amount
      * @param  string  $name
-     * @return string
+     * @return array
      *
      * @throws \Exception
+     *
+     * @todo Think about return type here.
      */
     public function charge($amount, $name)
     {
@@ -60,11 +79,204 @@ class Subscription extends Model
             throw new Exception('Charge name has a maximum length of 50 characters.');
         }
 
-        $response = Http::post("https://vendors.paddle.com/api/2.0/subscription/{$this->paddle_id}/charge", [
+        $payload = $this->owner->paddleOptions([
             'amount' => $amount,
             'charge_name' => $name,
-        ] + $this->owner->paddleOptions())->body();
+        ]);
 
-        return json_decode($response, true)['response'];
+        return Cashier::makeApiCall("/subscription/{$this->paddle_id}/charge", $payload)['response'];
+    }
+
+    /**
+     * Increment the quantity of the subscription.
+     *
+     * @param  int  $count
+     * @return $this
+     */
+    public function incrementQuantity($count = 1)
+    {
+        $this->updateQuantity($this->quantity + $count);
+
+        return $this;
+    }
+
+    /**
+     *  Increment the quantity of the subscription, and invoice immediately.
+     *
+     * @param  int  $count
+     * @return $this
+     */
+    public function incrementAndInvoice($count = 1)
+    {
+        $this->updateQuantity($this->quantity + $count, [
+            'bill_immediately' => true,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Decrement the quantity of the subscription.
+     *
+     * @param  int  $count
+     * @return $this
+     */
+    public function decrementQuantity($count = 1)
+    {
+        return $this->updateQuantity(max(1, $this->quantity - $count));
+    }
+
+    /**
+     * Update the quantity of the subscription.
+     *
+     * @param  int  $quantity
+     * @param  array  $options
+     * @return $this
+     */
+    public function updateQuantity($quantity, array $options = [])
+    {
+        $this->updateInPaddle(array_merge($options, [
+            'quantity' => $quantity,
+            'prorate' => $this->prorate,
+        ]));
+
+        $this->fill([
+            'quantity' => $quantity,
+        ])->save();
+
+        return $this;
+    }
+
+    /**
+     * Swap the subscription to a new Paddle plan.
+     *
+     * @param  int  $plan
+     * @param  array  $options
+     * @return $this
+     */
+    public function swap($plan, array $options = [])
+    {
+        // Todo protect against paused and past_due subscriptions.
+
+        $this->updateInPaddle(array_merge($options, [
+            'plan_id' => $plan,
+            'prorate' => $this->prorate,
+        ]));
+
+        $this->fill([
+            'paddle_plan' => $plan,
+        ])->save();
+
+        return $this;
+    }
+
+    /**
+     * Swap the subscription to a new Paddle plan, and invoice immediately.
+     *
+     * @param  int  $plan
+     * @param  array  $options
+     * @return $this
+     */
+    public function swapAndInvoice($plan, array $options = [])
+    {
+        return $this->swap($plan, array_merge($options, [
+            'bill_immediately' => true,
+        ]));
+    }
+
+    /**
+     * Pause the subscription.
+     *
+     * @return $this
+     * @todo The webhook for this returns a "paused_from" timestamp so pausing is delayed it seems.
+     */
+    public function pause()
+    {
+        $this->updateInPaddle([
+            'pause' => true,
+        ]);
+
+        $this->fill([
+            'paddle_status' => self::STATUS_PAUSED,
+        ])->save();
+
+        return $this;
+    }
+
+    /**
+     * Resume a paused subscription.
+     *
+     * @return $this
+     */
+    public function resume()
+    {
+        $this->updateInPaddle([
+            'pause' => false,
+        ]);
+
+        $this->fill([
+            'paddle_status' => self::STATUS_ACTIVE,
+        ])->save();
+
+        return $this;
+    }
+
+    /**
+     * Update the subscription.
+     *
+     * @param  array  $options
+     * @return array
+     */
+    public function updateInPaddle(array $options)
+    {
+        $payload = $this->owner->paddleOptions(array_merge([
+            'subscription_id' => $this->paddle_id,
+        ], $options));
+
+        return Cashier::makeApiCall('/subscription/users/update', $payload)['response'];
+    }
+
+    /**
+     * Cancel the subscription.
+     *
+     * @return $this
+     */
+    public function cancel()
+    {
+        $payload = $this->owner->paddleOptions([
+            'subscription_id' => $this->paddle_id,
+        ]);
+
+        Cashier::makeApiCall('/subscription/users_cancel', $payload);
+
+        $this->fill([
+            'paddle_status' => self::STATUS_DELETED,
+        ])->save();
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the plan change should not be prorated.
+     *
+     * @return $this
+     */
+    public function noProrate()
+    {
+        $this->prorate = false;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the plan change should be prorated.
+     *
+     * @return $this
+     */
+    public function prorate()
+    {
+        $this->prorate = true;
+
+        return $this;
     }
 }

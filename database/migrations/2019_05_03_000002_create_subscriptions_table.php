@@ -17,9 +17,9 @@ class CreateSubscriptionsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->string('name');
-            $table->string('paddle_id');
+            $table->integer('paddle_id');
             $table->string('paddle_status');
-            $table->string('paddle_plan');
+            $table->integer('paddle_plan');
             $table->integer('quantity');
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('ends_at')->nullable();
