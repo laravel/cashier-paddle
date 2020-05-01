@@ -54,6 +54,10 @@ trait PerformsCharges
      */
     protected function generatePayLink(array $options)
     {
+        $options['customer_email'] = (string) $this->paddleEmail();
+        $options['customer_country'] = (string) $this->paddleCountry();
+        $options['customer_postcode'] = (string) $this->paddlePostcode();
+
         return Cashier::makeApiCall('/product/generate_pay_link', $options)['response']['url'];
     }
 

@@ -9,6 +9,18 @@ use Illuminate\Support\ServiceProvider;
 class CashierServiceProvider extends ServiceProvider
 {
     /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/cashier.php', 'cashier'
+        );
+    }
+
+    /**
      * Bootstrap any package services.
      *
      * @return void
@@ -94,17 +106,5 @@ class CashierServiceProvider extends ServiceProvider
         Blade::directive('paddle', function () {
             return "<?php echo view('cashier::js'); ?>";
         });
-    }
-
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        $this->mergeConfigFrom(
-            __DIR__ . '/../config/cashier.php', 'cashier'
-        );
     }
 }

@@ -148,6 +148,8 @@ class SubscriptionBuilder
             $payload['trial_days'] = $trialDays;
         }
 
+        $payload['passthrough'] = "{$this->billable->getKey()},{$this->name}";
+
         return $this->billable->chargeProduct($this->plan, $payload);
     }
 
@@ -159,10 +161,8 @@ class SubscriptionBuilder
     protected function buildPayload()
     {
         return  [
-            'customer_email' => (string) $this->billable->paddleEmail(),
             'coupon_code' => (string) $this->coupon,
             'quantity' => $this->quantity,
-            'passthrough' => "{$this->billable->getKey()},{$this->plan}",
         ];
     }
 

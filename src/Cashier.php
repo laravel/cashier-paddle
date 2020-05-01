@@ -23,7 +23,7 @@ class Cashier
      *
      * @var string
      */
-    const API_ENDPOINT = 'https://vendors.paddle.com/api/2.0';
+    const API_ENDPOINT = 'https://sandbox-vendors.paddle.com/api/2.0';
 
     /**
      * The custom currency formatter.
@@ -101,7 +101,7 @@ class Cashier
     public static function paddleOptions(array $options = [])
     {
         return array_merge([
-            'vendor_id' => config('cashier.vendor_id'),
+            'vendor_id' => (int) config('cashier.vendor_id'),
             'vendor_auth_code' => config('cashier.vendor_auth_code'),
         ], $options);
     }
