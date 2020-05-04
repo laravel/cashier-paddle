@@ -66,9 +66,9 @@ class WebhookController extends Controller
             return;
         }
 
-        $user->fill([
-            'paddle_id' => $payload['user_id'],
-        ])->save();
+        $user->paddle_id = $payload['user_id'];
+
+        $user->save();
 
         $user->subscriptions()->create([
             'name' => $name,

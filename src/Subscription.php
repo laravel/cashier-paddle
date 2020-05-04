@@ -26,8 +26,6 @@ class Subscription extends Model
      * @var array
      */
     protected $casts = [
-        'paddle_id' => 'integer',
-        'paddle_plan' => 'integer',
         'quantity' => 'integer',
     ];
 
@@ -84,7 +82,7 @@ class Subscription extends Model
             'charge_name' => $name,
         ]);
 
-        return Cashier::makeApiCall("/subscription/{$this->paddle_id}/charge", $payload)['response'];
+        return Cashier::post("/subscription/{$this->paddle_id}/charge", $payload)['response'];
     }
 
     /**
@@ -233,7 +231,7 @@ class Subscription extends Model
             'subscription_id' => $this->paddle_id,
         ], $options));
 
-        return Cashier::makeApiCall('/subscription/users/update', $payload)['response'];
+        return Cashier::post('/subscription/users/update', $payload)['response'];
     }
 
     /**
@@ -247,7 +245,7 @@ class Subscription extends Model
             'subscription_id' => $this->paddle_id,
         ]);
 
-        Cashier::makeApiCall('/subscription/users_cancel', $payload);
+        Cashier::post('/subscription/users_cancel', $payload);
 
         $this->fill([
             'paddle_status' => self::STATUS_DELETED,
@@ -278,5 +276,22 @@ class Subscription extends Model
         $this->prorate = true;
 
         return $this;
+    }
+
+    /**
+     * Get the user's transactions.
+     *
+     * @param  int  $page
+     * @return \Illuminate\Support\Collection
+     */
+    public function transactions($page = 1)
+    {
+        $result = Cashier::post("/subscription/{$this->paddle_id}/transactions", array_merge([
+            'page' => $page,
+        ], $this->owner->paddleOptions()));
+
+        return collect($result['response'])->map(function (array $transaction) {
+            return new Transaction($this->owner, $transaction);
+        });
     }
 }

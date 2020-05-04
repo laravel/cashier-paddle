@@ -20,6 +20,13 @@ class Cashier
     const VERSION = '1.0.0-dev';
 
     /**
+     * The Paddle base Checkout URL.
+     *
+     * @var string
+     */
+    const BASE_URL = 'https://sandbox-checkout.paddle.com';
+
+    /**
      * The Paddle base endpoint for API calls.
      *
      * @var string
@@ -82,6 +89,20 @@ class Cashier
     }
 
     /**
+     * Perform a POST Paddle API call.
+     *
+     * @param  string  $uri
+     * @param  array  $payload
+     * @return \Illuminate\Http\Client\Response
+     *
+     * @throws \Laravel\Paddle\Exceptions\PaddleException
+     */
+    public static function post($uri, array $payload)
+    {
+        return static::makeApiCall('post', $uri, $payload);
+    }
+
+    /**
      * Perform a Paddle API call.
      *
      * @param  string  $uri
@@ -90,9 +111,9 @@ class Cashier
      *
      * @throws \Laravel\Paddle\Exceptions\PaddleException
      */
-    public static function makeApiCall($uri, array $payload)
+    protected static function makeApiCall($method, $uri, array $payload)
     {
-        $response = Http::post(Cashier::API_ENDPOINT.$uri, $payload);
+        $response = Http::$method(Cashier::API_ENDPOINT.$uri, $payload);
 
         if ($response['success'] === false) {
             throw new PaddleException($response['error']['message'], $response['error']['code']);

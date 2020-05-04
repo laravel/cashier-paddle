@@ -2,8 +2,45 @@
 
 namespace Laravel\Paddle\Concerns;
 
+use Laravel\Paddle\Exceptions\InvalidCustomer;
+
 trait ManagesCustomer
 {
+    /**
+     * Retrieve the Paddle user ID.
+     *
+     * @return int|null
+     */
+    public function paddleId()
+    {
+        return $this->paddle_id ? (int) $this->paddle_id : null;
+    }
+
+    /**
+     * Determine if the entity has a Paddle user ID.
+     *
+     * @return bool
+     */
+    public function hasPaddleId()
+    {
+        return ! is_null($this->paddleId());
+    }
+
+    /**
+     * Determine if the entity has a Paddle user ID and throw an exception if not.
+     *
+     * @return void
+     *
+     * @throws \Laravel\Paddle\Exceptions\InvalidCustomer
+     */
+    protected function assertCustomerExists()
+    {
+        if (! $this->hasPaddleId()) {
+            throw InvalidCustomer::notYetCreated($this);
+        }
+    }
+
+
     /**
      * Get the customer's email address to associate with Paddle.
      *

@@ -91,9 +91,9 @@ class SubscriptionBuilder
      */
     public function trialDays($trialDays)
     {
-        return $this->trialUntil(
-            Carbon::now()->addDays($trialDays)
-        );
+        $this->trialDays = $trialDays;
+
+        return $this;
     }
 
     /**
@@ -104,7 +104,7 @@ class SubscriptionBuilder
      */
     public function trialUntil($trialUntil)
     {
-        $this->trialDays = $trialUntil->diffInDays(now());
+        $this->trialDays = Carbon::now()->diffInDays($trialUntil);
 
         return $this;
     }

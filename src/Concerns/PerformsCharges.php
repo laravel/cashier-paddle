@@ -58,7 +58,7 @@ trait PerformsCharges
         $payload['customer_country'] = (string) $this->paddleCountry();
         $payload['customer_postcode'] = (string) $this->paddlePostcode();
 
-        return Cashier::makeApiCall('/product/generate_pay_link', $payload)['response']['url'];
+        return Cashier::post('/product/generate_pay_link', $payload)['response']['url'];
     }
 
     /**
@@ -80,7 +80,7 @@ trait PerformsCharges
             $payload['amount'] = $amount;
         }
 
-        Cashier::makeApiCall('/payment/refund', $payload);
+        Cashier::post('/payment/refund', $payload);
 
         return $this;
     }
