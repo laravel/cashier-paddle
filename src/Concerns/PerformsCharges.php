@@ -54,7 +54,7 @@ trait PerformsCharges
      */
     protected function generatePayLink(array $payload)
     {
-        $payload['customer_email'] = (string) $this->paddleEmail();
+        $payload['customer_email'] = $this->paddle_email ?: (string) $this->paddleEmail();
         $payload['customer_country'] = (string) $this->paddleCountry();
         $payload['customer_postcode'] = (string) $this->paddlePostcode();
 

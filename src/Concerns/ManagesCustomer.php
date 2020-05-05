@@ -40,7 +40,6 @@ trait ManagesCustomer
         }
     }
 
-
     /**
      * Get the customer's email address to associate with Paddle.
      *

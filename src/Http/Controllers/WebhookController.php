@@ -67,6 +67,7 @@ class WebhookController extends Controller
         }
 
         $user->paddle_id = $payload['user_id'];
+        $user->paddle_email = $payload['email'];
 
         $user->save();
 
