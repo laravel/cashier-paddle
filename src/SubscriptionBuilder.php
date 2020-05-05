@@ -148,7 +148,7 @@ class SubscriptionBuilder
             $payload['trial_days'] = $trialDays;
         }
 
-        $payload['passthrough'] = "{$this->billable->getKey()},{$this->name}";
+        $payload['passthrough'] = "{$this->billable->getAuthIdentifier()},{$this->name}";
 
         return $this->billable->chargeProduct($this->plan, $payload);
     }
