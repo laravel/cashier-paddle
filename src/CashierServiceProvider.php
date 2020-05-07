@@ -60,6 +60,8 @@ class CashierServiceProvider extends ServiceProvider
     protected function bootResources()
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
+
+        Blade::component('cashier::components.button', 'paddle-button');
     }
 
     /**
