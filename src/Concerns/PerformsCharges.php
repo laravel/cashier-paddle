@@ -71,7 +71,7 @@ trait PerformsCharges
      * @param  int  $orderId
      * @param  int|null  $amount
      * @param  string  $reason
-     * @return $this
+     * @return int
      */
     public function refund($orderId, $amount = null, $reason = '')
     {
@@ -84,8 +84,6 @@ trait PerformsCharges
             $payload['amount'] = $amount;
         }
 
-        Cashier::post('/payment/refund', $payload);
-
-        return $this;
+        return Cashier::post('/payment/refund', $payload)['refund_request_id'];
     }
 }
