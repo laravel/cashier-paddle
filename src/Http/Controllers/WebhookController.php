@@ -93,11 +93,6 @@ class WebhookController extends Controller
         }
 
         if (! $subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
-            // Quantity...
-            if (isset($payload['quantity'])) {
-                $subscription->quantity = $payload['quantity'];
-            }
-
             // Plan...
             if (isset($payload['subscription_plan_id'])) {
                 $subscription->paddle_plan = $payload['subscription_plan_id'];
@@ -106,6 +101,11 @@ class WebhookController extends Controller
             // Status...
             if (isset($payload['status'])) {
                 $subscription->paddle_status = $payload['status'];
+            }
+
+            // Quantity...
+            if (isset($payload['quantity'])) {
+                $subscription->quantity = $payload['quantity'];
             }
 
             $subscription->save();
