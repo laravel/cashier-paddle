@@ -84,19 +84,4 @@ return [
 
     'currency_locale' => env('CASHIER_CURRENCY_LOCALE', 'en'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Invoice Paper Size
-    |--------------------------------------------------------------------------
-    |
-    | This option is the default paper size for all invoices generated using
-    | Cashier. You are free to customize this settings based on the usual
-    | paper size used by the customers using your Laravel applications.
-    |
-    | Supported sizes: 'letter', 'legal', 'A4'
-    |
-    */
-
-    'paper' => env('CASHIER_PAPER', 'letter'),
-
 ];

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use Carbon\Carbon;
 use Laravel\Paddle\Exceptions\InvalidTransaction;
 use Laravel\Paddle\Transaction;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +29,16 @@ class TransactionTest extends TestCase
         new Transaction($billable, $transaction);
     }
 
+    public function test_it_can_returns_its_user()
+    {
+        $billable = new User(['paddle_id' => 1]);
+        $transaction = new Transaction($billable, [
+            'user' => ['user_id' => 1],
+        ]);
+
+        $this->assertSame($billable, $transaction->user());
+    }
+
     public function test_it_can_returns_its_receipt_url()
     {
         $billable = new User(['paddle_id' => 1]);
@@ -37,5 +48,43 @@ class TransactionTest extends TestCase
         ]);
 
         $this->assertSame('https://example.com/receipt.pdf', $transaction->receiptUrl());
+    }
+
+    public function test_it_can_returns_its_created_at_timestamp()
+    {
+        $billable = new User(['paddle_id' => 1]);
+        $transaction = new Transaction($billable, [
+            'user' => ['user_id' => 1],
+            'created_at' => '2020-05-07 10:53:17',
+        ]);
+
+        $this->assertInstanceOf(Carbon::class, $transaction->createdAt());
+        $this->assertSame('2020-05-07 10:53:17', $transaction->createdAt()->format('Y-m-d H:i:s'));
+    }
+
+    public function test_it_can_determine_if_it_is_a_subscription_transaction()
+    {
+        $billable = new User(['paddle_id' => 1]);
+        $transaction = new Transaction($billable, [
+            'user' => ['user_id' => 1],
+            'is_subscription' => true,
+            'is_one_off' => false,
+        ]);
+
+        $this->assertTrue($transaction->isSubscription());
+        $this->assertFalse($transaction->isOneOff());
+    }
+
+    public function test_it_can_determine_if_it_is_a_one_off_transaction()
+    {
+        $billable = new User(['paddle_id' => 1]);
+        $transaction = new Transaction($billable, [
+            'user' => ['user_id' => 1],
+            'is_subscription' => false,
+            'is_one_off' => true,
+        ]);
+
+        $this->assertFalse($transaction->isSubscription());
+        $this->assertTrue($transaction->isOneOff());
     }
 }
