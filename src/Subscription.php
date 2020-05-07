@@ -26,6 +26,8 @@ class Subscription extends Model
      * @var array
      */
     protected $casts = [
+        'paddle_id' => 'integer',
+        'paddle_plan' => 'integer',
         'quantity' => 'integer',
     ];
 
@@ -47,6 +49,13 @@ class Subscription extends Model
      * @var bool
      */
     protected $prorate = true;
+
+    /**
+     * The cached Paddle info for the subscription.
+     *
+     * @var array
+     */
+    protected $paddleInfo;
 
     /**
      * Get the model related to the subscription.
@@ -235,6 +244,16 @@ class Subscription extends Model
     }
 
     /**
+     * Get the Paddle update url.
+     *
+     * @return array
+     */
+    public function updateUrl()
+    {
+        return $this->paddleInfo()['update_url'];
+    }
+
+    /**
      * Cancel the subscription.
      *
      * @return $this
@@ -252,6 +271,16 @@ class Subscription extends Model
         ])->save();
 
         return $this;
+    }
+
+    /**
+     * Get the Paddle cancellation url.
+     *
+     * @return array
+     */
+    public function cancelUrl()
+    {
+        return $this->paddleInfo()['cancel_url'];
     }
 
     /**
@@ -276,6 +305,46 @@ class Subscription extends Model
         $this->prorate = true;
 
         return $this;
+    }
+
+    /**
+     * Get the last payment for the subscription.
+     *
+     * @return \Laravel\Paddle\Payment
+     */
+    public function lastPayment()
+    {
+        $payment = $this->paddleInfo()['last_payment'];
+
+        return new Payment($payment['amount'], $payment['currency'], $payment['date']);
+    }
+
+    /**
+     * Get the next payment for the subscription.
+     *
+     * @return \Laravel\Paddle\Payment
+     */
+    public function nextPayment()
+    {
+        $payment = $this->paddleInfo()['next_payment'];
+
+        return new Payment($payment['amount'], $payment['currency'], $payment['date']);
+    }
+
+    /**
+     * Get info from Paddle about the subscription.
+     *
+     * @return array
+     */
+    public function paddleInfo()
+    {
+        if ($this->paddleInfo) {
+            return $this->paddleInfo;
+        }
+
+        return $this->paddleInfo = Cashier::post('/subscription/users', array_merge([
+            'subscription_id' => $this->paddle_id,
+        ], $this->owner->paddleOptions()))['response'][0];
     }
 
     /**

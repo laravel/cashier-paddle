@@ -71,7 +71,7 @@ class WebhookController extends Controller
 
         $user->save();
 
-        $user->subscriptions()->create([
+        $subscription = $user->subscriptions()->create([
             'name' => $name,
             'paddle_id' => $payload['subscription_id'],
             'paddle_plan' => $payload['subscription_plan_id'],
@@ -92,7 +92,7 @@ class WebhookController extends Controller
             return;
         }
 
-        if (! $subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
+        if ($subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
             // Plan...
             if (isset($payload['subscription_plan_id'])) {
                 $subscription->paddle_plan = $payload['subscription_plan_id'];
@@ -124,17 +124,17 @@ class WebhookController extends Controller
             return;
         }
 
-        if (! $subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
+        if ($subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
             // Cancellation date...
-            if (isset($payload['cancellation_effective_date'])) {
-                if ($payload['cancellation_effective_date']) {
-                    $subscription->ends_at = $subscription->onTrial()
-                        ? $subscription->trial_ends_at
-                        : Carbon::createFromTimestamp($payload['cancellation_effective_date']);
-                } else {
-                    $subscription->ends_at = null;
-                }
-            }
+            // if (isset($payload['cancellation_effective_date'])) {
+            //     if ($payload['cancellation_effective_date']) {
+            //         $subscription->ends_at = $subscription->onTrial()
+            //             ? $subscription->trial_ends_at
+            //             : Carbon::createFromTimestamp($payload['cancellation_effective_date']);
+            //     } else {
+            //         $subscription->ends_at = null;
+            //     }
+            // }
 
             // Status...
             if (isset($payload['status'])) {
