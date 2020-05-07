@@ -32,6 +32,7 @@ class CashierServiceProvider extends ServiceProvider
         $this->bootMigrations();
         $this->bootPublishing();
         $this->bootDirectives();
+        $this->bootComponents();
     }
 
     /**
@@ -60,8 +61,6 @@ class CashierServiceProvider extends ServiceProvider
     protected function bootResources()
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
-
-        Blade::component('cashier::components.button', 'paddle-button');
     }
 
     /**
@@ -108,5 +107,15 @@ class CashierServiceProvider extends ServiceProvider
         Blade::directive('paddle', function () {
             return "<?php echo view('cashier::js'); ?>";
         });
+    }
+
+    /**
+     * Boot the package components.
+     *
+     * @return void
+     */
+    protected function bootComponents()
+    {
+        Blade::component('cashier::components.button', 'paddle-button');
     }
 }
