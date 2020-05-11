@@ -26,7 +26,7 @@ trait ManagesSubscriptions
      */
     public function subscriptions()
     {
-        return $this->hasMany(Subscription::class, $this->getForeignKey())->orderBy('created_at', 'desc');
+        return $this->hasMany(Subscription::class, $this->getForeignKey())->orderByDesc('created_at');
     }
 
     /**
@@ -37,10 +37,90 @@ trait ManagesSubscriptions
      */
     public function subscription($name = 'default')
     {
-        return $this->subscriptions->sortByDesc(function (Subscription $subscription) {
-            return $subscription->created_at->getTimestamp();
-        })->first(function (Subscription $subscription) use ($name) {
-            return $subscription->name === $name;
-        });
+        return $this->subscriptions()->where('name', $name)->first();
+    }
+
+    /**
+     * Determine if the Stripe model is on trial.
+     *
+     * @param  string  $name
+     * @param  int|null  $plan
+     * @return bool
+     */
+    public function onTrial($name = 'default', $plan = null)
+    {
+        if (func_num_args() === 0 && $this->onGenericTrial()) {
+            return true;
+        }
+
+        $subscription = $this->subscription($name);
+
+        if (! $subscription || ! $subscription->onTrial()) {
+            return false;
+        }
+
+        return $plan ? $subscription->hasPlan($plan) : true;
+    }
+
+    /**
+     * Determine if the Stripe model is on a "generic" trial at the model level.
+     *
+     * @return bool
+     */
+    public function onGenericTrial()
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+    }
+
+    /**
+     * Determine if the Stripe model has a given subscription.
+     *
+     * @param  string  $name
+     * @param  int|null  $plan
+     * @return bool
+     */
+    public function subscribed($name = 'default', $plan = null)
+    {
+        $subscription = $this->subscription($name);
+
+        if (! $subscription || ! $subscription->valid()) {
+            return false;
+        }
+
+        return $plan ? $subscription->hasPlan($plan) : true;
+    }
+
+    /**
+     * Determine if the Stripe model is actively subscribed to one of the given plans.
+     *
+     * @param  int  $plan
+     * @param  string  $name
+     * @return bool
+     */
+    public function subscribedToPlan($plan, $name = 'default')
+    {
+        $subscription = $this->subscription($name);
+
+        if (! $subscription || ! $subscription->valid()) {
+            return false;
+        }
+
+        return $subscription->hasPlan($plan);
+    }
+
+    /**
+     * Determine if the entity has a valid subscription on the given plan.
+     *
+     * @param  int  $plan
+     * @return bool
+     */
+    public function onPlan($plan)
+    {
+        return ! is_null($this->subscriptions()
+            ->where('paddle_plan', $plan)
+            ->get()
+            ->first(function (Subscription $subscription) use ($plan) {
+                return $subscription->valid();
+            }));
     }
 }

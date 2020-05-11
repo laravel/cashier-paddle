@@ -19,8 +19,8 @@ class TransactionsTest extends FeatureTestCase
 
     public function test_it_can_returns_its_amount_and_currency()
     {
-        $billable = new User(['paddle_id' => 1]);
-        $transaction = new Transaction($billable, [
+        $customer = new User(['paddle_id' => 1]);
+        $transaction = new Transaction($customer, [
             'user' => ['user_id' => 1],
             'amount' => '12.45',
             'currency' => 'EUR',
@@ -34,16 +34,16 @@ class TransactionsTest extends FeatureTestCase
 
     public function test_it_can_returns_its_subscription()
     {
-        $billable = $this->createCustomer();
-        $subscription = $billable->subscriptions()->create([
+        $customer = $this->createCustomer();
+        $subscription = $customer->subscriptions()->create([
             'name' => 'default',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
             'paddle_status' => 'active',
             'quantity' => 1,
         ]);
-        $transaction = new Transaction($billable, [
-            'user' => ['user_id' => $billable->paddleId()],
+        $transaction = new Transaction($customer, [
+            'user' => ['user_id' => $customer->paddleId()],
             'is_subscription' => true,
             'subscription' => [
                 'subscription_id' => 244,

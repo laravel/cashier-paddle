@@ -66,10 +66,10 @@ class WebhookController extends Controller
             return;
         }
 
-        $user->paddle_id = $payload['user_id'];
-        $user->paddle_email = $payload['email'];
-
-        $user->save();
+        $user->forceFill([
+            'paddle_id' => $payload['user_id'],
+            'paddle_email' => $payload['email'],
+        ])->save();
 
         $subscription = $user->subscriptions()->create([
             'name' => $name,
@@ -126,15 +126,15 @@ class WebhookController extends Controller
 
         if ($subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
             // Cancellation date...
-            // if (isset($payload['cancellation_effective_date'])) {
-            //     if ($payload['cancellation_effective_date']) {
-            //         $subscription->ends_at = $subscription->onTrial()
-            //             ? $subscription->trial_ends_at
-            //             : Carbon::createFromTimestamp($payload['cancellation_effective_date']);
-            //     } else {
-            //         $subscription->ends_at = null;
-            //     }
-            // }
+            if (isset($payload['cancellation_effective_date'])) {
+                if ($payload['cancellation_effective_date']) {
+                    $subscription->ends_at = $subscription->onTrial()
+                        ? $subscription->trial_ends_at
+                        : Carbon::createFromFormat('Y-m-d', $payload['cancellation_effective_date'], 'UTC')->startOfDay();
+                } else {
+                    $subscription->ends_at = null;
+                }
+            }
 
             // Status...
             if (isset($payload['status'])) {

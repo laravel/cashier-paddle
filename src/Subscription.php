@@ -2,6 +2,7 @@
 
 namespace Laravel\Paddle;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 
@@ -39,8 +40,6 @@ class Subscription extends Model
     protected $dates = [
         'trial_ends_at',
         'ends_at',
-        'created_at',
-        'updated_at',
     ];
 
     /**
@@ -70,6 +69,218 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription has a specific plan.
+     *
+     * @param  int  $plan
+     * @return bool
+     */
+    public function hasPlan($plan)
+    {
+        return $this->paddle_plan == $plan;
+    }
+
+    /**
+     * Determine if the subscription is active, on trial, or within its grace period.
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        return $this->active() || $this->onTrial() || $this->onGracePeriod();
+    }
+
+    /**
+     * Determine if the subscription is active.
+     *
+     * @return bool
+     */
+    public function active()
+    {
+        return (is_null($this->ends_at) || $this->onGracePeriod()) &&
+            (! Cashier::$deactivatePastDue || $this->paddle_status !== self::STATUS_PAST_DUE) &&
+            $this->paddle_status !== self::STATUS_PAUSED;
+    }
+
+    /**
+     * Filter query by active.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeActive($query)
+    {
+        $query->where(function ($query) {
+            $query->whereNull('ends_at')
+                ->orWhere(function ($query) {
+                    $query->onGracePeriod();
+                });
+        })->where('stripe_status', '!=', self::STATUS_PAUSED);
+
+        if (Cashier::$deactivatePastDue) {
+            $query->where('stripe_status', '!=', self::STATUS_PAST_DUE);
+        }
+    }
+
+    /**
+     * Determine if the subscription is past due.
+     *
+     * @return bool
+     */
+    public function pastDue()
+    {
+        return $this->paddle_status === self::STATUS_PAST_DUE;
+    }
+
+    /**
+     * Filter query by past due.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopePastDue($query)
+    {
+        $query->where('paddle_status', self::STATUS_PAST_DUE);
+    }
+
+    /**
+     * Determine if the subscription is recurring and not on trial.
+     *
+     * @return bool
+     */
+    public function recurring()
+    {
+        return ! $this->onTrial() && ! $this->cancelled();
+    }
+
+    /**
+     * Filter query by recurring.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeRecurring($query)
+    {
+        $query->notOnTrial()->notCancelled();
+    }
+
+    /**
+     * Determine if the subscription is no longer active.
+     *
+     * @return bool
+     */
+    public function cancelled()
+    {
+        return ! is_null($this->ends_at);
+    }
+
+    /**
+     * Filter query by cancelled.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeCancelled($query)
+    {
+        $query->whereNotNull('ends_at');
+    }
+
+    /**
+     * Filter query by not cancelled.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeNotCancelled($query)
+    {
+        $query->whereNull('ends_at');
+    }
+
+    /**
+     * Determine if the subscription has ended and the grace period has expired.
+     *
+     * @return bool
+     */
+    public function ended()
+    {
+        return $this->cancelled() && ! $this->onGracePeriod();
+    }
+
+    /**
+     * Filter query by ended.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeEnded($query)
+    {
+        $query->cancelled()->notOnGracePeriod();
+    }
+
+    /**
+     * Determine if the subscription is within its trial period.
+     *
+     * @return bool
+     */
+    public function onTrial()
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+    }
+
+    /**
+     * Filter query by on trial.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeOnTrial($query)
+    {
+        $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '>', Carbon::now());
+    }
+
+    /**
+     * Filter query by not on trial.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeNotOnTrial($query)
+    {
+        $query->whereNull('trial_ends_at')->orWhere('trial_ends_at', '<=', Carbon::now());
+    }
+
+    /**
+     * Determine if the subscription is within its grace period after cancellation.
+     *
+     * @return bool
+     */
+    public function onGracePeriod()
+    {
+        return $this->ends_at && $this->ends_at->isFuture();
+    }
+
+    /**
+     * Filter query by on grace period.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeOnGracePeriod($query)
+    {
+        $query->whereNotNull('ends_at')->where('ends_at', '>', Carbon::now());
+    }
+
+    /**
+     * Filter query by not on grace period.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeNotOnGracePeriod($query)
+    {
+        $query->whereNull('ends_at')->orWhere('ends_at', '<=', Carbon::now());
+    }
+
+    /**
      * Perform a "one off" charge on top of the subscription for the given amount.
      *
      * @param  int  $amount
@@ -90,6 +301,8 @@ class Subscription extends Model
             'amount' => $amount,
             'charge_name' => $name,
         ]);
+
+        $this->paddleInfo = null;
 
         return Cashier::post("/subscription/{$this->paddle_id}/charge", $payload)['response'];
     }
@@ -147,9 +360,11 @@ class Subscription extends Model
             'prorate' => $this->prorate,
         ]));
 
-        $this->fill([
+        $this->forceFill([
             'quantity' => $quantity,
         ])->save();
+
+        $this->paddleInfo = null;
 
         return $this;
     }
@@ -170,9 +385,11 @@ class Subscription extends Model
             'prorate' => $this->prorate,
         ]));
 
-        $this->fill([
+        $this->forceFill([
             'paddle_plan' => $plan,
         ])->save();
+
+        $this->paddleInfo = null;
 
         return $this;
     }
@@ -203,9 +420,11 @@ class Subscription extends Model
             'pause' => true,
         ]);
 
-        $this->fill([
+        $this->forceFill([
             'paddle_status' => self::STATUS_PAUSED,
         ])->save();
+
+        $this->paddleInfo = null;
 
         return $this;
     }
@@ -221,9 +440,12 @@ class Subscription extends Model
             'pause' => false,
         ]);
 
-        $this->fill([
+        $this->forceFill([
             'paddle_status' => self::STATUS_ACTIVE,
+            'ends_at' => null,
         ])->save();
+
+        $this->paddleInfo = null;
 
         return $this;
     }
@@ -240,7 +462,11 @@ class Subscription extends Model
             'subscription_id' => $this->paddle_id,
         ], $options));
 
-        return Cashier::post('/subscription/users/update', $payload)['response'];
+        $response = Cashier::post('/subscription/users/update', $payload)['response'];
+
+        $this->paddleInfo = null;
+
+        return $response;
     }
 
     /**
@@ -260,15 +486,51 @@ class Subscription extends Model
      */
     public function cancel()
     {
+        $nextPayment = $this->nextPayment();
+
         $payload = $this->owner->paddleOptions([
             'subscription_id' => $this->paddle_id,
         ]);
 
         Cashier::post('/subscription/users_cancel', $payload);
 
-        $this->fill([
-            'paddle_status' => self::STATUS_DELETED,
+        $this->paddle_status = self::STATUS_DELETED;
+
+        // If the user was on trial, we will set the grace period to end when the trial
+        // would have ended. Otherwise, we'll retrieve the end of the billing period
+        // period and make that the end of the grace period for this current user.
+        if ($this->onTrial()) {
+            $this->ends_at = $this->trial_ends_at;
+        } else {
+            $this->ends_at = $nextPayment->date();
+        }
+
+        $this->save();
+
+        $this->paddleInfo = null;
+
+        return $this;
+    }
+
+    /**
+     * Cancel the subscription immediately.
+     *
+     * @return $this
+     */
+    public function cancelNow()
+    {
+        $payload = $this->owner->paddleOptions([
+            'subscription_id' => $this->paddle_id,
+        ]);
+
+        Cashier::post('/subscription/users_cancel', $payload);
+
+        $this->forceFill([
+            'stripe_status' => self::STATUS_DELETED,
+            'ends_at' => Carbon::now(),
         ])->save();
+
+        $this->paddleInfo = null;
 
         return $this;
     }
@@ -322,10 +584,14 @@ class Subscription extends Model
     /**
      * Get the next payment for the subscription.
      *
-     * @return \Laravel\Paddle\Payment
+     * @return \Laravel\Paddle\Payment|null
      */
     public function nextPayment()
     {
+        if (! isset($this->paddleInfo()['next_payment'])) {
+            return null;
+        }
+
         $payment = $this->paddleInfo()['next_payment'];
 
         return new Payment($payment['amount'], $payment['currency'], $payment['date']);
