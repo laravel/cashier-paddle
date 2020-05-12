@@ -2,13 +2,13 @@
 
 namespace Laravel\Paddle\Http\Controllers;
 
+use Carbon\Carbon;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -106,6 +106,13 @@ class WebhookController extends Controller
             // Quantity...
             if (isset($payload['quantity'])) {
                 $subscription->quantity = $payload['quantity'];
+            }
+
+            // Paused...
+            if (isset($payload['paused_from'])) {
+                $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:m', $payload['paused_from'], 'UTC');
+            } else {
+                $subscription->paused_from = null;
             }
 
             $subscription->save();

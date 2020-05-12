@@ -39,6 +39,7 @@ class Subscription extends Model
      */
     protected $dates = [
         'trial_ends_at',
+        'paused_from',
         'ends_at',
     ];
 
@@ -86,7 +87,7 @@ class Subscription extends Model
      */
     public function valid()
     {
-        return $this->active() || $this->onTrial() || $this->onGracePeriod();
+        return $this->active() || $this->onTrial() || $this->onPausedGracePeriod() || $this->onGracePeriod();
     }
 
     /**
@@ -96,7 +97,7 @@ class Subscription extends Model
      */
     public function active()
     {
-        return (is_null($this->ends_at) || $this->onGracePeriod()) &&
+        return (is_null($this->ends_at) || $this->onGracePeriod() || $this->onPausedGracePeriod()) &&
             (! Cashier::$deactivatePastDue || $this->paddle_status !== self::STATUS_PAST_DUE) &&
             $this->paddle_status !== self::STATUS_PAUSED;
     }
@@ -113,6 +114,9 @@ class Subscription extends Model
             $query->whereNull('ends_at')
                 ->orWhere(function ($query) {
                     $query->onGracePeriod();
+                })
+                ->orWhere(function ($query) {
+                    $query->onPausedGracePeriod();
                 });
         })->where('stripe_status', '!=', self::STATUS_PAUSED);
 
@@ -149,7 +153,7 @@ class Subscription extends Model
      */
     public function recurring()
     {
-        return ! $this->onTrial() && ! $this->cancelled();
+        return ! $this->onTrial() && ! $this->paused() && ! $this->onPausedGracePeriod() && ! $this->cancelled();
     }
 
     /**
@@ -161,6 +165,70 @@ class Subscription extends Model
     public function scopeRecurring($query)
     {
         $query->notOnTrial()->notCancelled();
+    }
+
+    /**
+     * Determine if the subscription is paused.
+     *
+     * @return bool
+     */
+    public function paused()
+    {
+        return $this->paddle_status === self::STATUS_PAUSED;
+    }
+
+    /**
+     * Filter query by paused.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopePaused($query)
+    {
+        $query->where('paddle_status', self::STATUS_PAUSED);
+    }
+
+    /**
+     * Filter query by not paused.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeNotPaused($query)
+    {
+        $query->where('paddle_status', '!=', self::STATUS_PAUSED);
+    }
+
+    /**
+     * Determine if the subscription is within its grace period after being paused.
+     *
+     * @return bool
+     */
+    public function onPausedGracePeriod()
+    {
+        return $this->paused_from && $this->paused_from->isFuture();
+    }
+
+    /**
+     * Filter query by on trial grace period.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeOnPausedGracePeriod($query)
+    {
+        $query->whereNotNull('paused_from')->where('paused_from', '>', Carbon::now());
+    }
+
+    /**
+     * Filter query by not on trial grace period.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeNotOnPausedGracePeriod($query)
+    {
+        $query->whereNull('paused_from')->orWhere('paused_from', '<=', Carbon::now());
     }
 
     /**

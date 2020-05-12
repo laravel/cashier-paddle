@@ -3,6 +3,7 @@
 namespace Laravel\Paddle;
 
 use Carbon\Carbon;
+use Spatie\Url\Url;
 
 class SubscriptionBuilder
 {
@@ -56,6 +57,13 @@ class SubscriptionBuilder
     protected $coupon;
 
     /**
+     * The return url which will be triggered upon starting the subscription.
+     *
+     * @var string|null
+     */
+    protected $returnTo;
+
+    /**
      * Create a new subscription builder instance.
      *
      * @param  \Laravel\Paddle\Billable  $owner
@@ -97,19 +105,6 @@ class SubscriptionBuilder
     }
 
     /**
-     * Specify the ending date of the trial.
-     *
-     * @param  \Carbon\Carbon|\Carbon\CarbonInterface  $trialUntil
-     * @return $this
-     */
-    public function trialUntil($trialUntil)
-    {
-        $this->trialDays = Carbon::now()->diffInDays($trialUntil);
-
-        return $this;
-    }
-
-    /**
      * Force the trial to end immediately.
      *
      * @return $this
@@ -130,6 +125,21 @@ class SubscriptionBuilder
     public function withCoupon($coupon)
     {
         $this->coupon = $coupon;
+
+        return $this;
+    }
+
+    /**
+     * The return url which will be triggered upon starting the subscription.
+     *
+     * @param  string  $returnTo
+     * @param  string  $checkoutParameter
+     * @return $this
+     */
+    public function returnTo($returnTo, $checkoutParameter = 'checkout')
+    {
+        $this->returnTo = (string) Url::fromString($returnTo)
+            ->withQueryParameter($checkoutParameter, '{checkout_hash}');
 
         return $this;
     }
@@ -163,6 +173,7 @@ class SubscriptionBuilder
         return  [
             'coupon_code' => (string) $this->coupon,
             'quantity' => $this->quantity,
+            'return_url' => $this->returnTo,
         ];
     }
 

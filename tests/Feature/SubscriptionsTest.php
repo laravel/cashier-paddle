@@ -31,6 +31,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->valid());
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->onTrial());
+        $this->assertFalse($subscription->paused());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
         $this->assertTrue($subscription->recurring());
@@ -73,6 +74,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->valid());
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->onTrial());
+        $this->assertFalse($subscription->paused());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
         $this->assertFalse($subscription->recurring());
@@ -95,6 +97,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->valid());
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->onTrial());
+        $this->assertFalse($subscription->paused());
         $this->assertTrue($subscription->cancelled());
         $this->assertTrue($subscription->onGracePeriod());
         $this->assertFalse($subscription->recurring());
@@ -117,9 +120,55 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($subscription->valid());
         $this->assertFalse($subscription->active());
         $this->assertFalse($subscription->onTrial());
+        $this->assertFalse($subscription->paused());
         $this->assertTrue($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
         $this->assertFalse($subscription->recurring());
         $this->assertTrue($subscription->ended());
+    }
+
+    public function test_customers_can_check_if_the_subscription_is_paused()
+    {
+        $customer = $this->createCustomer('taylor');
+
+        $subscription = $customer->subscriptions()->create([
+            'name' => 'main',
+            'paddle_id' => 244,
+            'paddle_plan' => 2323,
+            'paddle_status' => Subscription::STATUS_PAUSED,
+            'quantity' => 1,
+        ]);
+
+        $this->assertFalse($subscription->valid());
+        $this->assertFalse($subscription->active());
+        $this->assertFalse($subscription->onTrial());
+        $this->assertTrue($subscription->paused());
+        $this->assertFalse($subscription->cancelled());
+        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
+    }
+
+    public function test_subscriptions_can_be_on_a_paused_grace_period()
+    {
+        $customer = $this->createCustomer('taylor');
+
+        $subscription = $customer->subscriptions()->create([
+            'name' => 'main',
+            'paddle_id' => 244,
+            'paddle_plan' => 2323,
+            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'quantity' => 1,
+            'paused_from' => Carbon::tomorrow(),
+        ]);
+
+        $this->assertTrue($subscription->valid());
+        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->onTrial());
+        $this->assertFalse($subscription->paused());
+        $this->assertFalse($subscription->cancelled());
+        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
     }
 }

@@ -24,6 +24,7 @@ class CreateSubscriptionsTable extends Migration
             $table->integer('paddle_plan');
             $table->integer('quantity');
             $table->timestamp('trial_ends_at')->nullable();
+            $table->timestamp('paused_from')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();
 
