@@ -85,7 +85,7 @@ class Cashier
      * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
-    public static function prices($products, array $options = [])
+    public static function productPrices($products, array $options = [])
     {
         $payload = array_merge($options, [
             'product_ids' => implode(',', (array) $products),
@@ -94,7 +94,7 @@ class Cashier
         $response = static::get('/prices', $payload)['response'];
 
         return collect($response['products'])->map(function (array $product) use ($response) {
-            return new ProductPrices($response['customer_country'], $product);
+            return new ProductPrice($response['customer_country'], $product);
         });
     }
 
@@ -117,7 +117,7 @@ class Cashier
      *
      * @throws \Laravel\Paddle\Exceptions\PaddleException
      */
-    public static function get($uri, array $payload)
+    public static function get($uri, array $payload = [])
     {
         return static::makeApiCall('get', static::CHECKOUT_URL.'/api/2.0'.$uri, $payload);
     }
@@ -131,7 +131,7 @@ class Cashier
      *
      * @throws \Laravel\Paddle\Exceptions\PaddleException
      */
-    public static function post($uri, array $payload)
+    public static function post($uri, array $payload = [])
     {
         return static::makeApiCall('post', static::VENDORS_URL.'/api/2.0'.$uri, $payload);
     }
@@ -146,7 +146,7 @@ class Cashier
      *
      * @throws \Laravel\Paddle\Exceptions\PaddleException
      */
-    protected static function makeApiCall($method, $uri, array $payload)
+    protected static function makeApiCall($method, $uri, array $payload = [])
     {
         $response = Http::$method($uri, $payload);
 

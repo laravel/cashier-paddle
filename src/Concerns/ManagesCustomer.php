@@ -34,13 +34,13 @@ trait ManagesCustomer
      * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
-    public function prices($products, array $options = [])
+    public function productPrices($products, array $options = [])
     {
         $options = array_merge([
             'customer_country' => $this->paddleCountry(),
         ], $options);
 
-        return Cashier::prices($products, $options);
+        return Cashier::productPrices($products, $options);
     }
 
     /**

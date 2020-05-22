@@ -15,16 +15,6 @@ trait Billable
     use PerformsCharges;
 
     /**
-     * Get the Stripe supported currency used by the entity.
-     *
-     * @return string
-     */
-    public function preferredCurrency()
-    {
-        return config('cashier.currency');
-    }
-
-    /**
      * Get the default Stripe API options for the current Billable model.
      *
      * @param  array  $options

@@ -2,11 +2,11 @@
 
 namespace Tests\Unit;
 
-use Laravel\Paddle\ProductPrices;
+use Laravel\Paddle\ProductPrice;
 use Money\Currency;
 use PHPUnit\Framework\TestCase;
 
-class ProductPricesTest extends TestCase
+class ProductPriceTest extends TestCase
 {
     public function it_can_return_its_country()
     {
@@ -41,11 +41,11 @@ class ProductPricesTest extends TestCase
      * Get a test product object.
      *
      * @param  array  $product
-     * @return \Laravel\Paddle\ProductPrices
+     * @return \Laravel\Paddle\ProductPrice
      */
     private function product(array $product = [])
     {
-        return new ProductPrices('BE', array_merge([
+        return new ProductPrice('BE', array_merge([
             'product_id' => 232,
             'product_title' => 232,
             'currency' => 'EUR',

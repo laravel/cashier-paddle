@@ -10,7 +10,7 @@ trait PerformsCharges
     /**
      * Generate a pay link for a "one off" charge on the customer for the given amount.
      *
-     * @param  int  $amount
+     * @param  int|array  $amount
      * @param  string  $title
      * @param  array  $options
      * @return string
@@ -26,9 +26,7 @@ trait PerformsCharges
         return $this->generatePayLink(array_merge([
             'title' => $title,
             'webhook_url' => Cashier::webhookUrl(),
-            'prices' => [
-                'EUR:'.$amount,
-            ],
+            'prices' => is_array($amount) ? $amount : [config('cashier.currency').':'.$amount],
         ], $options, $this->paddleOptions()));
     }
 

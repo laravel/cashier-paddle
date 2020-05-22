@@ -151,7 +151,7 @@ class SubscriptionBuilder
      */
     public function create(array $options = [])
     {
-        $payload = $this->buildPayload();
+        $payload = array_merge($this->buildPayload(), $options);
 
         if (! is_null($trialDays = $this->getTrialEndForPayload())) {
             $payload['trial_days'] = $trialDays;
@@ -159,11 +159,16 @@ class SubscriptionBuilder
             // Paddle will immediately charge the plan price for the trial days
             // so we'll need to explicitly set the prices to 0 for the first charge.
             if ($trialDays !== 0) {
-                $payload['prices'] = ['EUR:0'];
+                $prices = $payload['prices'] ?? $this->getPlanPricesForPayload();
+                $payload['prices'] = [];
+
+                foreach ($prices as $key => $price) {
+                    [$currency] = explode(':', $price);
+
+                    $payload['prices'][] = $currency.':0';
+                }
             }
         }
-
-        $payload = array_merge($payload, $options);
 
         $payload['passthrough'] = "{$this->billable->getAuthIdentifier()},{$this->name}";
 
@@ -177,7 +182,7 @@ class SubscriptionBuilder
      */
     protected function buildPayload()
     {
-        return  [
+        return [
             'coupon_code' => (string) $this->coupon,
             'quantity' => $this->quantity,
             'return_url' => $this->returnTo,
@@ -196,5 +201,24 @@ class SubscriptionBuilder
         }
 
         return $this->trialDays;
+    }
+
+    /**
+     * Get the plan prices for the Paddle payload.
+     *
+     * @return array
+     */
+    protected function getPlanPricesForPayload()
+    {
+        $plan = Cashier::post(
+            '/subscription/plans', $this->billable->paddleOptions(['plan' => $this->plan])
+        )['response'][0];
+
+        return collect($plan['initial_price'])
+            ->map(function ($price, $currency) {
+                return "$currency:$price";
+            })
+            ->values()
+            ->all();
     }
 }

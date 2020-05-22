@@ -7,7 +7,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Money\Currency;
 
-class ProductPrices implements Arrayable, Jsonable, JsonSerializable
+class ProductPrice implements Arrayable, Jsonable, JsonSerializable
 {
     /**
      * The customer's country for the prices.
