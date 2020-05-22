@@ -2,7 +2,6 @@
 
 namespace Laravel\Paddle;
 
-use Carbon\Carbon;
 use Spatie\Url\Url;
 
 class SubscriptionBuilder
@@ -152,11 +151,19 @@ class SubscriptionBuilder
      */
     public function create(array $options = [])
     {
-        $payload = array_merge($this->buildPayload(), $options);
+        $payload = $this->buildPayload();
 
         if (! is_null($trialDays = $this->getTrialEndForPayload())) {
             $payload['trial_days'] = $trialDays;
+
+            // Paddle will immediately charge the plan price for the trial days
+            // so we'll need to explicitly set the prices to 0 for the first charge.
+            if ($trialDays !== 0) {
+                $payload['prices'] = ['EUR:0'];
+            }
         }
+
+        $payload = array_merge($payload, $options);
 
         $payload['passthrough'] = "{$this->billable->getAuthIdentifier()},{$this->name}";
 

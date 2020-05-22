@@ -20,18 +20,18 @@ class Cashier
     const VERSION = '0.1.0-dev';
 
     /**
-     * The Paddle base Checkout URL.
+     * The Paddle checkout URL.
      *
      * @var string
      */
-    const BASE_URL = 'https://sandbox-checkout.paddle.com';
+    const CHECKOUT_URL = 'https://sandbox-checkout.paddle.com';
 
     /**
-     * The Paddle base endpoint for API calls.
+     * The Paddle vendors URL.
      *
      * @var string
      */
-    const API_ENDPOINT = 'https://sandbox-vendors.paddle.com/api/2.0';
+    const VENDORS_URL = 'https://sandbox-vendors.paddle.com';
 
     /**
      * The custom currency formatter.
@@ -79,6 +79,26 @@ class Cashier
     }
 
     /**
+     * Get prices for a set of product ids.
+     *
+     * @param  array|int  $products
+     * @param  array  $options
+     * @return \Illuminate\Support\Collection
+     */
+    public static function prices($products, array $options = [])
+    {
+        $payload = array_merge($options, [
+            'product_ids' => implode(',', (array) $products),
+        ]);
+
+        $response = static::get('/prices', $payload)['response'];
+
+        return collect($response['products'])->map(function (array $product) use ($response) {
+            return new ProductPrices($response['customer_country'], $product);
+        });
+    }
+
+    /**
      * Get the Paddle webhook url.
      *
      * @return string
@@ -86,6 +106,20 @@ class Cashier
     public static function webhookUrl()
     {
         return config('cashier.webhook') ?? route('cashier.webhook');
+    }
+
+    /**
+     * Perform a GET Paddle API call.
+     *
+     * @param  string  $uri
+     * @param  array  $payload
+     * @return \Illuminate\Http\Client\Response
+     *
+     * @throws \Laravel\Paddle\Exceptions\PaddleException
+     */
+    public static function get($uri, array $payload)
+    {
+        return static::makeApiCall('get', static::CHECKOUT_URL.'/api/2.0'.$uri, $payload);
     }
 
     /**
@@ -99,12 +133,13 @@ class Cashier
      */
     public static function post($uri, array $payload)
     {
-        return static::makeApiCall('post', $uri, $payload);
+        return static::makeApiCall('post', static::VENDORS_URL.'/api/2.0'.$uri, $payload);
     }
 
     /**
      * Perform a Paddle API call.
      *
+     * @param  string  $method
      * @param  string  $uri
      * @param  array  $payload
      * @return \Illuminate\Http\Client\Response
@@ -113,7 +148,7 @@ class Cashier
      */
     protected static function makeApiCall($method, $uri, array $payload)
     {
-        $response = Http::$method(Cashier::API_ENDPOINT.$uri, $payload);
+        $response = Http::$method($uri, $payload);
 
         if ($response['success'] === false) {
             throw new PaddleException($response['error']['message'], $response['error']['code']);

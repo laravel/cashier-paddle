@@ -3,10 +3,13 @@
 namespace Laravel\Paddle;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use JsonSerializable;
 use Laravel\Paddle\Exceptions\InvalidTransaction;
 use Money\Currency;
 
-class Transaction
+class Transaction implements Arrayable, Jsonable, JsonSerializable
 {
     const STATUS_COMPLETED = 'completed';
     const STATUS_REFUNDED = 'refunded';
@@ -149,6 +152,37 @@ class Transaction
     public function isOneOff()
     {
         return $this->transaction['is_one_off'];
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->transaction;
+    }
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toJson($options = 0)
+    {
+        return json_encode($this->jsonSerialize(), $options);
+    }
+
+    /**
+     * Convert the object into something JSON serializable.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 
     /**

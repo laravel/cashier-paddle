@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use Carbon\Carbon;
 use Laravel\Paddle\Exceptions\InvalidTransaction;
 use Laravel\Paddle\Transaction;
+use Money\Currency;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixtures\User;
 
@@ -37,6 +38,19 @@ class TransactionTest extends TestCase
         ]);
 
         $this->assertSame($billable, $transaction->user());
+    }
+
+    public function it_can_return_its_currency()
+    {
+        $billable = new User(['paddle_id' => 1]);
+        $transaction = new Transaction($billable, [
+            'user' => ['user_id' => 1],
+            'currency' => 'EUR',
+        ]);
+        $currency = $transaction->currency();
+
+        $this->assertInstanceOf(Currency::class, $currency);
+        $this->assertInstanceOf('EUR', $currency->getCode());
     }
 
     public function test_it_can_returns_its_receipt_url()
@@ -86,5 +100,19 @@ class TransactionTest extends TestCase
 
         $this->assertFalse($transaction->isSubscription());
         $this->assertTrue($transaction->isOneOff());
+    }
+
+    public function test_it_implements_arrayable_and_jsonable()
+    {
+        $billable = new User(['paddle_id' => 1]);
+        $transaction = new Transaction($billable, $data =[
+            'user' => ['user_id' => 1],
+            'is_subscription' => false,
+            'is_one_off' => true,
+        ]);
+
+        $this->assertSame($data, $transaction->toArray());
+        $this->assertSame($data, $transaction->jsonSerialize());
+        $this->assertSame(json_encode($data), $transaction->toJson());
     }
 }

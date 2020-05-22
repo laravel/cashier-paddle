@@ -2,6 +2,7 @@
 
 namespace Laravel\Paddle\Concerns;
 
+use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Exceptions\InvalidCustomer;
 
 trait ManagesCustomer
@@ -24,6 +25,22 @@ trait ManagesCustomer
     public function hasPaddleId()
     {
         return ! is_null($this->paddleId());
+    }
+
+    /**
+     * Get prices for a set of product ids for this customer.
+     *
+     * @param  array|int  $products
+     * @param  array  $options
+     * @return \Illuminate\Support\Collection
+     */
+    public function prices($products, array $options = [])
+    {
+        $options = array_merge([
+            'customer_country' => $this->paddleCountry(),
+        ], $options);
+
+        return Cashier::prices($products, $options);
     }
 
     /**
