@@ -78,6 +78,8 @@ class WebhookController extends Controller
             'paddle_status' => $payload['status'],
             'quantity' => $payload['quantity'],
         ]);
+
+        $subscription->syncPaymentInformation()->save();
     }
 
     /**

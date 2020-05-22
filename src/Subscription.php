@@ -697,4 +697,23 @@ class Subscription extends Model
             return new Transaction($this->owner, $transaction);
         });
     }
+
+    /**
+     * Sync the payment information from Paddle with the subscription.
+     *
+     * @return $this
+     */
+    public function syncPaymentInformation()
+    {
+        $info = $this->paddleInfo()['payment_information'];
+
+        if ($info['payment_method'] === 'card') {
+            $this->card_brand = $info['card_type'];
+            $this->card_last_four = $info['last_four_digits'];
+        }
+
+        $this->save();
+
+        return $this;
+    }
 }
