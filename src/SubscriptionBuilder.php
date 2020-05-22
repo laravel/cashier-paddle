@@ -170,7 +170,10 @@ class SubscriptionBuilder
             }
         }
 
-        $payload['passthrough'] = "{$this->billable->getAuthIdentifier()},{$this->name}";
+        $payload['passthrough'] = json_encode([
+            'customer_id' => $this->billable->getAuthIdentifier(),
+            'subscription_name' => $this->name,
+        ]);
 
         return $this->billable->chargeProduct($this->plan, $payload);
     }

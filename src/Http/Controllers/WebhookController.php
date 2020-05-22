@@ -58,11 +58,11 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionCreated(array $payload)
     {
-        [$userId, $name] = explode(',', $payload['passthrough']);
+        $passthrough = json_decode($payload['passthrough'], true);
 
         $model = config('cashier.model');
 
-        if (! $user = (new $model)->find($userId)) {
+        if (! $user = (new $model)->find($passthrough['customer_id'])) {
             return;
         }
 
@@ -72,7 +72,7 @@ class WebhookController extends Controller
         ])->save();
 
         $subscription = $user->subscriptions()->create([
-            'name' => $name,
+            'name' => $passthrough['subscription_name'],
             'paddle_id' => $payload['subscription_id'],
             'paddle_plan' => $payload['subscription_plan_id'],
             'paddle_status' => $payload['status'],
