@@ -31,8 +31,6 @@ class CreateCustomerColumns extends Migration
             $table->dropColumn([
                 'paddle_id',
                 'paddle_email',
-                'card_brand',
-                'card_last_four',
                 'trial_ends_at',
             ]);
         });
