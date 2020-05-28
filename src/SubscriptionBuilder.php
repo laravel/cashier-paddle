@@ -56,6 +56,13 @@ class SubscriptionBuilder
     protected $coupon;
 
     /**
+     * The metadata to apply to the subscription.
+     *
+     * @var array|null
+     */
+    protected $metadata;
+
+    /**
      * The return url which will be triggered upon starting the subscription.
      *
      * @var string|null
@@ -129,6 +136,19 @@ class SubscriptionBuilder
     }
 
     /**
+     * The metadata to apply to a new subscription.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function withMetadata($metadata)
+    {
+        $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    /**
      * The return url which will be triggered upon starting the subscription.
      *
      * @param  string  $returnTo
@@ -170,10 +190,10 @@ class SubscriptionBuilder
             }
         }
 
-        $payload['passthrough'] = json_encode([
+        $payload['passthrough'] = json_encode(array_merge($this->metadata, [
             'customer_id' => $this->billable->getAuthIdentifier(),
             'subscription_name' => $this->name,
-        ]);
+        ]));
 
         return $this->billable->chargeProduct($this->plan, $payload);
     }
