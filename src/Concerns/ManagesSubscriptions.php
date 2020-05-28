@@ -20,7 +20,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Get all of the subscriptions for the Stripe model.
+     * Get all of the subscriptions for the Paddle model.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -41,7 +41,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the Stripe model is on trial.
+     * Determine if the Paddle model is on trial.
      *
      * @param  string  $name
      * @param  int|null  $plan
@@ -63,7 +63,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the Stripe model is on a "generic" trial at the model level.
+     * Determine if the Paddle model is on a "generic" trial at the model level.
      *
      * @return bool
      */
@@ -73,7 +73,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the Stripe model has a given subscription.
+     * Determine if the Paddle model has a given subscription.
      *
      * @param  string  $name
      * @param  int|null  $plan
@@ -91,7 +91,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the Stripe model is actively subscribed to one of the given plans.
+     * Determine if the Paddle model is actively subscribed to one of the given plans.
      *
      * @param  int  $plan
      * @param  string  $name

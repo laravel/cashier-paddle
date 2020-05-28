@@ -38,7 +38,7 @@ class ProductPriceTest extends TestCase
     }
 
     /**
-     * Get a test product object.
+     * Get a test product price object.
      *
      * @param  array  $product
      * @return \Laravel\Paddle\ProductPrice

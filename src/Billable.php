@@ -15,7 +15,7 @@ trait Billable
     use PerformsCharges;
 
     /**
-     * Get the default Stripe API options for the current Billable model.
+     * Get the default Paddle API options for the current Billable model.
      *
      * @param  array  $options
      * @return array

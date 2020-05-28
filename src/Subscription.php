@@ -118,10 +118,10 @@ class Subscription extends Model
                 ->orWhere(function ($query) {
                     $query->onPausedGracePeriod();
                 });
-        })->where('stripe_status', '!=', self::STATUS_PAUSED);
+        })->where('paddle_status', '!=', self::STATUS_PAUSED);
 
         if (Cashier::$deactivatePastDue) {
-            $query->where('stripe_status', '!=', self::STATUS_PAST_DUE);
+            $query->where('paddle_status', '!=', self::STATUS_PAST_DUE);
         }
     }
 
@@ -351,7 +351,7 @@ class Subscription extends Model
     /**
      * Perform a "one off" charge on top of the subscription for the given amount.
      *
-     * @param  int  $amount
+     * @param  float  $amount
      * @param  string  $name
      * @return array
      *
@@ -594,7 +594,7 @@ class Subscription extends Model
         Cashier::post('/subscription/users_cancel', $payload);
 
         $this->forceFill([
-            'stripe_status' => self::STATUS_DELETED,
+            'paddle_status' => self::STATUS_DELETED,
             'ends_at' => Carbon::now(),
         ])->save();
 

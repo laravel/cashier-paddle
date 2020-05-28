@@ -58,9 +58,9 @@ class SubscriptionBuilder
     /**
      * The metadata to apply to the subscription.
      *
-     * @var array|null
+     * @var array
      */
-    protected $metadata;
+    protected $metadata = [];
 
     /**
      * The return url which will be triggered upon starting the subscription.
@@ -141,7 +141,7 @@ class SubscriptionBuilder
      * @param  array  $metadata
      * @return $this
      */
-    public function withMetadata($metadata)
+    public function withMetadata(array $metadata)
     {
         $this->metadata = $metadata;
 

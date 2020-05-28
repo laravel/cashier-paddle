@@ -10,7 +10,7 @@ trait PerformsCharges
     /**
      * Generate a pay link for a "one off" charge on the customer for the given amount.
      *
-     * @param  int|array  $amount
+     * @param  float|array  $amount
      * @param  string  $title
      * @param  array  $options
      * @return string
@@ -67,7 +67,7 @@ trait PerformsCharges
      * Refund a given order.
      *
      * @param  int  $orderId
-     * @param  int|null  $amount
+     * @param  float|null  $amount
      * @param  string  $reason
      * @return int
      */

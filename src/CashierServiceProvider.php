@@ -5,6 +5,7 @@ namespace Laravel\Paddle;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Paddle\Components\Checkout;
 
 class CashierServiceProvider extends ServiceProvider
 {
@@ -117,5 +118,6 @@ class CashierServiceProvider extends ServiceProvider
     protected function bootComponents()
     {
         Blade::component('cashier::components.button', 'paddle-button');
+        Blade::component(Checkout::class, 'paddle-checkout');
     }
 }
