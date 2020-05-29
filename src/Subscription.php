@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Paddle\Concerns\Prorates;
+use LogicException;
 
 class Subscription extends Model
 {
@@ -352,8 +353,6 @@ class Subscription extends Model
      * @return array
      *
      * @throws \Exception
-     *
-     * @todo Think about return type here.
      */
     public function charge($amount, $name)
     {
@@ -442,7 +441,9 @@ class Subscription extends Model
      */
     public function swap($plan, array $options = [])
     {
-        // Todo protect against paused and past_due subscriptions.
+        if ($this->paused() || $this->pastDue()) {
+            throw new LogicException('Cannot swap plans for paused or past due subscriptions.');
+        }
 
         $this->updatePaddleSubscription(array_merge($options, [
             'plan_id' => $plan,
