@@ -23,14 +23,4 @@ class ChargesTest extends FeatureTestCase
 
         $this->assertStringContainsString(Cashier::CHECKOUT_URL.'/checkout/custom/', $url);
     }
-
-    // This doesn't works atm because we don't have a order.
-    // public function test_customers_can_refund_a_product_charge_link()
-    // {
-    //     $customer = $this->createCustomer();
-    //
-    //     $result = $customer->refund($_ENV['PADDLE_TEST_ORDER']);
-    //
-    //     $this->assertTrue($result);
-    // }
 }

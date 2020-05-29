@@ -20,6 +20,8 @@ abstract class FeatureTestCase extends TestCase
     protected function createCustomer($description = 'taylor', $options = []): User
     {
         return User::create(array_merge([
+            'paddle_id' => $_ENV['PADDLE_TEST_CUSTOMER_ID'],
+            'paddle_email' => $_ENV['PADDLE_TEST_CUSTOMER_EMAIL'],
             'email' => "{$description}@paddle-test.com",
             'name' => 'Taylor Otwell',
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',

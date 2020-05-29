@@ -477,7 +477,6 @@ class Subscription extends Model
      * Pause the subscription.
      *
      * @return $this
-     * @todo The webhook for this returns a "paused_from" timestamp so pausing is delayed it seems.
      */
     public function pause()
     {

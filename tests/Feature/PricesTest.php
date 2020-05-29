@@ -9,9 +9,8 @@ class PricesTest extends FeatureTestCase
 {
     public function test_it_can_fetch_the_prices_of_products()
     {
-        $prices = Cashier::productPrices([1516, 1515]);
+        $prices = Cashier::productPrices([$_ENV['PADDLE_TEST_SUBSCRIPTION']]);
 
-        $this->assertCount(2, $prices);
         $this->assertContainsOnlyInstancesOf(ProductPrice::class, $prices->all());
     }
 }

@@ -1,10 +1,10 @@
 name: tests
 
 on:
-#  push:
+  push:
   pull_request:
-#  schedule:
-#    - cron: '0 0 * * *'
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   tests:
@@ -41,4 +41,10 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
         env:
-          STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+          PADDLE_VENDOR_ID: ${{ secrets.PADDLE_VENDOR_ID }}
+          PADDLE_VENDOR_AUTH_CODE: ${{ secrets.PADDLE_VENDOR_AUTH_CODE }}
+          PADDLE_PUBLIC_KEY: ${{ secrets.PADDLE_PUBLIC_KEY }}
+          PADDLE_TEST_CUSTOMER_ID: ${{ secrets.PADDLE_TEST_CUSTOMER_ID }}
+          PADDLE_TEST_CUSTOMER_EMAIL: ${{ secrets.PADDLE_TEST_CUSTOMER_EMAIL }}
+          PADDLE_TEST_PRODUCT: ${{ secrets.PADDLE_TEST_PRODUCT }}
+          PADDLE_TEST_SUBSCRIPTION: ${{ secrets.PADDLE_TEST_SUBSCRIPTION }}
