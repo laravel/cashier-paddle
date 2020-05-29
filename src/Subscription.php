@@ -485,8 +485,11 @@ class Subscription extends Model
             'pause' => true,
         ]);
 
+        $info = $this->paddleInfo();
+
         $this->forceFill([
-            'paddle_status' => self::STATUS_PAUSED,
+            'paddle_status' => $info['state'],
+            'paused_from' => Carbon::createFromFormat('Y-m-d H:i:m', $info['paused_from'], 'UTC'),
         ])->save();
 
         $this->paddleInfo = null;
