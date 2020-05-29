@@ -418,6 +418,10 @@ class Subscription extends Model
      */
     public function updateQuantity($quantity, array $options = [])
     {
+        if ($this->paused() || $this->pastDue()) {
+            throw new LogicException('Cannot update quantities for paused or past due subscriptions.');
+        }
+
         $this->updatePaddleSubscription(array_merge($options, [
             'quantity' => $quantity,
             'prorate' => $this->prorate,
