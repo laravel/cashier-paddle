@@ -423,7 +423,7 @@ class Subscription extends Model
      */
     public function updateQuantity($quantity, array $options = [])
     {
-        $this->updateInPaddle(array_merge($options, [
+        $this->updatePaddleSubscription(array_merge($options, [
             'quantity' => $quantity,
             'prorate' => $this->prorate,
         ]));
@@ -448,7 +448,7 @@ class Subscription extends Model
     {
         // Todo protect against paused and past_due subscriptions.
 
-        $this->updateInPaddle(array_merge($options, [
+        $this->updatePaddleSubscription(array_merge($options, [
             'plan_id' => $plan,
             'prorate' => $this->prorate,
         ]));
@@ -484,7 +484,7 @@ class Subscription extends Model
      */
     public function pause()
     {
-        $this->updateInPaddle([
+        $this->updatePaddleSubscription([
             'pause' => true,
         ]);
 
@@ -504,7 +504,7 @@ class Subscription extends Model
      */
     public function resume()
     {
-        $this->updateInPaddle([
+        $this->updatePaddleSubscription([
             'pause' => false,
         ]);
 
@@ -519,12 +519,12 @@ class Subscription extends Model
     }
 
     /**
-     * Update the subscription.
+     * Update the underlying Paddle subscription information for the model.
      *
      * @param  array  $options
      * @return array
      */
-    public function updateInPaddle(array $options)
+    public function updatePaddleSubscription(array $options)
     {
         $payload = $this->owner->paddleOptions(array_merge([
             'subscription_id' => $this->paddle_id,
