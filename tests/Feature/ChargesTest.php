@@ -19,7 +19,7 @@ class ChargesTest extends FeatureTestCase
     {
         $customer = $this->createCustomer();
 
-        $url = $customer->chargeProduct($_ENV['PADDLE_TEST_PRODUCT']);
+        $url = $customer->chargeProduct($_SERVER['PADDLE_TEST_PRODUCT']);
 
         $this->assertStringContainsString(Cashier::CHECKOUT_URL.'/checkout/custom/', $url);
     }
