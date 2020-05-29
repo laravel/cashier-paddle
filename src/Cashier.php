@@ -13,13 +13,6 @@ use NumberFormatter;
 class Cashier
 {
     /**
-     * The Cashier Paddle library version.
-     *
-     * @var string
-     */
-    const VERSION = '0.1.0-dev';
-
-    /**
      * The Paddle checkout URL.
      *
      * @var string
