@@ -5,9 +5,12 @@ namespace Laravel\Paddle;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Paddle\Concerns\Prorates;
 
 class Subscription extends Model
 {
+    use Prorates;
+
     const STATUS_ACTIVE = 'active';
     const STATUS_TRIALING = 'trialing';
     const STATUS_PAST_DUE = 'past_due';
@@ -42,13 +45,6 @@ class Subscription extends Model
         'paused_from',
         'ends_at',
     ];
-
-    /**
-     * Indicates if the plan change should be prorated.
-     *
-     * @var bool
-     */
-    protected $prorate = true;
 
     /**
      * The cached Paddle info for the subscription.
@@ -611,30 +607,6 @@ class Subscription extends Model
     public function cancelUrl()
     {
         return $this->paddleInfo()['cancel_url'];
-    }
-
-    /**
-     * Indicate that the plan change should not be prorated.
-     *
-     * @return $this
-     */
-    public function noProrate()
-    {
-        $this->prorate = false;
-
-        return $this;
-    }
-
-    /**
-     * Indicate that the plan change should be prorated.
-     *
-     * @return $this
-     */
-    public function prorate()
-    {
-        $this->prorate = true;
-
-        return $this;
     }
 
     /**
