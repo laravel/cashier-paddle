@@ -74,6 +74,26 @@ class Price
     }
 
     /**
+     * Get the net amount.
+     *
+     * @return string
+     */
+    public function tax()
+    {
+        return $this->formatAmount((int) ($this->rawTax() * 100));
+    }
+
+    /**
+     * Get the raw tax amount.
+     *
+     * @return string
+     */
+    public function rawTax()
+    {
+        return $this->price['tax'];
+    }
+
+    /**
      * Get the used currency for the transaction.
      *
      * @return \Money\Currency
