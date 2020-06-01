@@ -689,6 +689,9 @@ class Subscription extends Model
         if ($info['payment_method'] === 'card') {
             $this->card_brand = $info['card_type'];
             $this->card_last_four = $info['last_four_digits'];
+        } elseif ($info['payment_method'] === 'paypal') {
+            $this->card_brand = 'paypal';
+            $this->card_last_four = '';
         }
 
         $this->save();
