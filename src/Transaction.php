@@ -95,7 +95,7 @@ class Transaction implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Carbon\Carbon
      */
-    public function createdAt()
+    public function date()
     {
         return Carbon::createFromFormat('Y-m-d H:i:s', $this->transaction['created_at'], 'UTC');
     }

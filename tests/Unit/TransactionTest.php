@@ -72,8 +72,8 @@ class TransactionTest extends TestCase
             'created_at' => '2020-05-07 10:53:17',
         ]);
 
-        $this->assertInstanceOf(Carbon::class, $transaction->createdAt());
-        $this->assertSame('2020-05-07 10:53:17', $transaction->createdAt()->format('Y-m-d H:i:s'));
+        $this->assertInstanceOf(Carbon::class, $transaction->date());
+        $this->assertSame('2020-05-07 10:53:17', $transaction->date()->format('Y-m-d H:i:s'));
     }
 
     public function test_it_can_determine_if_it_is_a_subscription_transaction()
