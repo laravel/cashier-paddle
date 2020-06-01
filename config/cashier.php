@@ -84,4 +84,17 @@ return [
 
     'currency_locale' => env('CASHIER_CURRENCY_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Paddle Sandbox
+    |--------------------------------------------------------------------------
+    |
+    | This option allows you to toggle between the Paddle live environment
+    | and its sandboxed environment. Note that this is only available
+    | for a select group of vendors and not publicly available.
+    |
+    */
+
+    'sandbox' => env('PADDLE_SANDBOX', false),
+
 ];

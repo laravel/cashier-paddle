@@ -13,20 +13,6 @@ use NumberFormatter;
 class Cashier
 {
     /**
-     * The Paddle checkout URL.
-     *
-     * @var string
-     */
-    const CHECKOUT_URL = 'https://checkout.paddle.com';
-
-    /**
-     * The Paddle vendors URL.
-     *
-     * @var string
-     */
-    const VENDORS_URL = 'https://vendors.paddle.com';
-
-    /**
      * The custom currency formatter.
      *
      * @var callable
@@ -102,6 +88,26 @@ class Cashier
     }
 
     /**
+     * Get the Paddle vendors API url.
+     *
+     * @return string
+     */
+    public static function vendorsUrl()
+    {
+        return 'https://' . (config('paddle.sandbox') ? 'sandbox-' : '') . 'vendors.paddle.com';
+    }
+
+    /**
+     * Get the Paddle checkout API url.
+     *
+     * @return string
+     */
+    public static function checkoutUrl()
+    {
+        return 'https://' . (config('paddle.sandbox') ? 'sandbox-' : '') . 'checkout.paddle.com';
+    }
+
+    /**
      * Perform a GET Paddle API call.
      *
      * @param  string  $uri
@@ -112,7 +118,7 @@ class Cashier
      */
     public static function get($uri, array $payload = [])
     {
-        return static::makeApiCall('get', static::CHECKOUT_URL.'/api/2.0'.$uri, $payload);
+        return static::makeApiCall('get', static::checkoutUrl().'/api/2.0'.$uri, $payload);
     }
 
     /**
@@ -126,7 +132,7 @@ class Cashier
      */
     public static function post($uri, array $payload = [])
     {
-        return static::makeApiCall('post', static::VENDORS_URL.'/api/2.0'.$uri, $payload);
+        return static::makeApiCall('post', static::vendorsUrl().'/api/2.0'.$uri, $payload);
     }
 
     /**
