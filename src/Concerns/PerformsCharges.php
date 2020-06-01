@@ -2,7 +2,7 @@
 
 namespace Laravel\Paddle\Concerns;
 
-use Exception;
+use InvalidArgumentException;
 use Laravel\Paddle\Cashier;
 
 trait PerformsCharges
@@ -20,7 +20,7 @@ trait PerformsCharges
     public function charge($amount, $title, array $options = [])
     {
         if (strlen($title) > 100) {
-            throw new Exception('Charge title has a maximum length of 100 characters.');
+            throw new InvalidArgumentException('Charge title has a maximum length of 100 characters.');
         }
 
         return $this->generatePayLink(array_merge([
