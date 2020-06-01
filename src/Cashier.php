@@ -17,14 +17,14 @@ class Cashier
      *
      * @var string
      */
-    const CHECKOUT_URL = 'https://checkout.paddle.com';
+    const CHECKOUT_URL = 'https://sandbox-checkout.paddle.com';
 
     /**
      * The Paddle vendors URL.
      *
      * @var string
      */
-    const VENDORS_URL = 'https://vendors.paddle.com';
+    const VENDORS_URL = 'https://sandbox-vendors.paddle.com';
 
     /**
      * The custom currency formatter.

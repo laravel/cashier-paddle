@@ -61,7 +61,7 @@ class TransactionTest extends TestCase
             'receipt_url' => 'https://example.com/receipt.pdf',
         ]);
 
-        $this->assertSame('https://example.com/receipt.pdf', $transaction->receiptUrl());
+        $this->assertSame('https://example.com/receipt.pdf', $transaction->receipt());
     }
 
     public function test_it_can_returns_its_created_at_timestamp()

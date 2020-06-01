@@ -10,6 +10,7 @@ use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
+use Laravel\Paddle\Subscription;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
@@ -71,12 +72,17 @@ class WebhookController extends Controller
             'paddle_email' => $payload['email'],
         ])->save();
 
+        $trialEndsAt = $payload['status'] === Subscription::STATUS_TRIALING
+            ? Carbon::createFromFormat('Y-m-d', $payload['next_bill_date'], 'UTC')->startOfDay()
+            : null;
+
         $subscription = $user->subscriptions()->create([
             'name' => $passthrough['subscription_name'],
             'paddle_id' => $payload['subscription_id'],
             'paddle_plan' => $payload['subscription_plan_id'],
             'paddle_status' => $payload['status'],
             'quantity' => $payload['quantity'],
+            'trial_ends_at' => $trialEndsAt,
         ]);
 
         $subscription->syncPaymentInformation()->save();
@@ -112,7 +118,7 @@ class WebhookController extends Controller
 
             // Paused...
             if (isset($payload['paused_from'])) {
-                $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:m', $payload['paused_from'], 'UTC');
+                $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:s', $payload['paused_from'], 'UTC');
             } else {
                 $subscription->paused_from = null;
             }

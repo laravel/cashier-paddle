@@ -492,7 +492,7 @@ class Subscription extends Model
 
         $this->forceFill([
             'paddle_status' => $info['state'],
-            'paused_from' => Carbon::createFromFormat('Y-m-d H:i:m', $info['paused_from'], 'UTC'),
+            'paused_from' => Carbon::createFromFormat('Y-m-d H:i:s', $info['paused_from'], 'UTC'),
         ])->save();
 
         $this->paddleInfo = null;

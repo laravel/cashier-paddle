@@ -105,7 +105,7 @@ class Transaction implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function receiptUrl()
+    public function receipt()
     {
         return $this->transaction['receipt_url'];
     }
