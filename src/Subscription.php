@@ -505,7 +505,7 @@ class Subscription extends Model
      *
      * @return $this
      */
-    public function resume()
+    public function unpause()
     {
         $this->updatePaddleSubscription([
             'pause' => false,
