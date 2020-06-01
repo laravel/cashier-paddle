@@ -3,7 +3,6 @@
 namespace Laravel\Paddle\Concerns;
 
 use Laravel\Paddle\Cashier;
-use Laravel\Paddle\Exceptions\InvalidCustomer;
 
 trait ManagesCustomer
 {
@@ -41,20 +40,6 @@ trait ManagesCustomer
         ], $options);
 
         return Cashier::productPrices($products, $options);
-    }
-
-    /**
-     * Determine if the entity has a Paddle user ID and throw an exception if not.
-     *
-     * @return void
-     *
-     * @throws \Laravel\Paddle\Exceptions\InvalidCustomer
-     */
-    protected function assertCustomerExists()
-    {
-        if (! $this->hasPaddleId()) {
-            throw InvalidCustomer::notYetCreated($this);
-        }
     }
 
     /**
