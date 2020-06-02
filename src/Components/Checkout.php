@@ -62,6 +62,7 @@ class Checkout extends Component
     {
         $options = [
             'method' => 'inline',
+            'disableLogout' => true,
             'frameTarget' => $this->id,
             'frameInitialHeight' => $this->height,
             'frameStyle' => 'width: 100%; background-color: transparent; border: none;',
