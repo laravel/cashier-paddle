@@ -33,8 +33,8 @@ class Transaction implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new Transaction instance.
      *
-     * @param \Laravel\Paddle\Billable $billable
-     * @param array $transaction
+     * @param  \Laravel\Paddle\Billable  $billable
+     * @param  array  $transaction
      * @return void
      *
      * @throws \Laravel\Paddle\Exceptions\InvalidTransaction

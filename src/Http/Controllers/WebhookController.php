@@ -156,6 +156,8 @@ class WebhookController extends Controller
                 $subscription->paddle_status = $payload['status'];
             }
 
+            $subscription->paused_from = null;
+
             $subscription->save();
         }
     }

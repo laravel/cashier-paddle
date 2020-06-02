@@ -94,7 +94,7 @@ class Cashier
      */
     public static function vendorsUrl()
     {
-        return 'https://' . (config('paddle.sandbox') ? 'sandbox-' : '') . 'vendors.paddle.com';
+        return 'https://' . (config('cashier.sandbox') ? 'sandbox-' : '') . 'vendors.paddle.com';
     }
 
     /**
@@ -104,7 +104,7 @@ class Cashier
      */
     public static function checkoutUrl()
     {
-        return 'https://' . (config('paddle.sandbox') ? 'sandbox-' : '') . 'checkout.paddle.com';
+        return 'https://' . (config('cashier.sandbox') ? 'sandbox-' : '') . 'checkout.paddle.com';
     }
 
     /**
