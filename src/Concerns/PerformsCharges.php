@@ -4,6 +4,7 @@ namespace Laravel\Paddle\Concerns;
 
 use InvalidArgumentException;
 use Laravel\Paddle\Cashier;
+use LogicException;
 
 trait PerformsCharges
 {
@@ -63,10 +64,17 @@ trait PerformsCharges
         // We'll need a way to identify the user in any webhook we're catching so
         // before we make the API request we'll attach the auth identifier to
         // the payload. We can then match it with the user in a webhook.
-        $passthrough = isset($payload['passthrough']) ? (array) json_decode($payload['passthrough'], true) : [];
-        $passthrough['customer_id'] = $this->getAuthIdentifier();
+        if (! isset($payload['passthrough'])) {
+            $payload['passthrough'] = [];
+        }
 
-        $payload['passthrough'] = json_encode($passthrough);
+        if (! is_array($payload['passthrough'])) {
+            throw new LogicException('The value for "passthrough" always needs to be a an array.');
+        }
+
+        $payload['passthrough']['customer_id'] = $this->getAuthIdentifier();
+
+        $payload['passthrough'] = json_encode($payload['passthrough']);
 
         return Cashier::post('/product/generate_pay_link', $payload)['response']['url'];
     }

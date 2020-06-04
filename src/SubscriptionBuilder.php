@@ -190,9 +190,9 @@ class SubscriptionBuilder
             }
         }
 
-        $payload['passthrough'] = json_encode(array_merge($this->metadata, [
+        $payload['passthrough'] = array_merge($this->metadata, [
             'subscription_name' => $this->name,
-        ]));
+        ]);
 
         return $this->billable->chargeProduct($this->plan, $payload);
     }
