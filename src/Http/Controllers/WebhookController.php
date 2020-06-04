@@ -52,6 +52,33 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle one-time payment succeeded.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    protected function handlePaymentSucceeded(array $payload)
+    {
+        $passthrough = json_decode($payload['passthrough'], true);
+
+        $model = config('cashier.model');
+
+        if (! $user = (new $model)->find($passthrough['customer_id'])) {
+            return;
+        }
+
+        $response = Cashier::post(
+            "/checkout/{$payload['checkout_id']}/transactions",
+            $user->paddleOptions()
+        )['response'][0];
+
+        $user->forceFill([
+            'paddle_id' => $response['user']['user_id'],
+            'paddle_email' => $payload['email'],
+        ])->save();
+    }
+
+    /**
      * Handle subscription created.
      *
      * @param  array  $payload

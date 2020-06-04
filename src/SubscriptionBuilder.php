@@ -191,7 +191,6 @@ class SubscriptionBuilder
         }
 
         $payload['passthrough'] = json_encode(array_merge($this->metadata, [
-            'customer_id' => $this->billable->getAuthIdentifier(),
             'subscription_name' => $this->name,
         ]));
 

@@ -60,6 +60,14 @@ trait PerformsCharges
         $payload['customer_country'] = (string) $this->paddleCountry();
         $payload['customer_postcode'] = (string) $this->paddlePostcode();
 
+        // We'll need a way to identify the user in any webhook we're catching so
+        // before we make the API request we'll attach the auth identifier to
+        // the payload. We can then match it with the user in a webhook.
+        $passthrough = isset($payload['passthrough']) ? (array) json_decode($payload['passthrough'], true) : [];
+        $passthrough['customer_id'] = $this->getAuthIdentifier();
+
+        $payload['passthrough'] = json_encode($passthrough);
+
         return Cashier::post('/product/generate_pay_link', $payload)['response']['url'];
     }
 
