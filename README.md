@@ -17,6 +17,8 @@
 
 ## Introduction
 
+> Note that Cashier Paddle is currently in beta. During the beta period things can and probably will change. Don't use Cashier Paddle in production until a stable version has been released. We appreciate you helping out with testing and reporting any bugs.
+
 Laravel Cashier Paddle provides an expressive, fluent interface to [Paddle's](https://paddle.com) subscription billing services. It handles almost all of the boilerplate subscription billing code you are dreading writing. In addition to basic subscription management, Cashier can handle coupons, swapping subscription, subscription "quantities", cancellation grace periods and much more.
 
 ## Official Documentation
