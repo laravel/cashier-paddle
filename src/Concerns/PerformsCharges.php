@@ -72,7 +72,7 @@ trait PerformsCharges
             throw new LogicException('The value for "passthrough" always needs to be a an array.');
         }
 
-        $payload['passthrough']['customer_id'] = $this->getAuthIdentifier();
+        $payload['passthrough']['customer_id'] = $this->getKey();
 
         $payload['passthrough'] = json_encode($payload['passthrough']);
 
