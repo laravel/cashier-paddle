@@ -7,9 +7,9 @@ return [
     | Paddle Keys
     |--------------------------------------------------------------------------
     |
-    | The Paddle vendor id and auth code give you access to Paddle's
-    | API. The "public" key is typically used when interacting with
-    | Paddle.js while the "secret" key accesses private API endpoints.
+    | The Paddle vendor ID and auth code will allow your application to call
+    | the Paddle API. The "public" key is typically used when interacting
+    | with Paddle.js while the "secret" key accesses private endpoints.
     |
     */
 
@@ -24,9 +24,9 @@ return [
     | Cashier Path
     |--------------------------------------------------------------------------
     |
-    | This is the base URI path where Cashier's views, such as the
-    | webhook route, will be available from. You're free to tweak
-    | this path according to your preferences and application design.
+    | This is the base URI path where Cashier's views, such as the webhook
+    | route, will be available. You're free to tweak this path based on
+    | the needs of your particular application or design preferences.
     |
     */
 
@@ -37,9 +37,9 @@ return [
     | Cashier Webhook
     |--------------------------------------------------------------------------
     |
-    | This is the base URI where webhooks from Paddle will be sent to.
-    | By default the built in url will be used but you can optionally
-    | set a url which could be useful for testing purposes.
+    | This is the base URI where webhooks from Paddle will be sent. The URL
+    | built into Cashier Paddle is used by default; however, you can add
+    | a custom URL when required for any application testing purposes.
     |
     */
 
@@ -77,8 +77,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option allows you to toggle between the Paddle live environment
-    | and its sandboxed environment. Note that this is only available
-    | for a select group of vendors and not publicly available.
+    | and its sandboxed environment. This feature is only available for
+    | a select group of vendors and not a publicly available feature.
     |
     */
 
