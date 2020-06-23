@@ -10,8 +10,8 @@ use Laravel\Paddle\Concerns\PerformsCharges;
 trait Billable
 {
     use ManagesCustomer;
-    use ManagesTransactions;
     use ManagesSubscriptions;
+    use ManagesTransactions;
     use PerformsCharges;
 
     /**

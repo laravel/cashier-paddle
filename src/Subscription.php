@@ -34,17 +34,9 @@ class Subscription extends Model
         'paddle_id' => 'integer',
         'paddle_plan' => 'integer',
         'quantity' => 'integer',
-    ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'trial_ends_at',
-        'paused_from',
-        'ends_at',
+        'trial_ends_at' => 'datetime',
+        'paused_from' => 'datetime',
+        'ends_at' => 'datetime',
     ];
 
     /**
@@ -55,15 +47,13 @@ class Subscription extends Model
     protected $paddleInfo;
 
     /**
-     * Get the model related to the subscription.
+     * Get the customer related to the subscription.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function owner()
+    public function customer()
     {
-        $model = config('cashier.model');
-
-        return $this->belongsTo($model, (new $model)->getForeignKey());
+        return $this->belongsTo(Customer::class);
     }
 
     /**
@@ -360,7 +350,7 @@ class Subscription extends Model
             throw new Exception('Charge name has a maximum length of 50 characters.');
         }
 
-        $payload = $this->owner->paddleOptions([
+        $payload = $this->customer->paddleOptions([
             'amount' => $amount,
             'charge_name' => $name,
         ]);
@@ -529,7 +519,7 @@ class Subscription extends Model
      */
     public function updatePaddleSubscription(array $options)
     {
-        $payload = $this->owner->paddleOptions(array_merge([
+        $payload = $this->customer->paddleOptions(array_merge([
             'subscription_id' => $this->paddle_id,
         ], $options));
 
@@ -559,7 +549,7 @@ class Subscription extends Model
     {
         $nextPayment = $this->nextPayment();
 
-        $payload = $this->owner->paddleOptions([
+        $payload = $this->customer->paddleOptions([
             'subscription_id' => $this->paddle_id,
         ]);
 
@@ -590,7 +580,7 @@ class Subscription extends Model
      */
     public function cancelNow()
     {
-        $payload = $this->owner->paddleOptions([
+        $payload = $this->customer->paddleOptions([
             'subscription_id' => $this->paddle_id,
         ]);
 
@@ -657,7 +647,7 @@ class Subscription extends Model
 
         return $this->paddleInfo = Cashier::post('/subscription/users', array_merge([
             'subscription_id' => $this->paddle_id,
-        ], $this->owner->paddleOptions()))['response'][0];
+        ], $this->customer->paddleOptions()))['response'][0];
     }
 
     /**
@@ -670,10 +660,10 @@ class Subscription extends Model
     {
         $result = Cashier::post("/subscription/{$this->paddle_id}/transactions", array_merge([
             'page' => $page,
-        ], $this->owner->paddleOptions()));
+        ], $this->customer->paddleOptions()));
 
         return collect($result['response'])->map(function (array $transaction) {
-            return new Transaction($this->owner, $transaction);
+            return new Transaction($this->customer, $transaction);
         });
     }
 

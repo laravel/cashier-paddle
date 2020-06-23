@@ -3,31 +3,22 @@
 namespace Laravel\Paddle\Concerns;
 
 use Laravel\Paddle\Cashier;
+use Laravel\Paddle\Customer;
 
 trait ManagesCustomer
 {
     /**
-     * Retrieve the Paddle user ID.
+     * Get the customer related to the billable model.
      *
-     * @return int|null
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
-    public function paddleId()
+    public function customer()
     {
-        return $this->paddle_id ? (int) $this->paddle_id : null;
+        return $this->morphOne(Customer::class, 'billable');
     }
 
     /**
-     * Determine if the entity has a Paddle user ID.
-     *
-     * @return bool
-     */
-    public function hasPaddleId()
-    {
-        return ! is_null($this->paddleId());
-    }
-
-    /**
-     * Get prices for a set of product ids for this customer.
+     * Get prices for a set of product ids for this billable model.
      *
      * @param  array|int  $products
      * @param  array  $options
@@ -43,7 +34,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the customer's email address to associate with Paddle.
+     * Get the billable model's email address to associate with Paddle.
      *
      * @return string|null
      */
@@ -53,7 +44,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the customer's country to associate with Paddle.
+     * Get the billable model's country to associate with Paddle.
      *
      * This needs to be a 2 letter code. See the link below for supported countries.
      *
@@ -66,7 +57,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the customer's postcode to associate with Paddle.
+     * Get the billable model's postcode to associate with Paddle.
      *
      * See the link below for countries which require this.
      *

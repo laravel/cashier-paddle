@@ -56,7 +56,7 @@ trait PerformsCharges
         // Because Paddle associates users based on email address, we need to re-use
         // the email address that's being set in Paddle on new payment link generations
         // to make sure Paddle associates them with the same user within Paddle.
-        $payload['customer_email'] = $this->paddle_email ?: (string) $this->paddleEmail();
+        $payload['customer_email'] = optional($this->customer)->paddle_email ?: (string) $this->paddleEmail();
 
         $payload['customer_country'] = (string) $this->paddleCountry();
         $payload['customer_postcode'] = (string) $this->paddlePostcode();
@@ -72,7 +72,8 @@ trait PerformsCharges
             throw new LogicException('The value for "passthrough" always needs to be a an array.');
         }
 
-        $payload['passthrough']['customer_id'] = $this->getKey();
+        $payload['passthrough']['billable_id'] = $this->getKey();
+        $payload['passthrough']['billable_type'] = $this->getMorphClass();
 
         $payload['passthrough'] = json_encode($payload['passthrough']);
 
