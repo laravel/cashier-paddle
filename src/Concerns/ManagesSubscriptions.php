@@ -2,7 +2,6 @@
 
 namespace Laravel\Paddle\Concerns;
 
-use Laravel\Paddle\Subscription;
 use Laravel\Paddle\SubscriptionBuilder;
 
 trait ManagesSubscriptions
@@ -20,13 +19,17 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Get all of the subscriptions for the Paddle model.
+     * Get all of the subscriptions for the Billable model.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Laravel\Paddle\Subscription[]|\Illuminate\Database\Eloquent\Collection
      */
     public function subscriptions()
     {
-        return $this->hasMany(Subscription::class, $this->getForeignKey())->orderByDesc('created_at');
+        if (is_null($this->customer)) {
+            return collect();
+        }
+
+        return $this->customer->subscriptions;
     }
 
     /**
@@ -37,11 +40,11 @@ trait ManagesSubscriptions
      */
     public function subscription($name = 'default')
     {
-        return $this->subscriptions()->where('name', $name)->first();
+        return optional($this->customer)->subscription($name);
     }
 
     /**
-     * Determine if the Paddle model is on trial.
+     * Determine if the Billable model is on trial.
      *
      * @param  string  $name
      * @param  int|null  $plan
@@ -63,17 +66,17 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the Paddle model is on a "generic" trial at the model level.
+     * Determine if the Billable model is on a "generic" trial at the model level.
      *
      * @return bool
      */
     public function onGenericTrial()
     {
-        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+        return optional($this->customer)->onGenericTrial();
     }
 
     /**
-     * Determine if the Paddle model has a given subscription.
+     * Determine if the Billable model has a given subscription.
      *
      * @param  string  $name
      * @param  int|null  $plan
@@ -91,7 +94,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the Paddle model is actively subscribed to one of the given plans.
+     * Determine if the Billable model is actively subscribed to one of the given plans.
      *
      * @param  int  $plan
      * @param  string  $name
@@ -116,11 +119,6 @@ trait ManagesSubscriptions
      */
     public function onPlan($plan)
     {
-        return ! is_null($this->subscriptions()
-            ->where('paddle_plan', $plan)
-            ->get()
-            ->first(function (Subscription $subscription) use ($plan) {
-                return $subscription->valid();
-            }));
+        return $this->customer->onPlan($plan);
     }
 }

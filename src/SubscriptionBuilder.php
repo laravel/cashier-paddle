@@ -7,7 +7,7 @@ use Spatie\Url\Url;
 class SubscriptionBuilder
 {
     /**
-     * The model that is subscribing.
+     * The Billable model that is subscribing.
      *
      * @var \Laravel\Paddle\Billable
      */
@@ -72,16 +72,16 @@ class SubscriptionBuilder
     /**
      * Create a new subscription builder instance.
      *
-     * @param  \Laravel\Paddle\Billable  $owner
+     * @param  \Laravel\Paddle\Billable  $billable
      * @param  string  $name
      * @param  int  $plan
      * @return void
      */
-    public function __construct($owner, $name, $plan)
+    public function __construct($billable, $name, $plan)
     {
         $this->name = $name;
         $this->plan = $plan;
-        $this->billable = $owner;
+        $this->billable = $billable;
     }
 
     /**

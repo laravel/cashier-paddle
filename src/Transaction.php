@@ -17,11 +17,11 @@ class Transaction implements Arrayable, Jsonable, JsonSerializable
     const STATUS_DISPUTED = 'disputed';
 
     /**
-     * The Paddle billable instance.
+     * The Customer model instance.
      *
-     * @var \Laravel\Paddle\Billable
+     * @var \Laravel\Paddle\Customer
      */
-    protected $billable;
+    protected $customer;
 
     /**
      * The Paddle transaction attributes.
@@ -33,19 +33,19 @@ class Transaction implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new Transaction instance.
      *
-     * @param  \Laravel\Paddle\Billable  $billable
+     * @param  \Laravel\Paddle\Customer  $customer
      * @param  array  $transaction
      * @return void
      *
      * @throws \Laravel\Paddle\Exceptions\InvalidTransaction
      */
-    public function __construct($billable, array $transaction)
+    public function __construct(Customer $customer, array $transaction)
     {
-        if ($billable->paddleId() !== $transaction['user']['user_id']) {
-            throw InvalidTransaction::invalidOwner($billable);
+        if ($customer->paddle_id !== $transaction['user']['user_id']) {
+            throw InvalidTransaction::invalidCustomer($customer);
         }
 
-        $this->billable = $billable;
+        $this->customer = $customer;
         $this->transaction = $transaction;
     }
 
@@ -111,13 +111,13 @@ class Transaction implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the related user.
+     * Get the related customer.
      *
-     * @return \Laravel\Paddle\Billable
+     * @return \Laravel\Paddle\Customer
      */
-    public function user()
+    public function customer()
     {
-        return $this->billable;
+        return $this->customer;
     }
 
     /**
@@ -128,7 +128,7 @@ class Transaction implements Arrayable, Jsonable, JsonSerializable
     public function subscription()
     {
         if ($this->isSubscription()) {
-            return $this->billable->subscriptions()
+            return $this->customer->subscriptions()
                 ->where('paddle_id', $this->transaction['subscription']['subscription_id'])
                 ->first();
         }
