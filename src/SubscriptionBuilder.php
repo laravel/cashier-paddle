@@ -180,6 +180,7 @@ class SubscriptionBuilder
             // so we'll need to explicitly set the prices to 0 for the first charge.
             if ($trialDays !== 0) {
                 $prices = $payload['prices'] ?? $this->getPlanPricesForPayload();
+
                 $payload['prices'] = [];
 
                 foreach ($prices as $key => $price) {
