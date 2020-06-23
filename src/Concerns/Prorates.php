@@ -28,9 +28,9 @@ trait Prorates
      *
      * @return $this
      */
-    public function prorate()
+    public function prorate($prorates = true)
     {
-        $this->prorate = true;
+        $this->prorate = $prorates;
 
         return $this;
     }
