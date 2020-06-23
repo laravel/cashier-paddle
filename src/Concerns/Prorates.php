@@ -28,7 +28,19 @@ trait Prorates
      *
      * @return $this
      */
-    public function prorate($prorates = true)
+    public function prorate()
+    {
+        $this->prorate = true;
+
+        return $this;
+    }
+
+    /**
+     * Set the proration for the plan change.
+     *
+     * @return $this
+     */
+    public function setProration($prorates = true)
     {
         $this->prorate = $prorates;
 
