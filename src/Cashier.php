@@ -41,23 +41,6 @@ class Cashier
     public static $deactivatePastDue = true;
 
     /**
-     * Get the billable entity instance by its Paddle ID.
-     *
-     * @param  string  $paddleId
-     * @return \Laravel\Paddle\Billable|null
-     */
-    public static function findBillable($paddleId)
-    {
-        if ($paddleId === null) {
-            return;
-        }
-
-        $model = config('cashier.model');
-
-        return (new $model)->where('paddle_id', $paddleId)->first();
-    }
-
-    /**
      * Get prices for a set of product ids.
      *
      * @param  array|int  $products

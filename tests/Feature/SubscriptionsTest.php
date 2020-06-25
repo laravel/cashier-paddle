@@ -9,9 +9,9 @@ class SubscriptionsTest extends FeatureTestCase
 {
     public function test_customers_can_perform_subscription_checks()
     {
-        $customer = $this->createCustomer();
+        $billable = $this->createBillable();
 
-        $subscription = $customer->subscriptions()->create([
+        $subscription = $billable->customer->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -19,14 +19,14 @@ class SubscriptionsTest extends FeatureTestCase
             'quantity' => 1,
         ]);
 
-        $this->assertTrue($customer->subscribed('main'));
-        $this->assertFalse($customer->subscribed('default'));
-        $this->assertFalse($customer->subscribedToPlan(2323));
-        $this->assertTrue($customer->subscribedToPlan(2323, 'main'));
-        $this->assertTrue($customer->onPlan(2323));
-        $this->assertFalse($customer->onPlan(323));
-        $this->assertFalse($customer->onTrial('main'));
-        $this->assertFalse($customer->onGenericTrial());
+        $this->assertTrue($billable->subscribed('main'));
+        $this->assertFalse($billable->subscribed('default'));
+        $this->assertFalse($billable->subscribedToPlan(2323));
+        $this->assertTrue($billable->subscribedToPlan(2323, 'main'));
+        $this->assertTrue($billable->onPlan(2323));
+        $this->assertFalse($billable->onPlan(323));
+        $this->assertFalse($billable->onTrial('main'));
+        $this->assertFalse($billable->onGenericTrial());
 
         $this->assertTrue($subscription->valid());
         $this->assertTrue($subscription->active());
@@ -40,18 +40,18 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_customers_can_check_if_they_are_on_a_generic_trial()
     {
-        $customer = $this->createCustomer('taylor', ['trial_ends_at' => Carbon::tomorrow()]);
+        $billable = $this->createBillable('taylor', ['trial_ends_at' => Carbon::tomorrow()]);
 
-        $this->assertTrue($customer->onGenericTrial());
-        $this->assertTrue($customer->onTrial());
-        $this->assertFalse($customer->onTrial('main'));
+        $this->assertTrue($billable->onGenericTrial());
+        $this->assertTrue($billable->onTrial());
+        $this->assertFalse($billable->onTrial('main'));
     }
 
     public function test_customers_can_check_if_their_subscription_is_on_trial()
     {
-        $customer = $this->createCustomer('taylor');
+        $billable = $this->createBillable('taylor');
 
-        $subscription = $customer->subscriptions()->create([
+        $subscription = $billable->customer->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -60,16 +60,16 @@ class SubscriptionsTest extends FeatureTestCase
             'trial_ends_at' => Carbon::tomorrow(),
         ]);
 
-        $this->assertTrue($customer->subscribed('main'));
-        $this->assertFalse($customer->subscribed('default'));
-        $this->assertFalse($customer->subscribedToPlan(2323));
-        $this->assertTrue($customer->subscribedToPlan(2323, 'main'));
-        $this->assertTrue($customer->onPlan(2323));
-        $this->assertFalse($customer->onPlan(323));
-        $this->assertTrue($customer->onTrial('main'));
-        $this->assertTrue($customer->onTrial('main', 2323));
-        $this->assertFalse($customer->onTrial('main', 323));
-        $this->assertFalse($customer->onGenericTrial());
+        $this->assertTrue($billable->subscribed('main'));
+        $this->assertFalse($billable->subscribed('default'));
+        $this->assertFalse($billable->subscribedToPlan(2323));
+        $this->assertTrue($billable->subscribedToPlan(2323, 'main'));
+        $this->assertTrue($billable->onPlan(2323));
+        $this->assertFalse($billable->onPlan(323));
+        $this->assertTrue($billable->onTrial('main'));
+        $this->assertTrue($billable->onTrial('main', 2323));
+        $this->assertFalse($billable->onTrial('main', 323));
+        $this->assertFalse($billable->onGenericTrial());
 
         $this->assertTrue($subscription->valid());
         $this->assertTrue($subscription->active());
@@ -83,9 +83,9 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_customers_can_check_if_their_subscription_is_cancelled()
     {
-        $customer = $this->createCustomer('taylor');
+        $billable = $this->createBillable('taylor');
 
-        $subscription = $customer->subscriptions()->create([
+        $subscription = $billable->customer->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -106,9 +106,9 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_customers_can_check_if_the_grace_period_is_over()
     {
-        $customer = $this->createCustomer('taylor');
+        $billable = $this->createBillable('taylor');
 
-        $subscription = $customer->subscriptions()->create([
+        $subscription = $billable->customer->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -129,9 +129,9 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_customers_can_check_if_the_subscription_is_paused()
     {
-        $customer = $this->createCustomer('taylor');
+        $billable = $this->createBillable('taylor');
 
-        $subscription = $customer->subscriptions()->create([
+        $subscription = $billable->customer->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -151,9 +151,9 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_subscriptions_can_be_on_a_paused_grace_period()
     {
-        $customer = $this->createCustomer('taylor');
+        $billable = $this->createBillable('taylor');
 
-        $subscription = $customer->subscriptions()->create([
+        $subscription = $billable->customer->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,

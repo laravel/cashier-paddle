@@ -15,16 +15,16 @@ trait ManagesTransactions
      */
     public function transactions($page = 1)
     {
-        if (! $this->hasPaddleId()) {
+        if (is_null($this->customer)) {
             return collect();
         }
 
-        $result = Cashier::post("/user/{$this->paddleId()}/transactions", array_merge([
+        $result = Cashier::post("/user/{$this->customer->paddle_id}/transactions", array_merge([
             'page' => $page,
         ], $this->paddleOptions()));
 
         return collect($result['response'])->map(function (array $transaction) {
-            return new Transaction($this, $transaction);
+            return new Transaction($this->customer, $transaction);
         });
     }
 }

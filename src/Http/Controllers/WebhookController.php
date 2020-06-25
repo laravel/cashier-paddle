@@ -4,6 +4,7 @@ namespace Laravel\Paddle\Http\Controllers;
 
 use Carbon\Carbon;
 use Laravel\Paddle\Cashier;
+use Laravel\Paddle\Customer;
 use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
@@ -61,21 +62,17 @@ class WebhookController extends Controller
     {
         $passthrough = json_decode($payload['passthrough'], true);
 
-        $model = config('cashier.model');
-
-        if (! $user = (new $model)->find($passthrough['customer_id'])) {
-            return;
-        }
-
         $response = Cashier::post(
             "/checkout/{$payload['checkout_id']}/transactions",
-            $user->paddleOptions()
+            Cashier::paddleOptions()
         )['response'][0];
 
-        $user->forceFill([
+        Customer::firstOrCreate([
+            'billable_id' => $passthrough['billable_id'],
+            'billable_type' => $passthrough['billable_type'],
             'paddle_id' => $response['user']['user_id'],
             'paddle_email' => $payload['email'],
-        ])->save();
+        ]);
     }
 
     /**
@@ -88,22 +85,19 @@ class WebhookController extends Controller
     {
         $passthrough = json_decode($payload['passthrough'], true);
 
-        $model = config('cashier.model');
-
-        if (! $user = (new $model)->find($passthrough['customer_id'])) {
-            return;
-        }
-
-        $user->forceFill([
+        /** @var \Laravel\Paddle\Customer $customer */
+        $customer = Customer::firstOrCreate([
+            'billable_id' => $passthrough['billable_id'],
+            'billable_type' => $passthrough['billable_type'],
             'paddle_id' => $payload['user_id'],
             'paddle_email' => $payload['email'],
-        ])->save();
+        ]);
 
         $trialEndsAt = $payload['status'] === Subscription::STATUS_TRIALING
             ? Carbon::createFromFormat('Y-m-d', $payload['next_bill_date'], 'UTC')->startOfDay()
             : null;
 
-        $subscription = $user->subscriptions()->create([
+        $subscription = $customer->subscriptions()->create([
             'name' => $passthrough['subscription_name'],
             'paddle_id' => $payload['subscription_id'],
             'paddle_plan' => $payload['subscription_plan_id'],
@@ -123,11 +117,7 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionUpdated(array $payload)
     {
-        if (! $user = Cashier::findBillable($payload['user_id'])) {
-            return;
-        }
-
-        if ($subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
+        if ($subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
             // Plan...
             if (isset($payload['subscription_plan_id'])) {
                 $subscription->paddle_plan = $payload['subscription_plan_id'];
@@ -162,11 +152,7 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionCancelled(array $payload)
     {
-        if (! $user = Cashier::findBillable($payload['user_id'])) {
-            return;
-        }
-
-        if ($subscription = $user->subscriptions()->where('paddle_id', $payload['subscription_id'])->first()) {
+        if ($subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
             // Cancellation date...
             if (isset($payload['cancellation_effective_date'])) {
                 if ($payload['cancellation_effective_date']) {

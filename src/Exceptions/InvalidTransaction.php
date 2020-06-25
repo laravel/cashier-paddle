@@ -3,18 +3,18 @@
 namespace Laravel\Paddle\Exceptions;
 
 use Exception;
+use Laravel\Paddle\Customer;
 
 class InvalidTransaction extends Exception
 {
     /**
-     * Create a new InvalidInvoice instance.
+     * Create a new InvalidTransaction instance.
      *
-     * @param  array  $transaction
-     * @param  \Laravel\Paddle\Billable  $billable
+     * @param  \Laravel\Paddle\Customer  $customer
      * @return static
      */
-    public static function invalidOwner($billable)
+    public static function invalidCustomer(Customer $customer)
     {
-        return new static("The transaction does not belong to this customer `{$billable->paddleId()}`.");
+        return new static("The transaction does not belong to this customer `{$customer->paddle_id}`.");
     }
 }
