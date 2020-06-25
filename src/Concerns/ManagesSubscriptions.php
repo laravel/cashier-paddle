@@ -2,6 +2,7 @@
 
 namespace Laravel\Paddle\Concerns;
 
+use Illuminate\Database\Eloquent\Collection;
 use Laravel\Paddle\SubscriptionBuilder;
 
 trait ManagesSubscriptions
@@ -26,7 +27,7 @@ trait ManagesSubscriptions
     public function subscriptions()
     {
         if (is_null($this->customer)) {
-            return collect();
+            return new Collection;
         }
 
         return $this->customer->subscriptions;
