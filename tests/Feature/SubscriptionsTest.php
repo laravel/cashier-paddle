@@ -12,7 +12,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $subscription = new Subscription(['trial_ends_at' => now()->addDay()]);
 
-        $this->expectExceptionObject(new LogicException('Cannot swap plans while on trial.'));
+        $this->expectExceptionObject(new LogicException('Paddle does not allow swapping plans while on trial.'));
 
         $subscription->swap(123);
     }
