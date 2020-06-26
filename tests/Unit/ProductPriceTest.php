@@ -8,19 +8,19 @@ use PHPUnit\Framework\TestCase;
 
 class ProductPriceTest extends TestCase
 {
-    public function it_can_return_its_country()
+    public function test_it_can_return_its_country()
     {
         $product = $this->product();
 
-        $this->assertInstanceOf('BE', $product->customerCountry());
+        $this->assertSame('BE', $product->customerCountry());
     }
 
-    public function it_can_return_its_currency()
+    public function test_it_can_return_its_currency()
     {
         $currency = $this->product()->currency();
 
         $this->assertInstanceOf(Currency::class, $currency);
-        $this->assertInstanceOf('EUR', $currency->getCode());
+        $this->assertSame('EUR', $currency->getCode());
     }
 
     public function test_it_implements_arrayable_and_jsonable()

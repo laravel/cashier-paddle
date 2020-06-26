@@ -31,7 +31,7 @@ class TransactionTest extends TestCase
         $this->assertSame($customer, $transaction->customer());
     }
 
-    public function it_can_return_its_currency()
+    public function test_it_can_return_its_currency()
     {
         $customer = new Customer(['paddle_id' => 1]);
         $transaction = new Transaction($customer, [
@@ -41,7 +41,7 @@ class TransactionTest extends TestCase
         $currency = $transaction->currency();
 
         $this->assertInstanceOf(Currency::class, $currency);
-        $this->assertInstanceOf('EUR', $currency->getCode());
+        $this->assertSame('EUR', $currency->getCode());
     }
 
     public function test_it_can_returns_its_receipt_url()
