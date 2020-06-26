@@ -436,7 +436,7 @@ class Subscription extends Model
     public function swap($plan, array $options = [])
     {
         if ($this->onTrial()) {
-            throw new LogicException('Cannot swap plans while on trial.');
+            throw new LogicException('Paddle does not allow swapping plans while on trial.');
         }
 
         if ($this->paused() || $this->pastDue()) {
