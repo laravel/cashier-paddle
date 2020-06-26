@@ -4,9 +4,19 @@ namespace Tests\Feature;
 
 use Carbon\Carbon;
 use Laravel\Paddle\Subscription;
+use LogicException;
 
 class SubscriptionsTest extends FeatureTestCase
 {
+    public function test_cannot_swap_while_on_trial()
+    {
+        $subscription = new Subscription(['trial_ends_at' => now()->addDay()]);
+
+        $this->expectExceptionObject(new LogicException('Paddle does not allow swapping plans while on trial.'));
+
+        $subscription->swap(123);
+    }
+
     public function test_customers_can_perform_subscription_checks()
     {
         $billable = $this->createBillable();
