@@ -21,7 +21,7 @@
         "php": "^7.2",
         "ext-json": "*",
         "ext-openssl": "*",
-        "guzzlehttp/guzzle": "^6.5",
+        "guzzlehttp/guzzle": "^6.5|^7.0",
         "illuminate/contracts": "^7.9",
         "illuminate/database": "^7.9",
         "illuminate/http": "^7.9",
