@@ -24,7 +24,7 @@ class TransactionsTest extends FeatureTestCase
 
         $transactions = $billable->transactions();
 
-        $this->assertCount(1, $transactions);
+        $this->assertNotEmpty($transactions);
         $this->assertSame('0.00', $transactions->first()->amount);
     }
 
