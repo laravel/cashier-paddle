@@ -27,7 +27,7 @@ class VerifyWebhookSignature
         $fields = $this->extractFields($request);
         $signature = $request->get(self::SIGNATURE_KEY);
 
-        if ($this->isValidSignature($fields, $signature)) {
+        if ($this->isInvalidSignature($fields, $signature)) {
             throw new AccessDeniedHttpException('Invalid webhook signature.');
         }
 
@@ -62,7 +62,7 @@ class VerifyWebhookSignature
      * @param  string  $signature
      * @return bool
      */
-    protected function isValidSignature(array $fields, $signature)
+    protected function isInvalidSignature(array $fields, $signature)
     {
         return openssl_verify(
             serialize($fields),
