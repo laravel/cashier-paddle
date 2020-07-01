@@ -508,6 +508,7 @@ class Subscription extends Model
         $this->forceFill([
             'paddle_status' => self::STATUS_ACTIVE,
             'ends_at' => null,
+            'paused_from' => null,
         ])->save();
 
         $this->paddleInfo = null;
