@@ -30,7 +30,7 @@ trait ManagesSubscriptions
             return new Collection;
         }
 
-        return $this->customer->subscriptions;
+        return $this->customer->subscriptions();
     }
 
     /**
