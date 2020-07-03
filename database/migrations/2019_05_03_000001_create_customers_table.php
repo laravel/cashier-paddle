@@ -22,7 +22,7 @@ class CreateCustomersTable extends Migration
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['billable_id', 'billable_type']);
+            $table->index(['billable_id', 'billable_type']);
         });
     }
 
