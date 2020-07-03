@@ -67,6 +67,86 @@ class ProductPrice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Get the initial price for the subscription plan with a coupon applied.
+     *
+     * @return \Laravel\Paddle\Price
+     */
+    public function initialPrice()
+    {
+        return $this->price();
+    }
+
+    /**
+     * Get the initial original listed price for the subscription plan.
+     *
+     * @return \Laravel\Paddle\Price
+     */
+    public function initialListPrice()
+    {
+        return $this->listPrice();
+    }
+
+    /**
+     * Get the recurring price for the subscription plan with a coupon applied.
+     *
+     * @return \Laravel\Paddle\Price
+     */
+    public function recurringPrice()
+    {
+        if (isset($this->product['subscription'])) {
+            return new Price($this->product['subscription']['price'], $this->currency());
+        }
+    }
+
+    /**
+     * Get the recurring original listed price for the subscription plan.
+     *
+     * @return \Laravel\Paddle\Price|null
+     */
+    public function recurringListPrice()
+    {
+        if (isset($this->product['subscription'])) {
+            return new Price($this->product['subscription']['list_price'], $this->currency());
+        }
+    }
+
+    /**
+     * Get the amount of trial days for the subscription plan.
+     *
+     * @return int|null
+     */
+    public function planTrialDays()
+    {
+        if (isset($this->product['subscription'])) {
+            return $this->product['subscription']['trial_days'];
+        }
+    }
+
+    /**
+     * Get the interval for the subscription plan.
+     *
+     * @return string|null
+     */
+    public function planInterval()
+    {
+        if (isset($this->product['subscription'])) {
+            return $this->product['subscription']['interval'];
+        }
+    }
+
+    /**
+     * Get the frequency for the subscription plan.
+     *
+     * @return int|null
+     */
+    public function planFrequency()
+    {
+        if (isset($this->product['subscription'])) {
+            return $this->product['subscription']['frequency'];
+        }
+    }
+
+    /**
      * Get the used currency for the transaction.
      *
      * @return \Money\Currency
