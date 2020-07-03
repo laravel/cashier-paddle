@@ -673,24 +673,22 @@ class Subscription extends Model
     }
 
     /**
-     * Sync the payment information from Paddle with the subscription.
+     * Get the card brand from the subscription.
      *
-     * @return $this
+     * @return string
      */
-    public function syncPaymentInformation()
+    public function cardBrand()
     {
-        $info = $this->paddleInfo()['payment_information'];
+        return (string) $this->paddleInfo()['card_type'];
+    }
 
-        if ($info['payment_method'] === 'card') {
-            $this->card_brand = $info['card_type'];
-            $this->card_last_four = $info['last_four_digits'];
-        } elseif ($info['payment_method'] === 'paypal') {
-            $this->card_brand = 'paypal';
-            $this->card_last_four = '';
-        }
-
-        $this->save();
-
-        return $this;
+    /**
+     * Get the last four digits from the subscription if it's a credit card.
+     *
+     * @return string
+     */
+    public function cardLastFour()
+    {
+        return (string) $this->paddleInfo()['last_four_digits'];
     }
 }

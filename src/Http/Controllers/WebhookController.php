@@ -105,8 +105,6 @@ class WebhookController extends Controller
             'quantity' => $payload['quantity'],
             'trial_ends_at' => $trialEndsAt,
         ]);
-
-        $subscription->syncPaymentInformation();
     }
 
     /**
