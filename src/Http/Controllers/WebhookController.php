@@ -106,7 +106,7 @@ class WebhookController extends Controller
             'trial_ends_at' => $trialEndsAt,
         ]);
 
-        $subscription->syncPaymentInformation()->save();
+        $subscription->syncPaymentInformation();
     }
 
     /**
