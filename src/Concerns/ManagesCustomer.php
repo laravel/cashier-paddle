@@ -8,6 +8,17 @@ use Laravel\Paddle\Customer;
 trait ManagesCustomer
 {
     /**
+     * Create a customer record for the billable model.
+     *
+     * @param  array  $attributes
+     * @return \Laravel\Paddle\Customer
+     */
+    public function createAsCustomer(array $attributes = [])
+    {
+        return $this->customer()->create($attributes);
+    }
+
+    /**
      * Get the customer related to the billable model.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
