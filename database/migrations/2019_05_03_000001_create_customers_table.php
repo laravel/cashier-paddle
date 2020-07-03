@@ -17,12 +17,12 @@ class CreateCustomersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('billable_id');
             $table->string('billable_type');
-            $table->string('paddle_id')->unique();
-            $table->string('paddle_email')->unique();
+            $table->string('paddle_id')->nullable()->unique();
+            $table->string('paddle_email')->nullable()->unique();
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamps();
 
-            $table->index(['billable_id', 'billable_type']);
+            $table->unique(['billable_id', 'billable_type']);
         });
     }
 

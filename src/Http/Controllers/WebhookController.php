@@ -70,6 +70,7 @@ class WebhookController extends Controller
         Customer::firstOrCreate([
             'billable_id' => $passthrough['billable_id'],
             'billable_type' => $passthrough['billable_type'],
+        ], [
             'paddle_id' => $response['user']['user_id'],
             'paddle_email' => $payload['email'],
         ]);
@@ -89,6 +90,7 @@ class WebhookController extends Controller
         $customer = Customer::firstOrCreate([
             'billable_id' => $passthrough['billable_id'],
             'billable_type' => $passthrough['billable_type'],
+        ], [
             'paddle_id' => $payload['user_id'],
             'paddle_email' => $payload['email'],
         ]);
@@ -97,7 +99,7 @@ class WebhookController extends Controller
             ? Carbon::createFromFormat('Y-m-d', $payload['next_bill_date'], 'UTC')->startOfDay()
             : null;
 
-        $subscription = $customer->subscriptions()->create([
+        $customer->subscriptions()->create([
             'name' => $passthrough['subscription_name'],
             'paddle_id' => $payload['subscription_id'],
             'paddle_plan' => $payload['subscription_plan_id'],

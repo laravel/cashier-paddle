@@ -73,7 +73,11 @@ trait ManagesSubscriptions
      */
     public function onGenericTrial()
     {
-        return optional($this->customer)->onGenericTrial();
+        if (is_null($this->customer)) {
+            return false;
+        }
+
+        return $this->customer->onGenericTrial();
     }
 
     /**
@@ -120,6 +124,10 @@ trait ManagesSubscriptions
      */
     public function onPlan($plan)
     {
+        if (is_null($this->customer)) {
+            return false;
+        }
+
         return $this->customer->onPlan($plan);
     }
 }

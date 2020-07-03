@@ -19,7 +19,7 @@ abstract class FeatureTestCase extends TestCase
 
     protected function createBillable($description = 'taylor', $options = []): User
     {
-        $user = User::create([
+        $user =$this->createUser([
             'email' => "{$description}@paddle-test.com",
             'name' => 'Taylor Otwell',
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
@@ -31,6 +31,15 @@ abstract class FeatureTestCase extends TestCase
         ], $options));
 
         return $user;
+    }
+
+    protected function createUser($description = 'taylor', $options = []): User
+    {
+        return User::create(array_merge([
+            'email' => "{$description}@paddle-test.com",
+            'name' => 'Taylor Otwell',
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        ], $options));
     }
 
     protected function getPackageProviders($app)
