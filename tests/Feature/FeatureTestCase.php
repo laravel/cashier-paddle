@@ -19,7 +19,7 @@ abstract class FeatureTestCase extends TestCase
 
     protected function createBillable($description = 'taylor', array $options = []): User
     {
-        $user =$this->createUser($description);
+        $user = $this->createUser($description);
 
         $user->customer()->create(array_merge([
             'paddle_id' => $_SERVER['PADDLE_TEST_CUSTOMER_ID'],
