@@ -67,7 +67,7 @@ class WebhookController extends Controller
             Cashier::paddleOptions()
         )['response'][0];
 
-        Customer::firstOrCreate([
+        Customer::updateOrCreate([
             'billable_id' => $passthrough['billable_id'],
             'billable_type' => $passthrough['billable_type'],
         ], [
@@ -87,7 +87,7 @@ class WebhookController extends Controller
         $passthrough = json_decode($payload['passthrough'], true);
 
         /** @var \Laravel\Paddle\Customer $customer */
-        $customer = Customer::firstOrCreate([
+        $customer = Customer::updateOrCreate([
             'billable_id' => $passthrough['billable_id'],
             'billable_type' => $passthrough['billable_type'],
         ], [
