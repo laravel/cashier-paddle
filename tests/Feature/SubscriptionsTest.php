@@ -181,4 +181,24 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($subscription->recurring());
         $this->assertFalse($subscription->ended());
     }
+
+    public function test_subscriptions_can_retrieve_their_payment_info()
+    {
+        if (! isset($_SERVER['PADDLE_TEST_PLAN_HOBBY'], $_SERVER['PADDLE_TEST_SUBSCRIPTION'])) {
+            $this->markTestSkipped('Plan and/or subscription not configured.');
+        }
+
+        $billable = $this->createBillable('taylor');
+
+        $subscription = $billable->subscriptions()->create([
+            'name' => 'main',
+            'paddle_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
+            'paddle_plan' => $_SERVER['PADDLE_TEST_PLAN_HOBBY'],
+            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'quantity' => 1,
+        ]);
+
+        $this->assertSame('master', $subscription->cardBrand());
+        $this->assertSame('4050', $subscription->cardLastFour());
+    }
 }
