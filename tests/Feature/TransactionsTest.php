@@ -46,7 +46,7 @@ class TransactionsTest extends FeatureTestCase
     public function test_it_can_returns_its_subscription()
     {
         $billable = $this->createBillable();
-        $subscription = $billable->customer->subscriptions()->create([
+        $subscription = $billable->subscriptions()->create([
             'name' => 'default',
             'paddle_id' => 244,
             'paddle_plan' => 2323,

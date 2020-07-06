@@ -128,7 +128,7 @@ class Transaction implements Arrayable, Jsonable, JsonSerializable
     public function subscription()
     {
         if ($this->isSubscription()) {
-            return $this->customer->subscriptions()
+            return $this->customer->billable->subscriptions()
                 ->where('paddle_id', $this->transaction['subscription']['subscription_id'])
                 ->first();
         }

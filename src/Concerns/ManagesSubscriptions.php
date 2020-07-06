@@ -2,7 +2,7 @@
 
 namespace Laravel\Paddle\Concerns;
 
-use Illuminate\Database\Eloquent\Collection;
+use Laravel\Paddle\Subscription;
 use Laravel\Paddle\SubscriptionBuilder;
 
 trait ManagesSubscriptions
@@ -22,15 +22,11 @@ trait ManagesSubscriptions
     /**
      * Get all of the subscriptions for the Billable model.
      *
-     * @return \Laravel\Paddle\Subscription[]|\Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function subscriptions()
     {
-        if (is_null($this->customer)) {
-            return new Collection;
-        }
-
-        return $this->customer->subscriptions;
+        return $this->morphMany(Subscription::class, 'billable')->orderByDesc('created_at');
     }
 
     /**
@@ -41,7 +37,7 @@ trait ManagesSubscriptions
      */
     public function subscription($name = 'default')
     {
-        return optional($this->customer)->subscription($name);
+        return $this->subscriptions()->where('name', $name)->first();
     }
 
     /**
@@ -124,10 +120,11 @@ trait ManagesSubscriptions
      */
     public function onPlan($plan)
     {
-        if (is_null($this->customer)) {
-            return false;
-        }
-
-        return $this->customer->onPlan($plan);
+        return ! is_null($this->subscriptions()
+            ->where('paddle_plan', $plan)
+            ->get()
+            ->first(function (Subscription $subscription) use ($plan) {
+                return $subscription->valid();
+            }));
     }
 }

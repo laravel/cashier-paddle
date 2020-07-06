@@ -15,9 +15,10 @@ class CreateSubscriptionsTable extends Migration
     {
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('billable_id');
+            $table->string('billable_type');
             $table->string('name');
-            $table->integer('paddle_id');
+            $table->integer('paddle_id')->unique();
             $table->string('paddle_status');
             $table->integer('paddle_plan');
             $table->integer('quantity');
@@ -26,7 +27,7 @@ class CreateSubscriptionsTable extends Migration
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['customer_id', 'paddle_id']);
+            $table->index(['billable_id', 'billable_type']);
         });
     }
 

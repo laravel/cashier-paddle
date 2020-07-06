@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Paddle\Concerns\Prorates;
 use LogicException;
 
+/**
+ * @property \Laravel\Paddle\Billable $billable
+ */
 class Subscription extends Model
 {
     use Prorates;
@@ -47,13 +50,13 @@ class Subscription extends Model
     protected $paddleInfo;
 
     /**
-     * Get the customer related to the subscription.
+     * Get the billable model related to the subscription.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function customer()
+    public function billable()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->morphTo();
     }
 
     /**
@@ -350,7 +353,7 @@ class Subscription extends Model
             throw new Exception('Charge name has a maximum length of 50 characters.');
         }
 
-        $payload = $this->customer->paddleOptions([
+        $payload = $this->billable->paddleOptions([
             'amount' => $amount,
             'charge_name' => $name,
         ]);
@@ -524,7 +527,7 @@ class Subscription extends Model
      */
     public function updatePaddleSubscription(array $options)
     {
-        $payload = $this->customer->paddleOptions(array_merge([
+        $payload = $this->billable->paddleOptions(array_merge([
             'subscription_id' => $this->paddle_id,
         ], $options));
 
@@ -554,7 +557,7 @@ class Subscription extends Model
     {
         $nextPayment = $this->nextPayment();
 
-        $payload = $this->customer->paddleOptions([
+        $payload = $this->billable->paddleOptions([
             'subscription_id' => $this->paddle_id,
         ]);
 
@@ -585,7 +588,7 @@ class Subscription extends Model
      */
     public function cancelNow()
     {
-        $payload = $this->customer->paddleOptions([
+        $payload = $this->billable->paddleOptions([
             'subscription_id' => $this->paddle_id,
         ]);
 
@@ -652,7 +655,7 @@ class Subscription extends Model
 
         return $this->paddleInfo = Cashier::post('/subscription/users', array_merge([
             'subscription_id' => $this->paddle_id,
-        ], $this->customer->paddleOptions()))['response'][0];
+        ], $this->billable->paddleOptions()))['response'][0];
     }
 
     /**
@@ -665,10 +668,10 @@ class Subscription extends Model
     {
         $result = Cashier::post("/subscription/{$this->paddle_id}/transactions", array_merge([
             'page' => $page,
-        ], $this->customer->paddleOptions()));
+        ], $this->billable->paddleOptions()));
 
         return collect($result['response'])->map(function (array $transaction) {
-            return new Transaction($this->customer, $transaction);
+            return new Transaction($this->billable->customer, $transaction);
         });
     }
 
