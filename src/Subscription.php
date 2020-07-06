@@ -682,7 +682,7 @@ class Subscription extends Model
      */
     public function cardBrand()
     {
-        return (string) $this->paddleInfo()['card_type'];
+        return (string) $this->paddleInfo()['payment_information']['card_type'];
     }
 
     /**
@@ -692,6 +692,6 @@ class Subscription extends Model
      */
     public function cardLastFour()
     {
-        return (string) $this->paddleInfo()['last_four_digits'];
+        return (string) $this->paddleInfo()['payment_information']['last_four_digits'];
     }
 }
