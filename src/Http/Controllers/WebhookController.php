@@ -99,7 +99,9 @@ class WebhookController extends Controller
             ? Carbon::createFromFormat('Y-m-d', $payload['next_bill_date'], 'UTC')->startOfDay()
             : null;
 
-        $customer->subscriptions()->create([
+        $customer->billable->subscriptions()->create([
+            'billable_id' => $passthrough['billable_id'],
+            'billable_type' => $passthrough['billable_type'],
             'name' => $passthrough['subscription_name'],
             'paddle_id' => $payload['subscription_id'],
             'paddle_plan' => $payload['subscription_plan_id'],

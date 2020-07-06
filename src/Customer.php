@@ -4,6 +4,9 @@ namespace Laravel\Paddle;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property \Laravel\Paddle\Billable $billable
+ */
 class Customer extends Model
 {
     /**
@@ -34,43 +37,6 @@ class Customer extends Model
     }
 
     /**
-     * Get all of the subscriptions for the Customer model.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function subscriptions()
-    {
-        return $this->hasMany(Subscription::class)->orderByDesc('created_at');
-    }
-
-    /**
-     * Get a subscription instance by name.
-     *
-     * @param  string  $name
-     * @return \Laravel\Paddle\Subscription|null
-     */
-    public function subscription($name = 'default')
-    {
-        return $this->subscriptions()->where('name', $name)->first();
-    }
-
-    /**
-     * Determine if the entity has a valid subscription on the given plan.
-     *
-     * @param  int  $plan
-     * @return bool
-     */
-    public function onPlan($plan)
-    {
-        return ! is_null($this->subscriptions()
-            ->where('paddle_plan', $plan)
-            ->get()
-            ->first(function (Subscription $subscription) use ($plan) {
-                return $subscription->valid();
-            }));
-    }
-
-    /**
      * Determine if the Paddle model is on a "generic" trial at the model level.
      *
      * @return bool
@@ -78,16 +44,5 @@ class Customer extends Model
     public function onGenericTrial()
     {
         return $this->trial_ends_at && $this->trial_ends_at->isFuture();
-    }
-
-    /**
-     * Get the default Paddle API options for the current Billable model.
-     *
-     * @param  array  $options
-     * @return array
-     */
-    public function paddleOptions(array $options = [])
-    {
-        return $this->billable->paddleOptions($options);
     }
 }

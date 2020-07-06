@@ -21,7 +21,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $billable = $this->createBillable();
 
-        $subscription = $billable->customer->subscriptions()->create([
+        $subscription = $billable->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -61,7 +61,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $billable = $this->createBillable('taylor');
 
-        $subscription = $billable->customer->subscriptions()->create([
+        $subscription = $billable->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -95,7 +95,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $billable = $this->createBillable('taylor');
 
-        $subscription = $billable->customer->subscriptions()->create([
+        $subscription = $billable->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -118,7 +118,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $billable = $this->createBillable('taylor');
 
-        $subscription = $billable->customer->subscriptions()->create([
+        $subscription = $billable->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -141,7 +141,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $billable = $this->createBillable('taylor');
 
-        $subscription = $billable->customer->subscriptions()->create([
+        $subscription = $billable->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
@@ -163,7 +163,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $billable = $this->createBillable('taylor');
 
-        $subscription = $billable->customer->subscriptions()->create([
+        $subscription = $billable->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
