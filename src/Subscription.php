@@ -694,4 +694,14 @@ class Subscription extends Model
     {
         return (string) $this->paddleInfo()['payment_information']['last_four_digits'];
     }
+
+    /**
+     * Get the card expiration date.
+     *
+     * @return string
+     */
+    public function cardExpirationDate()
+    {
+        return (string) $this->paddleInfo()['payment_information']['expiry_date'];
+    }
 }
