@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Carbon\Carbon;
 use Laravel\Paddle\Subscription;
 
 class WebhooksTest extends FeatureTestCase
@@ -39,9 +38,8 @@ class WebhooksTest extends FeatureTestCase
             $this->markTestSkipped('Checkout identifier not configured');
         }
 
-        $user = $this->createUser();
-        $user->customer()->create([
-            'trial_ends_at' => now('UTC')->addDays(5)
+        $user = $this->createBillable('taylor', [
+            'trial_ends_at' => now('UTC')->addDays(5),
         ]);
 
         $this->postJson('paddle/webhook', [
