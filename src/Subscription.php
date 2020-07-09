@@ -411,6 +411,10 @@ class Subscription extends Model
      */
     public function updateQuantity($quantity, array $options = [])
     {
+        if ($this->onTrial()) {
+            throw new LogicException('Paddle does not allow updating quantities while on trial.');
+        }
+
         if ($this->paused() || $this->pastDue()) {
             throw new LogicException('Cannot update quantities for paused or past due subscriptions.');
         }
