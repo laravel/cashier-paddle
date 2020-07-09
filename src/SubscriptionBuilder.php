@@ -176,10 +176,9 @@ class SubscriptionBuilder
         if (! is_null($trialDays = $this->getTrialEndForPayload())) {
             $payload['trial_days'] = $trialDays;
 
-            // Paddle will immediately charge the plan price for the trial days
-            // so we'll need to explicitly set the prices to 0 for the first charge.
-            // If there's no trial, we use the recurring_prices to charge the user
-            // immediately.
+            // Paddle will immediately charge the plan price for the trial days so we'll
+            // need to explicitly set the prices to 0 for the first charge. If there's
+            // no trial, we use the recurring_prices to charge the user immediately.
             $payload['prices'] = $payload['prices']
                 ?? $this->getPlanPricesForPayload($trialDays !== 0);
         }
@@ -224,7 +223,6 @@ class SubscriptionBuilder
      *
      * @param  bool  $trialing
      * @return array
-     * @throws Exceptions\PaddleException
      */
     protected function getPlanPricesForPayload($trialing = true)
     {
