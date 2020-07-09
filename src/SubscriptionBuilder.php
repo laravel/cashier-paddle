@@ -178,17 +178,10 @@ class SubscriptionBuilder
 
             // Paddle will immediately charge the plan price for the trial days
             // so we'll need to explicitly set the prices to 0 for the first charge.
-            if ($trialDays !== 0) {
-                $prices = $payload['prices'] ?? $this->getPlanPricesForPayload();
-
-                $payload['prices'] = [];
-
-                foreach ($prices as $key => $price) {
-                    [$currency] = explode(':', $price);
-
-                    $payload['prices'][] = $currency.':0';
-                }
-            }
+            // If there's no trial, we use the recurring_prices to charge the user
+            // immediately.
+            $payload['prices'] = $payload['prices']
+                ?? $this->getPlanPricesForPayload($trialDays !== 0);
         }
 
         $payload['passthrough'] = array_merge($this->metadata, [
@@ -229,17 +222,21 @@ class SubscriptionBuilder
     /**
      * Get the plan prices for the Paddle payload.
      *
+     * @param  bool  $trialing
      * @return array
+     * @throws Exceptions\PaddleException
      */
-    protected function getPlanPricesForPayload()
+    protected function getPlanPricesForPayload($trialing = true)
     {
         $plan = Cashier::post(
             '/subscription/plans', $this->billable->paddleOptions(['plan' => $this->plan])
         )['response'][0];
 
-        return collect($plan['initial_price'])
-            ->map(function ($price, $currency) {
-                return "$currency:$price";
+        return collect($plan[$trialing ? 'initial_price' : 'recurring_price'])
+            ->map(function ($price, $currency) use ($trialing) {
+                $price = $trialing ? 0 : $price;
+
+                return $currency.':'.$price;
             })
             ->values()
             ->all();
