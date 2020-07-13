@@ -559,6 +559,10 @@ class Subscription extends Model
      */
     public function cancel()
     {
+        if ($this->onGracePeriod()) {
+            return $this;
+        }
+
         $nextPayment = $this->nextPayment();
 
         $payload = $this->billable->paddleOptions([
