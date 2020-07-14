@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
-use Laravel\Paddle\Exceptions\InvalidTransaction;
 use Money\Currency;
 
 class Transaction implements Arrayable, Jsonable, JsonSerializable
@@ -36,15 +35,9 @@ class Transaction implements Arrayable, Jsonable, JsonSerializable
      * @param  \Laravel\Paddle\Customer  $customer
      * @param  array  $transaction
      * @return void
-     *
-     * @throws \Laravel\Paddle\Exceptions\InvalidTransaction
      */
     public function __construct(Customer $customer, array $transaction)
     {
-        if ($customer->paddle_id !== $transaction['user']['user_id']) {
-            throw InvalidTransaction::invalidCustomer($customer);
-        }
-
         $this->customer = $customer;
         $this->transaction = $transaction;
     }

@@ -1,3 +1,3 @@
-<a href="#!" data-override="{{ $url }}" data-disable-logout="true" {{ $attributes->merge(['class' => 'paddle_button']) }}>
+<a href="#!" data-override="{{ $url }}" {{ $attributes->merge(['class' => 'paddle_button']) }}>
     {{ $slot }}
 </a>
