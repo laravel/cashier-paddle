@@ -21,7 +21,7 @@ abstract class FeatureTestCase extends TestCase
     {
         $user = $this->createUser($description);
 
-        $user->customer()->create($options);
+        $user->createAsCustomer($options);
 
         return $user;
     }

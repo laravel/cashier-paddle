@@ -94,7 +94,7 @@ class Price
     }
 
     /**
-     * Get the used currency for the transaction.
+     * Get the used currency for the price.
      *
      * @return \Money\Currency
      */
@@ -115,13 +115,13 @@ class Price
     }
 
     /**
-     * Dynamically get values from the Paddle transaction.
+     * Dynamically get values from the Paddle price.
      *
      * @param  string  $key
      * @return mixed
      */
     public function __get($key)
     {
-        return $this->product[$key];
+        return $this->price[$key];
     }
 }
