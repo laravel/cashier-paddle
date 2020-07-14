@@ -22,7 +22,6 @@ class Customer extends Model
      * @var array
      */
     protected $casts = [
-        'paddle_id' => 'integer',
         'trial_ends_at' => 'datetime',
     ];
 

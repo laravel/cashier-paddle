@@ -27,7 +27,6 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('customers', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
-            'paddle_email' => $user->paddleEmail(),
         ]);
     }
 
@@ -55,7 +54,6 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('customers', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
-            'paddle_email' => $user->paddleEmail(),
         ]);
     }
 
@@ -81,8 +79,6 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('customers', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
-            'paddle_id' => 'foo',
-            'paddle_email' => $user->paddleEmail(),
         ]);
 
         $this->assertDatabaseHas('subscriptions', [
@@ -123,8 +119,6 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('customers', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
-            'paddle_id' => 'foo',
-            'paddle_email' => $user->paddleEmail(),
         ]);
 
         $this->assertDatabaseHas('subscriptions', [

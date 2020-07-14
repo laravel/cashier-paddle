@@ -4,23 +4,12 @@ namespace Tests\Unit;
 
 use Carbon\Carbon;
 use Laravel\Paddle\Customer;
-use Laravel\Paddle\Exceptions\InvalidTransaction;
 use Laravel\Paddle\Transaction;
 use Money\Currency;
 use PHPUnit\Framework\TestCase;
 
 class TransactionTest extends TestCase
 {
-    public function test_it_throws_an_exception_for_an_invalid_owner()
-    {
-        $customer = new Customer(['paddle_id' => 1]);
-        $transaction = ['user' => ['user_id' => 2]];
-
-        $this->expectException(InvalidTransaction::class);
-
-        new Transaction($customer, $transaction);
-    }
-
     public function test_it_can_returns_its_customer()
     {
         $customer = new Customer(['paddle_id' => 1]);

@@ -23,7 +23,6 @@ class CustomerTest extends FeatureTestCase
         $this->assertFalse($user->onPlan(123));
         $this->assertFalse($user->subscribed());
         $this->assertFalse($user->subscribedToPlan(123));
-        $this->assertEmpty($user->transactions());
         $this->assertEmpty($user->subscriptions);
         $this->assertNull($user->subscription());
     }

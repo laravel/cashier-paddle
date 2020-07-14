@@ -684,6 +684,16 @@ class Subscription extends Model
     }
 
     /**
+     * Get the email address of the customer associated to this subscription.
+     *
+     * @return string
+     */
+    public function paddleEmail()
+    {
+        return (string) $this->paddleInfo()['user_email'];
+    }
+
+    /**
      * Get the card brand from the subscription.
      *
      * @return string

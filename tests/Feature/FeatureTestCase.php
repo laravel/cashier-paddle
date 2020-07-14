@@ -21,10 +21,7 @@ abstract class FeatureTestCase extends TestCase
     {
         $user = $this->createUser($description);
 
-        $user->customer()->create(array_merge([
-            'paddle_id' => $_SERVER['PADDLE_TEST_CUSTOMER_ID'],
-            'paddle_email' => $_SERVER['PADDLE_TEST_CUSTOMER_EMAIL'],
-        ], $options));
+        $user->customer()->create($options);
 
         return $user;
     }

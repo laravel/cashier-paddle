@@ -17,8 +17,6 @@ class CreateCustomersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('billable_id');
             $table->string('billable_type');
-            $table->string('paddle_id')->nullable()->unique();
-            $table->string('paddle_email')->nullable()->unique();
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamps();
 

@@ -62,17 +62,9 @@ class WebhookController extends Controller
     {
         $passthrough = json_decode($payload['passthrough'], true);
 
-        $response = Cashier::post(
-            "/checkout/{$payload['checkout_id']}/transactions",
-            Cashier::paddleOptions()
-        )['response'][0];
-
-        Customer::updateOrCreate([
+        Customer::firstOrCreate([
             'billable_id' => $passthrough['billable_id'],
             'billable_type' => $passthrough['billable_type'],
-        ], [
-            'paddle_id' => $response['user']['user_id'],
-            'paddle_email' => $payload['email'],
         ]);
     }
 
@@ -87,12 +79,9 @@ class WebhookController extends Controller
         $passthrough = json_decode($payload['passthrough'], true);
 
         /** @var \Laravel\Paddle\Customer $customer */
-        $customer = Customer::updateOrCreate([
+        $customer = Customer::firstOrCreate([
             'billable_id' => $passthrough['billable_id'],
             'billable_type' => $passthrough['billable_type'],
-        ], [
-            'paddle_id' => $payload['user_id'],
-            'paddle_email' => $payload['email'],
         ]);
 
         $trialEndsAt = $payload['status'] === Subscription::STATUS_TRIALING
