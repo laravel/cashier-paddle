@@ -198,6 +198,7 @@ class SubscriptionsTest extends FeatureTestCase
             'quantity' => 1,
         ]);
 
+        $this->assertSame('john@example.com', $subscription->paddleEmail());
         $this->assertSame('master', $subscription->cardBrand());
         $this->assertSame('4050', $subscription->cardLastFour());
     }
