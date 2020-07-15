@@ -93,9 +93,6 @@ class WebhookController extends Controller
             return;
         }
 
-        // We'll first attempt to look up the subscription by its paddle id. When it's not found, we'll
-        // assume this is the first payment for the subscription and that the subscription hasn't been
-        // created yet. If so, we'll use the passthrough values to find or create the customer.
         if ($subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
             $billable = $subscription->billable;
         } else {
