@@ -24,7 +24,7 @@ class CreateReceiptsTable extends Migration
             $table->string('tax');
             $table->string('currency', 3);
             $table->integer('quantity');
-            $table->string('download_url')->unique();
+            $table->string('receipt_url')->unique();
             $table->timestamp('paid_at');
             $table->timestamps();
 

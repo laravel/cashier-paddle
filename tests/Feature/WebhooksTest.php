@@ -54,7 +54,7 @@ class WebhooksTest extends FeatureTestCase
             'tax' => '4.34',
             'currency' => 'EUR',
             'quantity' => 1,
-            'download_url' => 'https://example.com/receipt.pdf',
+            'receipt_url' => 'https://example.com/receipt.pdf',
         ]);
     }
 
@@ -102,7 +102,7 @@ class WebhooksTest extends FeatureTestCase
             'tax' => '4.34',
             'currency' => 'EUR',
             'quantity' => 1,
-            'download_url' => 'https://example.com/receipt.pdf',
+            'receipt_url' => 'https://example.com/receipt.pdf',
         ]);
     }
 
@@ -156,7 +156,7 @@ class WebhooksTest extends FeatureTestCase
             'tax' => '4.34',
             'currency' => 'EUR',
             'quantity' => 1,
-            'download_url' => 'https://example.com/receipt.pdf',
+            'receipt_url' => 'https://example.com/receipt.pdf',
         ]);
     }
 
