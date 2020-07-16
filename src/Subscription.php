@@ -60,6 +60,16 @@ class Subscription extends Model
     }
 
     /**
+     * Get all of the receipts for the Billable model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function receipts()
+    {
+        return $this->hasMany(Receipt::class, 'paddle_subscription_id', 'paddle_id')->orderByDesc('created_at');
+    }
+
+    /**
      * Determine if the subscription has a specific plan.
      *
      * @param  int  $plan
@@ -664,23 +674,6 @@ class Subscription extends Model
         return $this->paddleInfo = Cashier::post('/subscription/users', array_merge([
             'subscription_id' => $this->paddle_id,
         ], $this->billable->paddleOptions()))['response'][0];
-    }
-
-    /**
-     * Get the user's transactions.
-     *
-     * @param  int  $page
-     * @return \Illuminate\Support\Collection
-     */
-    public function transactions($page = 1)
-    {
-        $result = Cashier::post("/subscription/{$this->paddle_id}/transactions", array_merge([
-            'page' => $page,
-        ], $this->billable->paddleOptions()));
-
-        return collect($result['response'])->map(function (array $transaction) {
-            return new Transaction($this->billable->customer, $transaction);
-        });
     }
 
     /**

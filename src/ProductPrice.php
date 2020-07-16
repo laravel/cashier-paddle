@@ -147,7 +147,7 @@ class ProductPrice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the used currency for the transaction.
+     * Get the used currency for the product price.
      *
      * @return \Money\Currency
      */
@@ -188,7 +188,7 @@ class ProductPrice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Dynamically get values from the Paddle transaction.
+     * Dynamically get values from the Paddle product price.
      *
      * @param  string  $key
      * @return mixed

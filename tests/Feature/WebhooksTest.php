@@ -6,6 +6,13 @@ use Laravel\Paddle\Subscription;
 
 class WebhooksTest extends FeatureTestCase
 {
+    public function test_gracefully_handle_webhook_without_alert_name()
+    {
+        $this->postJson('paddle/webhook', [
+            'event_time' => now()->addDay()->format('Y-m-d H:i:s'),
+        ])->assertOk();
+    }
+
     public function test_it_can_handle_a_payment_succeeded_event()
     {
         if (! isset($_SERVER['PADDLE_TEST_CHECKOUT'])) {
@@ -16,8 +23,15 @@ class WebhooksTest extends FeatureTestCase
 
         $this->postJson('paddle/webhook', [
             'alert_name' => 'payment_succeeded',
+            'event_time' => $paidAt = now()->addDay()->format('Y-m-d H:i:s'),
             'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'order_id' => 'foo',
             'email' => $user->paddleEmail(),
+            'sale_gross' => '12.55',
+            'payment_tax' => '4.34',
+            'currency' => 'EUR',
+            'quantity' => 1,
+            'receipt_url' => 'https://example.com/receipt.pdf',
             'passthrough' => json_encode([
                 'billable_id' => $user->id,
                 'billable_type' => $user->getMorphClass(),
@@ -27,6 +41,20 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('customers', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
+        ]);
+
+        $this->assertDatabaseHas('receipts', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'paddle_subscription_id' => null,
+            'paid_at' => $paidAt,
+            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'order_id' => 'foo',
+            'amount' => '12.55',
+            'tax' => '4.34',
+            'currency' => 'EUR',
+            'quantity' => 1,
+            'receipt_url' => 'https://example.com/receipt.pdf',
         ]);
     }
 
@@ -43,8 +71,15 @@ class WebhooksTest extends FeatureTestCase
 
         $this->postJson('paddle/webhook', [
             'alert_name' => 'payment_succeeded',
+            'event_time' => $paidAt = now()->addDay()->format('Y-m-d H:i:s'),
             'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'order_id' => 'foo',
             'email' => $user->paddleEmail(),
+            'sale_gross' => '12.55',
+            'payment_tax' => '4.34',
+            'currency' => 'EUR',
+            'quantity' => 1,
+            'receipt_url' => 'https://example.com/receipt.pdf',
             'passthrough' => json_encode([
                 'billable_id' => $user->id,
                 'billable_type' => $user->getMorphClass(),
@@ -54,6 +89,74 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('customers', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
+        ]);
+
+        $this->assertDatabaseHas('receipts', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'paddle_subscription_id' => null,
+            'paid_at' => $paidAt,
+            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'order_id' => 'foo',
+            'amount' => '12.55',
+            'tax' => '4.34',
+            'currency' => 'EUR',
+            'quantity' => 1,
+            'receipt_url' => 'https://example.com/receipt.pdf',
+        ]);
+    }
+
+    public function test_it_can_handle_a_subscription_payment_succeeded_event()
+    {
+        if (! isset($_SERVER['PADDLE_TEST_CHECKOUT'])) {
+            $this->markTestSkipped('Checkout identifier not configured');
+        }
+
+        $user = $this->createBillable();
+
+        $subscription = $user->subscriptions()->create([
+            'name' => 'main',
+            'paddle_id' => 244,
+            'paddle_plan' => 2323,
+            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'quantity' => 1,
+        ]);
+
+        $this->postJson('paddle/webhook', [
+            'alert_name' => 'subscription_payment_succeeded',
+            'event_time' => $paidAt = now()->addDay()->format('Y-m-d H:i:s'),
+            'subscription_id' => $subscription->paddle_id,
+            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'order_id' => 'foo',
+            'email' => $user->paddleEmail(),
+            'sale_gross' => '12.55',
+            'payment_tax' => '4.34',
+            'currency' => 'EUR',
+            'quantity' => 1,
+            'receipt_url' => 'https://example.com/receipt.pdf',
+            'passthrough' => json_encode([
+                'billable_id' => $user->id,
+                'billable_type' => $user->getMorphClass(),
+            ]),
+        ])->assertOk();
+
+        $this->assertDatabaseHas('customers', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+        ]);
+
+        $this->assertDatabaseHas('receipts', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'paddle_subscription_id' => $subscription->paddle_id,
+            'paid_at' => $paidAt,
+            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'order_id' => 'foo',
+            'amount' => '12.55',
+            'tax' => '4.34',
+            'currency' => 'EUR',
+            'quantity' => 1,
+            'receipt_url' => 'https://example.com/receipt.pdf',
         ]);
     }
 
