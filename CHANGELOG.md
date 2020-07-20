@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.0.0-beta.2...master)
 
 
-## [v1.0.0-beta.2 (2020-07-20)](https://github.com/laravel/cashier-paddle/compare/v1.0.0-beta...v1.0.0-beta.2)
+## [v1.0.0-beta.2 (2020-07-21)](https://github.com/laravel/cashier-paddle/compare/v1.0.0-beta...v1.0.0-beta.2)
 
 ### Changed
 - Use primary key as customer ID ([#3](https://github.com/laravel/cashier-paddle/pull/3))
