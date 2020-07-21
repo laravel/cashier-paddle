@@ -583,14 +583,9 @@ class Subscription extends Model
 
         $this->paddle_status = self::STATUS_DELETED;
 
-        // If the user was on trial, we will set the grace period to end when the trial
-        // would have ended. Otherwise, we'll retrieve the end of the billing period
-        // period and make that the end of the grace period for this current user.
-        if ($this->onTrial()) {
-            $this->ends_at = $this->trial_ends_at;
-        } else {
-            $this->ends_at = $nextPayment->date();
-        }
+        $this->ends_at = $this->onTrial()
+                    ? $this->trial_ends_at
+                    : $nextPayment->date();
 
         $this->save();
 
@@ -661,22 +656,6 @@ class Subscription extends Model
     }
 
     /**
-     * Get info from Paddle about the subscription.
-     *
-     * @return array
-     */
-    public function paddleInfo()
-    {
-        if ($this->paddleInfo) {
-            return $this->paddleInfo;
-        }
-
-        return $this->paddleInfo = Cashier::post('/subscription/users', array_merge([
-            'subscription_id' => $this->paddle_id,
-        ], $this->billable->paddleOptions()))['response'][0];
-    }
-
-    /**
      * Get the email address of the customer associated to this subscription.
      *
      * @return string
@@ -714,5 +693,21 @@ class Subscription extends Model
     public function cardExpirationDate()
     {
         return (string) $this->paddleInfo()['payment_information']['expiry_date'];
+    }
+
+    /**
+     * Get raw information about the subscription from Paddle.
+     *
+     * @return array
+     */
+    public function paddleInfo()
+    {
+        if ($this->paddleInfo) {
+            return $this->paddleInfo;
+        }
+
+        return $this->paddleInfo = Cashier::post('/subscription/users', array_merge([
+            'subscription_id' => $this->paddle_id,
+        ], $this->billable->paddleOptions()))['response'][0];
     }
 }
