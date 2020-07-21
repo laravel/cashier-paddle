@@ -144,31 +144,33 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionUpdated(array $payload)
     {
-        if ($subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
-            // Plan...
-            if (isset($payload['subscription_plan_id'])) {
-                $subscription->paddle_plan = $payload['subscription_plan_id'];
-            }
-
-            // Status...
-            if (isset($payload['status'])) {
-                $subscription->paddle_status = $payload['status'];
-            }
-
-            // Quantity...
-            if (isset($payload['quantity'])) {
-                $subscription->quantity = $payload['quantity'];
-            }
-
-            // Paused...
-            if (isset($payload['paused_from'])) {
-                $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:s', $payload['paused_from'], 'UTC');
-            } else {
-                $subscription->paused_from = null;
-            }
-
-            $subscription->save();
+        if (! $subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
+            return;
         }
+
+        // Plan...
+        if (isset($payload['subscription_plan_id'])) {
+            $subscription->paddle_plan = $payload['subscription_plan_id'];
+        }
+
+        // Status...
+        if (isset($payload['status'])) {
+            $subscription->paddle_status = $payload['status'];
+        }
+
+        // Quantity...
+        if (isset($payload['quantity'])) {
+            $subscription->quantity = $payload['quantity'];
+        }
+
+        // Paused...
+        if (isset($payload['paused_from'])) {
+            $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:s', $payload['paused_from'], 'UTC');
+        } else {
+            $subscription->paused_from = null;
+        }
+
+        $subscription->save();
     }
 
     /**
@@ -179,27 +181,29 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionCancelled(array $payload)
     {
-        if ($subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
-            // Cancellation date...
-            if (isset($payload['cancellation_effective_date'])) {
-                if ($payload['cancellation_effective_date']) {
-                    $subscription->ends_at = $subscription->onTrial()
-                        ? $subscription->trial_ends_at
-                        : Carbon::createFromFormat('Y-m-d', $payload['cancellation_effective_date'], 'UTC')->startOfDay();
-                } else {
-                    $subscription->ends_at = null;
-                }
-            }
-
-            // Status...
-            if (isset($payload['status'])) {
-                $subscription->paddle_status = $payload['status'];
-            }
-
-            $subscription->paused_from = null;
-
-            $subscription->save();
+        if (! $subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
+            return;
         }
+
+        // Cancellation date...
+        if (isset($payload['cancellation_effective_date'])) {
+            if ($payload['cancellation_effective_date']) {
+                $subscription->ends_at = $subscription->onTrial()
+                    ? $subscription->trial_ends_at
+                    : Carbon::createFromFormat('Y-m-d', $payload['cancellation_effective_date'], 'UTC')->startOfDay();
+            } else {
+                $subscription->ends_at = null;
+            }
+        }
+
+        // Status...
+        if (isset($payload['status'])) {
+            $subscription->paddle_status = $payload['status'];
+        }
+
+        $subscription->paused_from = null;
+
+        $subscription->save();
     }
 
     /**
