@@ -3,13 +3,13 @@
 namespace Laravel\Paddle\Http\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Laravel\Paddle\Customer;
 use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Illuminate\Support\Str;
 use Laravel\Paddle\Receipt;
 use Laravel\Paddle\Subscription;
 use Symfony\Component\HttpFoundation\Response;

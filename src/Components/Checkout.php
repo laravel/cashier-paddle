@@ -60,13 +60,11 @@ class Checkout extends Component
      */
     public function options()
     {
-        $options = [
+        return array_merge([
             'method' => 'inline',
             'frameTarget' => $this->id,
             'frameInitialHeight' => $this->height,
             'frameStyle' => 'width: 100%; background-color: transparent; border: none;',
-        ];
-
-        return array_merge($options, $this->options);
+        ], $this->options);
     }
 }

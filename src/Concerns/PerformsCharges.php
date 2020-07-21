@@ -57,9 +57,9 @@ trait PerformsCharges
         $payload['customer_country'] = (string) $this->paddleCountry();
         $payload['customer_postcode'] = (string) $this->paddlePostcode();
 
-        // We'll need a way to identify the user in any webhook we're catching so
-        // before we make the API request we'll attach the auth identifier to
-        // the payload. We can then match it with the user in a webhook.
+        // We'll need a way to identify the user in any webhook we're catching so before
+        // we make the API request we'll attach the authentication identifier to this
+        // payload so we can match it back to a user when handling Paddle webhooks.
         if (! isset($payload['passthrough'])) {
             $payload['passthrough'] = [];
         }
