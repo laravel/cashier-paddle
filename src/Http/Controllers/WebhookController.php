@@ -65,7 +65,7 @@ class WebhookController extends Controller
      */
     protected function handlePaymentSucceeded(array $payload)
     {
-        if (Receipt::where('order_id', $payload['order_id'])->count()) {
+        if ($this->getReceiptCount($payload['order_id'])) {
             return;
         }
 
@@ -89,11 +89,11 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionPaymentSucceeded(array $payload)
     {
-        if (Receipt::where('order_id', $payload['order_id'])->count()) {
+        if ($this->getReceiptCount($payload['order_id'])) {
             return;
         }
 
-        if ($subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
+        if ($subscription = $this->findSubscription($payload['subscription_id'])) {
             $billable = $subscription->billable;
         } else {
             $billable = $this->findOrCreateCustomer($payload['passthrough']);
@@ -144,7 +144,7 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionUpdated(array $payload)
     {
-        if (! $subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
+        if (! $subscription = $this->findSubscription($payload['subscription_id'])) {
             return;
         }
 
@@ -181,7 +181,7 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionCancelled(array $payload)
     {
-        if (! $subscription = Subscription::firstWhere('paddle_id', $payload['subscription_id'])) {
+        if (! $subscription = $this->findSubscription($payload['subscription_id'])) {
             return;
         }
 
@@ -221,5 +221,27 @@ class WebhookController extends Controller
             'billable_id' => $passthrough['billable_id'],
             'billable_type' => $passthrough['billable_type'],
         ])->billable;
+    }
+
+    /**
+     * Find the first subscription matching a Paddle subscription id.
+     *
+     * @param  string  $subscriptionId
+     * @return \Laravel\Paddle\Subscription|null
+     */
+    protected function findSubscription(string $subscriptionId)
+    {
+        return Subscription::firstWhere('paddle_id', $subscriptionId);
+    }
+
+    /**
+     * Find the number of receipts for an order.
+     *
+     * @param  string  $orderId
+     * @return int
+     */
+    protected function getReceiptCount(string $orderId)
+    {
+        return Receipt::where('order_id', $orderId)->count();
     }
 }
