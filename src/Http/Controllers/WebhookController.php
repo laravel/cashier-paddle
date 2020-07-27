@@ -159,8 +159,8 @@ class WebhookController extends Controller
         }
 
         // Quantity...
-        if (isset($payload['quantity'])) {
-            $subscription->quantity = $payload['quantity'];
+        if (isset($payload['new_quantity'])) {
+            $subscription->quantity = $payload['new_quantity'];
         }
 
         // Paused...
