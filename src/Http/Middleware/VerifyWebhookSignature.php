@@ -47,7 +47,7 @@ class VerifyWebhookSignature
         ksort($fields);
 
         foreach ($fields as $k => $v) {
-            if (! in_array(gettype($v), array('object', 'array'))) {
+            if (! in_array(gettype($v), ['object', 'array'])) {
                 $fields[$k] = "$v";
             }
         }
