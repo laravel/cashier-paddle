@@ -250,7 +250,7 @@ class WebhooksTest extends FeatureTestCase
 
         $this->postJson('paddle/webhook', [
             'alert_name' => 'subscription_updated',
-            'quantity' => 3,
+            'new_quantity' => 3,
             'status' => Subscription::STATUS_PAUSED,
             'paused_from' => ($date = now('UTC')->addDays(5))->format('Y-m-d H:i:s'),
             'subscription_id' => 244,

@@ -159,8 +159,8 @@ class WebhookController extends Controller
         }
 
         // Quantity...
-        if (isset($payload['quantity'])) {
-            $subscription->quantity = $payload['quantity'];
+        if (isset($payload['new_quantity'])) {
+            $subscription->quantity = $payload['new_quantity'];
         }
 
         // Paused...
@@ -186,15 +186,9 @@ class WebhookController extends Controller
         }
 
         // Cancellation date...
-        if (isset($payload['cancellation_effective_date'])) {
-            if ($payload['cancellation_effective_date']) {
-                $subscription->ends_at = $subscription->onTrial()
-                    ? $subscription->trial_ends_at
-                    : Carbon::createFromFormat('Y-m-d', $payload['cancellation_effective_date'], 'UTC')->startOfDay();
-            } else {
-                $subscription->ends_at = null;
-            }
-        }
+        $subscription->ends_at = $subscription->onTrial()
+            ? $subscription->trial_ends_at
+            : Carbon::createFromFormat('Y-m-d', $payload['cancellation_effective_date'], 'UTC')->startOfDay();
 
         // Status...
         if (isset($payload['status'])) {
