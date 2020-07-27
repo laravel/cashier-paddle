@@ -647,7 +647,7 @@ class Subscription extends Model
     public function nextPayment()
     {
         if (! isset($this->paddleInfo()['next_payment'])) {
-            return null;
+            return;
         }
 
         $payment = $this->paddleInfo()['next_payment'];
