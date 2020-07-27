@@ -201,7 +201,7 @@ class WebhooksTest extends FeatureTestCase
     {
         $user = $this->createUser();
         $user->customer()->create([
-            'trial_ends_at' => now('UTC')->addDays(5)
+            'trial_ends_at' => now('UTC')->addDays(5),
         ]);
 
         $this->postJson('paddle/webhook', [
