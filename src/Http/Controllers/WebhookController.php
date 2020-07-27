@@ -65,7 +65,7 @@ class WebhookController extends Controller
      */
     protected function handlePaymentSucceeded(array $payload)
     {
-        if ($this->getReceiptCount($payload['order_id'])) {
+        if ($this->doesReceiptExists($payload['order_id'])) {
             return;
         }
 
@@ -89,7 +89,7 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionPaymentSucceeded(array $payload)
     {
-        if ($this->getReceiptCount($payload['order_id'])) {
+        if ($this->doesReceiptExists($payload['order_id'])) {
             return;
         }
 
@@ -235,13 +235,13 @@ class WebhookController extends Controller
     }
 
     /**
-     * Find the number of receipts for an order.
+     * Determine if a receipt with a given Order ID already exists.
      *
      * @param  string  $orderId
-     * @return int
+     * @return bool
      */
-    protected function getReceiptCount(string $orderId)
+    protected function doesReceiptExists(string $orderId)
     {
-        return Receipt::where('order_id', $orderId)->count();
+        return Receipt::where('order_id', $orderId)->count() > 0;
     }
 }
