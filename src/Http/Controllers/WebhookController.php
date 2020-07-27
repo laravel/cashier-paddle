@@ -65,7 +65,7 @@ class WebhookController extends Controller
      */
     protected function handlePaymentSucceeded(array $payload)
     {
-        if ($this->doesReceiptExist($payload['order_id'])) {
+        if ($this->receiptExists($payload['order_id'])) {
             return;
         }
 
@@ -89,7 +89,7 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionPaymentSucceeded(array $payload)
     {
-        if ($this->doesReceiptExist($payload['order_id'])) {
+        if ($this->receiptExists($payload['order_id'])) {
             return;
         }
 
@@ -240,7 +240,7 @@ class WebhookController extends Controller
      * @param  string  $orderId
      * @return bool
      */
-    protected function doesReceiptExist(string $orderId)
+    protected function receiptExists(string $orderId)
     {
         return Receipt::where('order_id', $orderId)->count() > 0;
     }
