@@ -41,7 +41,7 @@ class Receipt extends Model
      */
     public function subscription()
     {
-        return $this->belongsTo(Subscription::class, 'paddle_id', 'paddle_subscription_id');
+        return $this->belongsTo(Subscription::class, 'paddle_subscription_id', 'paddle_id');
     }
 
     /**
