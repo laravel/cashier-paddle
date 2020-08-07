@@ -666,6 +666,16 @@ class Subscription extends Model
     }
 
     /**
+     * Get the payment method type from the subscription.
+     *
+     * @return string
+     */
+    public function paymentMethod()
+    {
+        return (string) $this->paddleInfo()['payment_information']['payment_method'];
+    }
+
+    /**
      * Get the card brand from the subscription.
      *
      * @return string
