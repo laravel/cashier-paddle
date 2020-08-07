@@ -123,7 +123,7 @@ trait ManagesSubscriptions
         return ! is_null($this->subscriptions()
             ->where('paddle_plan', $plan)
             ->get()
-            ->first(function (Subscription $subscription) use ($plan) {
+            ->first(function (Subscription $subscription) {
                 return $subscription->valid();
             }));
     }
