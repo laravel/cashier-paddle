@@ -710,7 +710,7 @@ class Subscription extends Model
     }
 
     /**
-     * Perform a guard check to prevent change for a specific action,
+     * Perform a guard check to prevent change for a specific action,.
      *
      * @param  string  $action
      * @return void
