@@ -421,13 +421,7 @@ class Subscription extends Model
      */
     public function updateQuantity($quantity, array $options = [])
     {
-        if ($this->onTrial()) {
-            throw new LogicException('Paddle does not allow updating quantities while on trial.');
-        }
-
-        if ($this->paused() || $this->pastDue()) {
-            throw new LogicException('Cannot update quantities for paused or past due subscriptions.');
-        }
+        $this->guardAgainstUpdates('update quantities');
 
         $this->updatePaddleSubscription(array_merge($options, [
             'quantity' => $quantity,
@@ -452,13 +446,7 @@ class Subscription extends Model
      */
     public function swap($plan, array $options = [])
     {
-        if ($this->onTrial()) {
-            throw new LogicException('Paddle does not allow swapping plans while on trial.');
-        }
-
-        if ($this->paused() || $this->pastDue()) {
-            throw new LogicException('Cannot swap plans for paused or past due subscriptions.');
-        }
+        $this->guardAgainstUpdates('swap plans');
 
         $this->updatePaddleSubscription(array_merge($options, [
             'plan_id' => $plan,
@@ -719,5 +707,32 @@ class Subscription extends Model
         return $this->paddleInfo = Cashier::post('/subscription/users', array_merge([
             'subscription_id' => $this->paddle_id,
         ], $this->billable->paddleOptions()))['response'][0];
+    }
+
+    /**
+     * Perform a guard check to prevent change for a specific action.
+     *
+     * @param  string  $action
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function guardAgainstUpdates($action): void
+    {
+        if ($this->onTrial()) {
+            throw new LogicException("Cannot $action while on trial.");
+        }
+
+        if ($this->paused() || $this->onPausedGracePeriod()) {
+            throw new LogicException("Cannot $action for paused subscriptions.");
+        }
+
+        if ($this->cancelled() || $this->onGracePeriod()) {
+            throw new LogicException("Cannot $action for cancelled subscriptions.");
+        }
+
+        if ($this->pastDue()) {
+            throw new LogicException("Cannot $action for past due subscriptions.");
+        }
     }
 }
