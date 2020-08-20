@@ -202,6 +202,7 @@ class SubscriptionsTest extends FeatureTestCase
             'paddle_plan' => $_SERVER['PADDLE_TEST_PLAN_HOBBY'],
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
+            'update_url' => $this->updateUrl(),
         ]);
 
         $this->assertSame('john@example.com', $subscription->paddleEmail());

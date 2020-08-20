@@ -120,6 +120,7 @@ class WebhooksTest extends FeatureTestCase
             'paddle_plan' => 2323,
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
+            'update_url' => $this->updateUrl(),
         ]);
 
         $this->postJson('paddle/webhook', [
