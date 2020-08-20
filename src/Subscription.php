@@ -541,16 +541,6 @@ class Subscription extends Model
     }
 
     /**
-     * Get the Paddle update url.
-     *
-     * @return array
-     */
-    public function updateUrl()
-    {
-        return $this->paddleInfo()['update_url'];
-    }
-
-    /**
      * Cancel the subscription.
      *
      * @return $this

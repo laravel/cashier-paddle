@@ -22,6 +22,7 @@ class CreateSubscriptionsTable extends Migration
             $table->string('paddle_status');
             $table->integer('paddle_plan');
             $table->integer('quantity');
+            $table->string('update_url', 200);
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('paused_from')->nullable();
             $table->timestamp('ends_at')->nullable();

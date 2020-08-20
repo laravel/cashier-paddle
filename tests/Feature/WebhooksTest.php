@@ -177,6 +177,7 @@ class WebhooksTest extends FeatureTestCase
             'status' => Subscription::STATUS_ACTIVE,
             'subscription_id' => 'bar',
             'subscription_plan_id' => 1234,
+            'update_url' => $this->updateUrl(),
         ])->assertOk();
 
         $this->assertDatabaseHas('customers', [
@@ -193,6 +194,7 @@ class WebhooksTest extends FeatureTestCase
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
             'trial_ends_at' => null,
+            'update_url' => $this->updateUrl(),
         ]);
     }
 
@@ -217,6 +219,7 @@ class WebhooksTest extends FeatureTestCase
             'status' => Subscription::STATUS_ACTIVE,
             'subscription_id' => 'bar',
             'subscription_plan_id' => 1234,
+            'update_url' => $this->updateUrl(),
         ])->assertOk();
 
         $this->assertDatabaseHas('customers', [
@@ -233,6 +236,7 @@ class WebhooksTest extends FeatureTestCase
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
             'trial_ends_at' => null,
+            'update_url' => $this->updateUrl(),
         ]);
     }
 
@@ -246,6 +250,7 @@ class WebhooksTest extends FeatureTestCase
             'paddle_plan' => 2323,
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
+            'update_url' => $this->updateUrl($subscriptionId = 1)
         ]);
 
         $this->postJson('paddle/webhook', [
@@ -255,6 +260,7 @@ class WebhooksTest extends FeatureTestCase
             'paused_from' => ($date = now('UTC')->addDays(5))->format('Y-m-d H:i:s'),
             'subscription_id' => 244,
             'subscription_plan_id' => 1234,
+            'update_url' => $this->updateUrl($subscriptionId = 2),
         ])->assertOk();
 
         $this->assertDatabaseHas('subscriptions', [
@@ -267,6 +273,7 @@ class WebhooksTest extends FeatureTestCase
             'paddle_status' => Subscription::STATUS_PAUSED,
             'quantity' => 3,
             'paused_from' => $date,
+            'update_url' => $this->updateUrl($subscriptionId = 2),
         ]);
     }
 
@@ -298,5 +305,10 @@ class WebhooksTest extends FeatureTestCase
             'paddle_status' => Subscription::STATUS_DELETED,
             'ends_at' => $date,
         ]);
+    }
+
+    protected function updateUrl($subscriptionId = 1)
+    {
+        return "https://checkout.paddle.com/subscription/update?user=1&subscription={$subscriptionId}&hash=114493d1810c2dcd45c5cd44d16c3d8484082360";
     }
 }

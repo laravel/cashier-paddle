@@ -133,6 +133,7 @@ class WebhookController extends Controller
             'paddle_status' => $payload['status'],
             'quantity' => $payload['quantity'],
             'trial_ends_at' => $trialEndsAt,
+            'update_url' => $payload['update_url'],
         ]);
     }
 
@@ -168,6 +169,11 @@ class WebhookController extends Controller
             $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:s', $payload['paused_from'], 'UTC');
         } else {
             $subscription->paused_from = null;
+        }
+
+        // Update url
+        if (isset($payload['update_url'])) {
+            $subscription->update_url = $payload['update_url'];
         }
 
         $subscription->save();
