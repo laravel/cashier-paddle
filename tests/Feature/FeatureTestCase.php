@@ -35,6 +35,11 @@ abstract class FeatureTestCase extends TestCase
         ], $options));
     }
 
+    protected function updateUrl($subscriptionId = 1)
+    {
+        return "https://checkout.paddle.com/subscription/update?user=1&subscription={$subscriptionId}&hash=114493d1810c2dcd45c5cd44d16c3d8484082360";
+    }
+
     protected function getPackageProviders($app)
     {
         return [CashierServiceProvider::class];

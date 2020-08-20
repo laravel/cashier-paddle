@@ -27,6 +27,7 @@ class SubscriptionsTest extends FeatureTestCase
             'paddle_plan' => 2323,
             'paddle_status' => 'active',
             'quantity' => 1,
+            'update_url' => $this->updateUrl(),
         ]);
 
         $this->assertTrue($billable->subscribed('main'));
@@ -68,6 +69,7 @@ class SubscriptionsTest extends FeatureTestCase
             'paddle_status' => 'trialing',
             'quantity' => 1,
             'trial_ends_at' => Carbon::tomorrow(),
+            'update_url' => $this->updateUrl(),
         ]);
 
         $this->assertTrue($billable->subscribed('main'));
@@ -102,6 +104,7 @@ class SubscriptionsTest extends FeatureTestCase
             'paddle_status' => Subscription::STATUS_DELETED,
             'quantity' => 1,
             'ends_at' => Carbon::tomorrow(),
+            'update_url' => $this->updateUrl(),
         ]);
 
         $this->assertTrue($subscription->valid());
@@ -125,6 +128,7 @@ class SubscriptionsTest extends FeatureTestCase
             'paddle_status' => Subscription::STATUS_DELETED,
             'quantity' => 1,
             'ends_at' => Carbon::yesterday(),
+            'update_url' => $this->updateUrl(),
         ]);
 
         $this->assertFalse($subscription->valid());
@@ -147,6 +151,7 @@ class SubscriptionsTest extends FeatureTestCase
             'paddle_plan' => 2323,
             'paddle_status' => Subscription::STATUS_PAUSED,
             'quantity' => 1,
+            'update_url' => $this->updateUrl(),
         ]);
 
         $this->assertFalse($subscription->valid());
@@ -170,6 +175,7 @@ class SubscriptionsTest extends FeatureTestCase
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
             'paused_from' => Carbon::tomorrow(),
+            'update_url' => $this->updateUrl(),
         ]);
 
         $this->assertTrue($subscription->valid());

@@ -287,6 +287,7 @@ class WebhooksTest extends FeatureTestCase
             'paddle_plan' => 2323,
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
+            'update_url' => $this->updateUrl(),
         ]);
 
         $this->postJson('paddle/webhook', [
@@ -305,10 +306,5 @@ class WebhooksTest extends FeatureTestCase
             'paddle_status' => Subscription::STATUS_DELETED,
             'ends_at' => $date,
         ]);
-    }
-
-    protected function updateUrl($subscriptionId = 1)
-    {
-        return "https://checkout.paddle.com/subscription/update?user=1&subscription={$subscriptionId}&hash=114493d1810c2dcd45c5cd44d16c3d8484082360";
     }
 }
