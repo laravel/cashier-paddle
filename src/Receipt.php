@@ -65,6 +65,26 @@ class Receipt extends Model
     }
 
     /**
+     * Get the total amount that was earned.
+     *
+     * @return string
+     */
+    public function earnings()
+    {
+        return $this->formatAmount((int) ($this->earnings * 100));
+    }
+
+    /**
+     * Get the total fee that was paid to Paddle.
+     *
+     * @return string
+     */
+    public function fee()
+    {
+        return $this->formatAmount((int) ($this->fee * 100));
+    }
+
+    /**
      * Get the used currency for the receipt.
      *
      * @return \Money\Currency
