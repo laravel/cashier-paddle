@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.0.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.0.0...master)
 
 
 ## [v1.0.0 (2020-08-25)](https://github.com/laravel/cashier-paddle/compare/v1.0.0-beta.2...v1.0.0)
