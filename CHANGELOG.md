@@ -1,6 +1,20 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.0.0-beta.2...master)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.0.0...master)
+
+
+## [v1.0.0 (2020-08-25)](https://github.com/laravel/cashier-paddle/compare/v1.0.0-beta.2...v1.0.0)
+
+### Added
+- Add `paymentMethod` method ([6f78dfe](https://github.com/laravel/cashier-paddle/commit/6f78dfe10a4fcb3033591385a1f20eb16412a8b7))
+- Laravel 8 support ([#62](https://github.com/laravel/cashier-paddle/pull/62))
+
+### Changed
+- Refactor exception throwing for updates ([#54](https://github.com/laravel/cashier-paddle/pull/54))
+
+### Fixed
+- Fix webhook controller quantities ([#44](https://github.com/laravel/cashier-paddle/pull/44))
+- Fix receipt relation with subscription ([#49](https://github.com/laravel/cashier-paddle/pull/49))
 
 
 ## [v1.0.0-beta.2 (2020-07-21)](https://github.com/laravel/cashier-paddle/compare/v1.0.0-beta...v1.0.0-beta.2)
