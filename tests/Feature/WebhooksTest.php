@@ -15,16 +15,12 @@ class WebhooksTest extends FeatureTestCase
 
     public function test_it_can_handle_a_payment_succeeded_event()
     {
-        if (! isset($_SERVER['PADDLE_TEST_CHECKOUT'])) {
-            $this->markTestSkipped('Checkout identifier not configured');
-        }
-
         $user = $this->createUser();
 
         $this->postJson('paddle/webhook', [
             'alert_name' => 'payment_succeeded',
             'event_time' => $paidAt = now()->addDay()->format('Y-m-d H:i:s'),
-            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'checkout_id' => 12345,
             'order_id' => 'foo',
             'email' => $user->paddleEmail(),
             'sale_gross' => '12.55',
@@ -48,7 +44,7 @@ class WebhooksTest extends FeatureTestCase
             'billable_type' => $user->getMorphClass(),
             'paddle_subscription_id' => null,
             'paid_at' => $paidAt,
-            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'checkout_id' => 12345,
             'order_id' => 'foo',
             'amount' => '12.55',
             'tax' => '4.34',
@@ -61,10 +57,6 @@ class WebhooksTest extends FeatureTestCase
     /** @test */
     public function test_it_can_handle_a_payment_succeeded_event_when_billable_already_exists()
     {
-        if (! isset($_SERVER['PADDLE_TEST_CHECKOUT'])) {
-            $this->markTestSkipped('Checkout identifier not configured');
-        }
-
         $user = $this->createBillable('taylor', [
             'trial_ends_at' => now('UTC')->addDays(5),
         ]);
@@ -72,7 +64,7 @@ class WebhooksTest extends FeatureTestCase
         $this->postJson('paddle/webhook', [
             'alert_name' => 'payment_succeeded',
             'event_time' => $paidAt = now()->addDay()->format('Y-m-d H:i:s'),
-            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'checkout_id' => 12345,
             'order_id' => 'foo',
             'email' => $user->paddleEmail(),
             'sale_gross' => '12.55',
@@ -96,7 +88,7 @@ class WebhooksTest extends FeatureTestCase
             'billable_type' => $user->getMorphClass(),
             'paddle_subscription_id' => null,
             'paid_at' => $paidAt,
-            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'checkout_id' => 12345,
             'order_id' => 'foo',
             'amount' => '12.55',
             'tax' => '4.34',
@@ -108,10 +100,6 @@ class WebhooksTest extends FeatureTestCase
 
     public function test_it_can_handle_a_subscription_payment_succeeded_event()
     {
-        if (! isset($_SERVER['PADDLE_TEST_CHECKOUT'])) {
-            $this->markTestSkipped('Checkout identifier not configured');
-        }
-
         $user = $this->createBillable();
 
         $subscription = $user->subscriptions()->create([
@@ -126,7 +114,7 @@ class WebhooksTest extends FeatureTestCase
             'alert_name' => 'subscription_payment_succeeded',
             'event_time' => $paidAt = now()->addDay()->format('Y-m-d H:i:s'),
             'subscription_id' => $subscription->paddle_id,
-            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'checkout_id' => 12345,
             'order_id' => 'foo',
             'email' => $user->paddleEmail(),
             'sale_gross' => '12.55',
@@ -150,7 +138,7 @@ class WebhooksTest extends FeatureTestCase
             'billable_type' => $user->getMorphClass(),
             'paddle_subscription_id' => $subscription->paddle_id,
             'paid_at' => $paidAt,
-            'checkout_id' => $_SERVER['PADDLE_TEST_CHECKOUT'],
+            'checkout_id' => 12345,
             'order_id' => 'foo',
             'amount' => '12.55',
             'tax' => '4.34',
