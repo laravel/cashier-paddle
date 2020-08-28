@@ -2,9 +2,9 @@
 
 The Laravel contributing guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Running Paddle's Tests
+## Running Cashier Paddle's Tests
 
-You will need to set some environment variables in a custom `phpunit.xml` file in order to run the Paddle tests.
+You will need to set some environment variables in a custom `phpunit.xml` file in order to run the Cashier Paddle tests.
 
 Copy the default file using `cp phpunit.xml.dist phpunit.xml` and add the following lines below the `DB_CONNECTION` environment variable in your new `phpunit.xml` file:
 
@@ -13,4 +13,4 @@ Copy the default file using `cp phpunit.xml.dist phpunit.xml` and add the follow
     <server name="PADDLE_TEST_PRODUCT" value="Identifier for a random one off product"/>
     <server name="PADDLE_TEST_SUBSCRIPTION" value="Identifier for a random customer's subscription"/>
 
-Now you can run your tests by running `vendor/bin/phpunit`.
+After setting these variables, you can run your tests by executing the `vendor/bin/phpunit` command.
