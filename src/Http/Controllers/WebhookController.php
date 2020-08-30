@@ -210,7 +210,7 @@ class WebhookController extends Controller
     {
         $passthrough = json_decode($passthrough, true);
 
-        /** @var \Laravel\Paddle\Customer $customer */
+        /** @var \Laravel\Paddle\Customer */
         return Customer::firstOrCreate([
             'billable_id' => $passthrough['billable_id'],
             'billable_type' => $passthrough['billable_type'],
