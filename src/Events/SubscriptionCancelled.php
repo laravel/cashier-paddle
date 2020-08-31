@@ -1,4 +1,5 @@
 <?php
+
 namespace Laravel\Paddle\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
