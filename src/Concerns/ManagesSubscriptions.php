@@ -77,7 +77,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Get the date of when the trial ends
+     * Get the date of when the trial ends.
      *
      * @param  string  $name
      * @return Illuminate\Support\Carbon|null
