@@ -1,4 +1,5 @@
 <?php
+
 namespace Laravel\Paddle\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
@@ -17,7 +18,7 @@ class SubscriptionUpdated
     public $subscription;
 
     /**
-     * The webhook payload
+     * The webhook payload.
      *
      * @var array
      */

@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use Laravel\Paddle\Subscription;
 use Illuminate\Support\Facades\Event;
 use Laravel\Paddle\Events\PaymentSucceeded;
-use Laravel\Paddle\Events\SubscriptionCreated;
-use Laravel\Paddle\Events\SubscriptionUpdated;
 use Laravel\Paddle\Events\SubscriptionCancelled;
+use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
+use Laravel\Paddle\Events\SubscriptionUpdated;
+use Laravel\Paddle\Subscription;
 
 class WebhooksTest extends FeatureTestCase
 {

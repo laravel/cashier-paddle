@@ -1,4 +1,5 @@
 <?php
+
 namespace Laravel\Paddle\Events;
 
 use Illuminate\Database\Eloquent\Model;
