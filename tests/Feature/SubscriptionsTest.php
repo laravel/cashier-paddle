@@ -55,6 +55,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($billable->onGenericTrial());
         $this->assertTrue($billable->onTrial());
         $this->assertFalse($billable->onTrial('main'));
+        $this->assertEquals($billable->trialEndsAt(), Carbon::tomorrow());
     }
 
     public function test_customers_can_check_if_their_subscription_is_on_trial()
@@ -80,6 +81,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($billable->onTrial('main', 2323));
         $this->assertFalse($billable->onTrial('main', 323));
         $this->assertFalse($billable->onGenericTrial());
+        $this->assertEquals($billable->trialEndsAt('main'), Carbon::tomorrow());
 
         $this->assertTrue($subscription->valid());
         $this->assertTrue($subscription->active());
