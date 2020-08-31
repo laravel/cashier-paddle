@@ -1,27 +1,32 @@
 <?php
 namespace Laravel\Paddle\Events;
 
-use Laravel\Paddle\Subscription;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+use Laravel\Paddle\Subscription;
 
 class SubscriptionCreated
 {
-    use Dispatchable;
-    use SerializesModels;
+    use Dispatchable, SerializesModels;
 
     /**
+     * The billable entity.
+     *
      * @var \Illuminate\Database\Eloquent\Model
      */
     public $billable;
 
     /**
+     * The subscription instance.
+     *
      * @var \Laravel\Paddle\Subscription
      */
     public $subscription;
 
     /**
+     * The payload array.
+     *
      * @var array
      */
     public $payload;

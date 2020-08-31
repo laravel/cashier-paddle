@@ -1,21 +1,24 @@
 <?php
 namespace Laravel\Paddle\Events;
 
-use Laravel\Paddle\Subscription;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+use Laravel\Paddle\Subscription;
 
 class SubscriptionCancelled
 {
-    use Dispatchable;
-    use SerializesModels;
+    use Dispatchable, SerializesModels;
 
     /**
+     * The subscription instance.
+     *
      * @var \Laravel\Paddle\Subscription
      */
     public $subscription;
 
     /**
+     * The webhook payload.
+     *
      * @var array
      */
     public $payload;

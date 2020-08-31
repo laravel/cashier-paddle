@@ -3,21 +3,21 @@
 namespace Laravel\Paddle\Http\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Support\Str;
-use Laravel\Paddle\Receipt;
 use Illuminate\Http\Request;
-use Laravel\Paddle\Customer;
-use Laravel\Paddle\Subscription;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
+use Laravel\Paddle\Customer;
+use Laravel\Paddle\Events\PaymentSucceeded;
+use Laravel\Paddle\Events\SubscriptionCancelled;
+use Laravel\Paddle\Events\SubscriptionCreated;
+use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
+use Laravel\Paddle\Events\SubscriptionUpdated;
 use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
-use Laravel\Paddle\Events\PaymentSucceeded;
-use Laravel\Paddle\Events\SubscriptionCreated;
-use Laravel\Paddle\Events\SubscriptionUpdated;
-use Symfony\Component\HttpFoundation\Response;
-use Laravel\Paddle\Events\SubscriptionCancelled;
-use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
+use Laravel\Paddle\Receipt;
+use Laravel\Paddle\Subscription;
+use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
 {
