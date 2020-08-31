@@ -3,16 +3,21 @@
 namespace Laravel\Paddle\Http\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
+use Laravel\Paddle\Receipt;
+use Illuminate\Http\Request;
 use Laravel\Paddle\Customer;
+use Laravel\Paddle\Subscription;
+use Illuminate\Routing\Controller;
 use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
-use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
-use Laravel\Paddle\Receipt;
-use Laravel\Paddle\Subscription;
+use Laravel\Paddle\Events\PaymentSucceeded;
+use Laravel\Paddle\Events\SubscriptionCreated;
+use Laravel\Paddle\Events\SubscriptionUpdated;
 use Symfony\Component\HttpFoundation\Response;
+use Laravel\Paddle\Events\SubscriptionCancelled;
+use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
+use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
 
 class WebhookController extends Controller
 {
@@ -69,7 +74,9 @@ class WebhookController extends Controller
             return;
         }
 
-        $this->findOrCreateCustomer($payload['passthrough'])->receipts()->create([
+        $customer = $this->findOrCreateCustomer($payload['passthrough']);
+
+        $receipt = $customer->receipts()->create([
             'checkout_id' => $payload['checkout_id'],
             'order_id' => $payload['order_id'],
             'amount' => $payload['sale_gross'],
@@ -79,6 +86,8 @@ class WebhookController extends Controller
             'receipt_url' => $payload['receipt_url'],
             'paid_at' => Carbon::createFromFormat('Y-m-d H:i:s', $payload['event_time'], 'UTC'),
         ]);
+
+        PaymentSucceeded::dispatch($customer, $receipt, $payload);
     }
 
     /**
@@ -99,7 +108,7 @@ class WebhookController extends Controller
             $billable = $this->findOrCreateCustomer($payload['passthrough']);
         }
 
-        $billable->receipts()->create([
+        $receipt = $billable->receipts()->create([
             'paddle_subscription_id' => $payload['subscription_id'],
             'checkout_id' => $payload['checkout_id'],
             'order_id' => $payload['order_id'],
@@ -110,6 +119,8 @@ class WebhookController extends Controller
             'receipt_url' => $payload['receipt_url'],
             'paid_at' => Carbon::createFromFormat('Y-m-d H:i:s', $payload['event_time'], 'UTC'),
         ]);
+
+        SubscriptionPaymentSucceeded::dispatch($billable, $receipt, $payload);
     }
 
     /**
@@ -126,7 +137,9 @@ class WebhookController extends Controller
             ? Carbon::createFromFormat('Y-m-d', $payload['next_bill_date'], 'UTC')->startOfDay()
             : null;
 
-        $this->findOrCreateCustomer($payload['passthrough'])->subscriptions()->create([
+        $customer = $this->findOrCreateCustomer($payload['passthrough']);
+
+        $subscription = $customer->subscriptions()->create([
             'name' => $passthrough['subscription_name'],
             'paddle_id' => $payload['subscription_id'],
             'paddle_plan' => $payload['subscription_plan_id'],
@@ -134,6 +147,8 @@ class WebhookController extends Controller
             'quantity' => $payload['quantity'],
             'trial_ends_at' => $trialEndsAt,
         ]);
+
+        SubscriptionCreated::dispatch($customer, $subscription, $payload);
     }
 
     /**
@@ -171,6 +186,8 @@ class WebhookController extends Controller
         }
 
         $subscription->save();
+
+        SubscriptionUpdated::dispatch($subscription, $payload);
     }
 
     /**
@@ -198,6 +215,8 @@ class WebhookController extends Controller
         $subscription->paused_from = null;
 
         $subscription->save();
+
+        SubscriptionCancelled::dispatch($subscription, $payload);
     }
 
     /**
