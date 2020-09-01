@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.0.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.1.0...1.x)
+
+
+## [v1.1.0 (2020-09-01)](https://github.com/laravel/cashier-paddle/compare/1.0.0...v1.1.0)
+
+### Added
+- Added function to see when the trial is ending ([#69](https://github.com/laravel/cashier-paddle/pull/69))
 
 
 ## [v1.0.0 (2020-08-25)](https://github.com/laravel/cashier-paddle/compare/v1.0.0-beta.2...v1.0.0)
