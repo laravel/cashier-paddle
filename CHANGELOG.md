@@ -7,6 +7,7 @@
 
 ### Added
 - Added function to see when the trial is ending ([#69](https://github.com/laravel/cashier-paddle/pull/69))
+- Update webhook events to be more expressive ([#67](https://github.com/laravel/cashier-paddle/pull/67))
 
 
 ## [v1.0.0 (2020-08-25)](https://github.com/laravel/cashier-paddle/compare/v1.0.0-beta.2...v1.0.0)
