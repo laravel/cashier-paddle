@@ -55,6 +55,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($billable->onGenericTrial());
         $this->assertTrue($billable->onTrial());
         $this->assertFalse($billable->onTrial('main'));
+        $this->assertEquals($billable->trialEndsAt(), Carbon::tomorrow());
     }
 
     public function test_customers_can_check_if_their_subscription_is_on_trial()
@@ -80,6 +81,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($billable->onTrial('main', 2323));
         $this->assertFalse($billable->onTrial('main', 323));
         $this->assertFalse($billable->onGenericTrial());
+        $this->assertEquals($billable->trialEndsAt('main'), Carbon::tomorrow());
 
         $this->assertTrue($subscription->valid());
         $this->assertTrue($subscription->active());
@@ -184,7 +186,7 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_subscriptions_can_retrieve_their_payment_info()
     {
-        if (! isset($_SERVER['PADDLE_TEST_PLAN_HOBBY'], $_SERVER['PADDLE_TEST_SUBSCRIPTION'])) {
+        if (! isset($_SERVER['CI'], $_SERVER['PADDLE_TEST_SUBSCRIPTION'])) {
             $this->markTestSkipped('Plan and/or subscription not configured.');
         }
 
@@ -193,14 +195,12 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription = $billable->subscriptions()->create([
             'name' => 'main',
             'paddle_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
-            'paddle_plan' => $_SERVER['PADDLE_TEST_PLAN_HOBBY'],
+            'paddle_plan' => 12345,
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
         ]);
 
         $this->assertSame('john@example.com', $subscription->paddleEmail());
         $this->assertSame('card', $subscription->paymentMethod());
-        $this->assertSame('master', $subscription->cardBrand());
-        $this->assertSame('4050', $subscription->cardLastFour());
     }
 }

@@ -77,6 +77,21 @@ trait ManagesSubscriptions
     }
 
     /**
+     * Get the ending date of the trial.
+     *
+     * @param  string  $name
+     * @return Illuminate\Support\Carbon|null
+     */
+    public function trialEndsAt($name = 'default')
+    {
+        if ($this->onGenericTrial()) {
+            return $this->customer->trial_ends_at;
+        }
+
+        return $this->subscription($name)->trial_ends_at;
+    }
+
+    /**
      * Determine if the Billable model has a given subscription.
      *
      * @param  string  $name
