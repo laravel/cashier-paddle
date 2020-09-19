@@ -37,6 +37,7 @@ class SubscriptionPaymentSucceeded
      *
      * @param  \Illuminate\Database\Eloquent\Model  $billable
      * @param  \Laravel\Paddle\Receipt  $receipt
+     * @param  array  $payload
      * @return void
      */
     public function __construct(Model $billable, Receipt $receipt, array $payload)
