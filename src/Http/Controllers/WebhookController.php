@@ -124,6 +124,19 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle subscription payment failed.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    protected function handleSubscriptionPaymentFailed(array $payload)
+    {
+        if ($subscription = $this->findSubscription($payload['subscription_id'])) {
+            SubscriptionPaymentFailed::dispatch($subscription->billable, $payload);
+        }
+    }
+
+    /**
      * Handle subscription created.
      *
      * @param  array  $payload
