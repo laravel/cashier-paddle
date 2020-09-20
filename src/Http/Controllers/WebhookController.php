@@ -91,19 +91,6 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle subscription payment failed.
-     *
-     * @param  array  $payload
-     * @return void
-     */
-    protected function handleSubscriptionPaymentFailed(array $payload)
-    {
-        if ($subscription = $this->findSubscription($payload['subscription_id'])) {
-            SubscriptionPaymentFailed::dispatch($subscription->billable, $payload);
-        }
-    }
-
-    /**
      * Handle subscription payment succeeded.
      *
      * @param  array  $payload
@@ -134,6 +121,19 @@ class WebhookController extends Controller
         ]);
 
         SubscriptionPaymentSucceeded::dispatch($billable, $receipt, $payload);
+    }
+
+    /**
+     * Handle subscription payment failed.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    protected function handleSubscriptionPaymentFailed(array $payload)
+    {
+        if ($subscription = $this->findSubscription($payload['subscription_id'])) {
+            SubscriptionPaymentFailed::dispatch($subscription->billable, $payload);
+        }
     }
 
     /**
