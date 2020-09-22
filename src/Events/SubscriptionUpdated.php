@@ -28,6 +28,7 @@ class SubscriptionUpdated
      * Create a new event instance.
      *
      * @param  \Laravel\Paddle\Subscription  $subscription
+     * @param  array  $payload
      * @return void
      */
     public function __construct(Subscription $subscription, array $payload)

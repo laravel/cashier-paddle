@@ -37,6 +37,7 @@ class SubscriptionCreated
      *
      * @param  \Illuminate\Database\Eloquent\Model  $billable
      * @param  \Laravel\Paddle\Subscription  $subscription
+     * @param  array  $payload
      * @return void
      */
     public function __construct(Model $billable, Subscription $subscription, array $payload)
