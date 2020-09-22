@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.1.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.2.0...1.x)
+
+
+## [v1.2.0 (2020-09-22)](https://github.com/laravel/cashier-paddle/compare/1.1.0...v1.2.0)
+
+### Added
+- Event Improvements ([#72](https://github.com/laravel/cashier-paddle/pull/72))
 
 
 ## [v1.1.0 (2020-09-01)](https://github.com/laravel/cashier-paddle/compare/1.0.0...v1.1.0)
