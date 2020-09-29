@@ -53,9 +53,9 @@ trait PerformsCharges
      */
     protected function generatePayLink(array $payload)
     {
-        $payload['customer_email'] = (string) $this->paddleEmail();
-        $payload['customer_country'] = (string) $this->paddleCountry();
-        $payload['customer_postcode'] = (string) $this->paddlePostcode();
+        $payload['customer_email'] = $payload['customer_email'] ?? (string) $this->paddleEmail();
+        $payload['customer_country'] = $payload['customer_country'] ?? (string) $this->paddleCountry();
+        $payload['customer_postcode'] = $payload['customer_postcode'] ?? (string) $this->paddlePostcode();
 
         // We'll need a way to identify the user in any webhook we're catching so before
         // we make the API request we'll attach the authentication identifier to this

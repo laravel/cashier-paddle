@@ -80,7 +80,7 @@ trait ManagesSubscriptions
      * Get the ending date of the trial.
      *
      * @param  string  $name
-     * @return Illuminate\Support\Carbon|null
+     * @return \Illuminate\Support\Carbon|null
      */
     public function trialEndsAt($name = 'default')
     {
