@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.2.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.2.1...1.x)
+
+
+## [v1.2.1 (2020-09-29)](https://github.com/laravel/cashier-paddle/compare/1.2.0...v1.2.1)
+
+### Changed
+- Allow customer values in payload override ([#78](https://github.com/laravel/cashier-paddle/pull/78))
 
 
 ## [v1.2.0 (2020-09-22)](https://github.com/laravel/cashier-paddle/compare/1.1.0...v1.2.0)
