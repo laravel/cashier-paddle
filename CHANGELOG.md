@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.2.1...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.2.2...1.x)
+
+
+## [v1.2.2 (2020-10-06)](https://github.com/laravel/cashier-paddle/compare/1.2.1...v1.2.2)
+
+### Fixed
+- Missing use statement for `SubscriptionPaymentFailed` ([#81](https://github.com/laravel/cashier-paddle/pull/81))
+- Fix n+1 problem with subscription retrieval ([#83](https://github.com/laravel/cashier-paddle/pull/83))
 
 
 ## [v1.2.1 (2020-09-29)](https://github.com/laravel/cashier-paddle/compare/1.2.0...v1.2.1)
