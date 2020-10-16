@@ -28,4 +28,12 @@ class CustomerTest extends FeatureTestCase
         $this->assertEmpty($user->receipts);
         $this->assertNull($user->subscription());
     }
+
+    public function test_trial_ends_at_works_if_generic_trial_is_expired()
+    {
+        $user = $this->createUser();
+        $user->createAsCustomer(['trial_ends_at' => $trialEndsAt = now()->subDays(15)]);
+
+        $this->assertSame($trialEndsAt->timestamp, $user->trialEndsAt()->timestamp);
+    }
 }
