@@ -11,6 +11,7 @@ class CustomerTest extends FeatureTestCase
         $customer = $user->createAsCustomer(['trial_ends_at' => $trialEndsAt = now()->addDays(15)]);
 
         $this->assertSame($trialEndsAt->timestamp, $customer->trial_ends_at->timestamp);
+        $this->assertSame($trialEndsAt->timestamp, $user->trialEndsAt()->timestamp);
         $this->assertTrue($user->onGenericTrial());
     }
 
