@@ -84,11 +84,11 @@ trait ManagesSubscriptions
      */
     public function trialEndsAt($name = 'default')
     {
-        if (is_null($this->subscription($name))) {
-            return $this->customer->trial_ends_at;
+        if ($subscription = $this->subscription($name)) {
+            return $subscription->trial_ends_at;
         }
 
-        return $this->subscription($name)->trial_ends_at;
+        return $this->customer->trial_ends_at;
     }
 
     /**
