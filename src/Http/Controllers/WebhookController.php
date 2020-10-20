@@ -57,7 +57,7 @@ class WebhookController extends Controller
             try {
                 $this->{$method}($payload);
             } catch (InvalidPassthroughPayload $e) {
-                return new Response();
+                return new Response('Webhook Skipped');
             }
 
             WebhookHandled::dispatch($payload);
