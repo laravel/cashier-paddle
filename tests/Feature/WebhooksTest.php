@@ -66,7 +66,6 @@ class WebhooksTest extends FeatureTestCase
         });
     }
 
-    /** @test */
     public function test_it_can_handle_a_payment_succeeded_event_when_billable_already_exists()
     {
         Event::fake();
@@ -214,7 +213,6 @@ class WebhooksTest extends FeatureTestCase
         });
     }
 
-    /** @test */
     public function test_it_can_handle_a_subscription_created_event_if_billable_already_exists()
     {
         Event::fake();
@@ -335,5 +333,42 @@ class WebhooksTest extends FeatureTestCase
         Event::assertDispatched(SubscriptionCancelled::class, function (SubscriptionCancelled $event) {
             return $event->subscription->paddle_plan === 2323;
         });
+    }
+
+    /** @group Foo */
+    public function test_manual_created_paylinks_without_passthrough_values_are_ignored()
+    {
+        Event::fake();
+
+        $user = $this->createUser();
+
+        $this->postJson('paddle/webhook', [
+            'alert_name' => 'subscription_created',
+            'user_id' => 'foo',
+            'email' => $user->paddleEmail(),
+            'passthrough' => '',
+            'quantity' => 1,
+            'status' => Subscription::STATUS_ACTIVE,
+            'subscription_id' => 'bar',
+            'subscription_plan_id' => 1234,
+        ])->assertOk();
+
+        $this->assertDatabaseMissing('customers', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+        ]);
+
+        $this->assertDatabaseMissing('subscriptions', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'name' => 'main',
+            'paddle_id' => 'bar',
+            'paddle_plan' => 1234,
+            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'quantity' => 1,
+            'trial_ends_at' => null,
+        ]);
+
+        Event::assertNotDispatched(SubscriptionCreated::class);
     }
 }
