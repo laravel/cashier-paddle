@@ -335,7 +335,6 @@ class WebhooksTest extends FeatureTestCase
         });
     }
 
-    /** @group Foo */
     public function test_manual_created_paylinks_without_passthrough_values_are_ignored()
     {
         Event::fake();
