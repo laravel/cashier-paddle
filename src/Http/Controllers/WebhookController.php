@@ -15,6 +15,7 @@ use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionUpdated;
 use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
+use Laravel\Paddle\Exceptions\InvalidPassthroughPayload;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Paddle\Receipt;
 use Laravel\Paddle\Subscription;
@@ -53,7 +54,11 @@ class WebhookController extends Controller
         WebhookReceived::dispatch($payload);
 
         if (method_exists($this, $method)) {
-            $this->{$method}($payload);
+            try {
+                $this->{$method}($payload);
+            } catch (InvalidPassthroughPayload $e) {
+                return new Response('Webhook Skipped');
+            }
 
             WebhookHandled::dispatch($payload);
 
@@ -142,16 +147,22 @@ class WebhookController extends Controller
      *
      * @param  array  $payload
      * @return void
+     *
+     * @throws \Laravel\Paddle\Exceptions\InvalidPassthroughPayload
      */
     protected function handleSubscriptionCreated(array $payload)
     {
         $passthrough = json_decode($payload['passthrough'], true);
 
+        if (! is_array($passthrough) || ! isset($passthrough['subscription_name'])) {
+            throw new InvalidPassthroughPayload;
+        }
+
+        $customer = $this->findOrCreateCustomer($payload['passthrough']);
+
         $trialEndsAt = $payload['status'] === Subscription::STATUS_TRIALING
             ? Carbon::createFromFormat('Y-m-d', $payload['next_bill_date'], 'UTC')->startOfDay()
             : null;
-
-        $customer = $this->findOrCreateCustomer($payload['passthrough']);
 
         $subscription = $customer->subscriptions()->create([
             'name' => $passthrough['subscription_name'],
@@ -238,10 +249,16 @@ class WebhookController extends Controller
      *
      * @param  string  $passthrough
      * @return \Laravel\Paddle\Billable
+     *
+     * @throws \Laravel\Paddle\Exceptions\InvalidPassthroughPayload
      */
     protected function findOrCreateCustomer(string $passthrough)
     {
         $passthrough = json_decode($passthrough, true);
+
+        if (! is_array($passthrough) || ! isset($passthrough['billable_id'], $passthrough['billable_type'])) {
+            throw new InvalidPassthroughPayload;
+        }
 
         return Customer::firstOrCreate([
             'billable_id' => $passthrough['billable_id'],

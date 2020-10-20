@@ -3,6 +3,13 @@
 ## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.2.2...master)
 
 
+## [v1.2.3 (2020-10-20)](https://github.com/laravel/cashier-paddle/compare/1.2.2...v1.2.3)
+
+### Fixed
+- Fix trial ends at ([#87](https://github.com/laravel/cashier-paddle/pull/87))
+- Ignore manual paylinks ([#89](https://github.com/laravel/cashier-paddle/pull/89))
+
+
 ## [v1.2.2 (2020-10-06)](https://github.com/laravel/cashier-paddle/compare/1.2.1...v1.2.2)
 
 ### Fixed
