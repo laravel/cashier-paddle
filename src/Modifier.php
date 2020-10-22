@@ -14,4 +14,14 @@ class Modifier extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * Get the subscription related to the modifier.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class);
+    }
 }
