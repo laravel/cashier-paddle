@@ -664,6 +664,17 @@ class Subscription extends Model
     }
 
     /**
+     * Get a modifier instance by name.
+     *
+     * @param  int  $id
+     * @return \Laravel\Paddle\Modifier|null
+     */
+    public function modifier($id)
+    {
+        return $this->modifiers->find($id);
+    }
+
+    /**
      * Get the email address of the customer associated to this subscription.
      *
      * @return string
