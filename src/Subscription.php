@@ -2,13 +2,11 @@
 
 namespace Laravel\Paddle;
 
-use Exception;
 use Carbon\Carbon;
-use LogicException;
-use Laravel\Paddle\Modifier;
-use Laravel\Paddle\ModifierBuilder;
-use Laravel\Paddle\Concerns\Prorates;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
+use LogicException;
+use Laravel\Paddle\Concerns\Prorates;
 
 /**
  * @property \Laravel\Paddle\Billable $billable

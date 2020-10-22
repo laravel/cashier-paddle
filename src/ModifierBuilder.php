@@ -3,7 +3,6 @@
 namespace Laravel\Paddle;
 
 use InvalidArgumentException;
-use Laravel\Paddle\Cashier;
 
 class ModifierBuilder
 {
@@ -86,7 +85,7 @@ class ModifierBuilder
     }
 
     /**
-     * Create the modifier
+     * Create the modifier.
      *
      * @return \Laravel\Paddle\Modifier
      *
