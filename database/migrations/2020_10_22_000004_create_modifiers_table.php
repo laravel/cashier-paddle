@@ -17,9 +17,9 @@ class CreateModifiersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('subscription_id')->index();
             $table->integer('paddle_id')->unique();
-            $table->boolean('recurring');
-            $table->string('amount');
             $table->string('description');
+            $table->string('amount');
+            $table->boolean('recurring');
             $table->timestamp('created_at');
         });
     }
