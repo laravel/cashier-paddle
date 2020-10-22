@@ -2,11 +2,13 @@
 
 namespace Laravel\Paddle;
 
-use Carbon\Carbon;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Paddle\Concerns\Prorates;
+use Carbon\Carbon;
 use LogicException;
+use Laravel\Paddle\Modifier;
+use Laravel\Paddle\ModifierBuilder;
+use Laravel\Paddle\Concerns\Prorates;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property \Laravel\Paddle\Billable $billable
@@ -641,6 +643,26 @@ class Subscription extends Model
         $payment = $this->paddleInfo()['next_payment'];
 
         return new Payment($payment['amount'], $payment['currency'], $payment['date']);
+    }
+
+    /**
+     * Begin creating a new modifier.
+     *
+     * @return \Laravel\Paddle\ModifierBuilder
+     */
+    public function newModifier()
+    {
+        return new ModifierBuilder($this);
+    }
+
+    /**
+     * Get all of the modifiers for this subscription.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function modifiers()
+    {
+        return $this->hasMany(Modifier::class);
     }
 
     /**

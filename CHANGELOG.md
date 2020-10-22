@@ -1,4 +1,4 @@
- # Release Notes
+# Release Notes
 
 ## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.2.3...1.x)
 
