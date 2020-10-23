@@ -93,6 +93,10 @@ class ModifierBuilder
      */
     public function create()
     {
+        if (is_null($this->amount)) {
+            throw new InvalidArgumentException('Amount is a required property.');
+        }
+
         if (strlen($this->description) > 255) {
             throw new InvalidArgumentException('Description has a maximum length of 255 characters.');
         }
