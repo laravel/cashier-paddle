@@ -24,4 +24,20 @@ class Modifier extends Model
     {
         return $this->belongsTo(Subscription::class);
     }
+
+    /**
+     * Deletes itself in the database and on Paddle.
+     *
+     * @return bool|null
+     */
+    public function delete()
+    {
+        $payload = $this->subscription->billable->paddleOptions([
+            'modifier_id' => $this->paddle_id,
+        ]);
+
+        Cashier::post('/subscription/modifiers/delete', $payload);
+
+        return parent::delete();
+    }
 }

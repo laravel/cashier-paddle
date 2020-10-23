@@ -51,4 +51,44 @@ class ModifiersTest extends FeatureTestCase
             'recurring' => false,
         ]);
     }
+
+    public function test_a_modifier_can_delete_itself()
+    {
+        Http::fake([
+            'https://vendors.paddle.com/api/2.0/subscription/modifiers/delete' => Http::response([
+                'success' => true
+            ])
+        ]);
+
+        $billable = $this->createBillable('taylor');
+
+        $subscription = $billable->subscriptions()->create([
+            'name' => 'main',
+            'paddle_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
+            'paddle_plan' => 12345,
+            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'quantity' => 1,
+        ]);
+
+        $modifier = $subscription->modifiers()->create([
+            'paddle_id' => 6789,
+            'amount' => 15.00,
+            'description' => 'Our test description',
+            'recurring' => false,
+        ]);
+
+        $modifier->delete();
+
+        Http::assertSent(function ($request) {
+            return $request['modifier_id'] == 6789;
+        });
+
+        $this->assertDatabaseMissing('modifiers', [
+            'subscription_id' => $subscription->id,
+            'paddle_id' => 6789,
+            'amount' => 15.00,
+            'description' => 'Our test description',
+            'recurring' => false,
+        ]);
+    }
 }
