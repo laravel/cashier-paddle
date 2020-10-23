@@ -15,8 +15,8 @@ class ModifiersTest extends FeatureTestCase
                 'response' => [
                     'subscription_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
                     'modifier_id' => 6789,
-                ]
-            ])
+                ],
+            ]),
         ]);
 
         $billable = $this->createBillable('taylor');
@@ -56,8 +56,8 @@ class ModifiersTest extends FeatureTestCase
     {
         Http::fake([
             'https://vendors.paddle.com/api/2.0/subscription/modifiers/delete' => Http::response([
-                'success' => true
-            ])
+                'success' => true,
+            ]),
         ]);
 
         $billable = $this->createBillable('taylor');

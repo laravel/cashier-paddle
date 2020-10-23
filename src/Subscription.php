@@ -5,8 +5,8 @@ namespace Laravel\Paddle;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use LogicException;
 use Laravel\Paddle\Concerns\Prorates;
+use LogicException;
 
 /**
  * @property \Laravel\Paddle\Billable $billable
