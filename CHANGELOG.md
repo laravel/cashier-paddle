@@ -8,9 +8,6 @@
 ### Added
 - PHP 8 Support ([#91](https://github.com/laravel/cashier-paddle/pull/91))
 
-### Changed
-- Bump `spatie/url` to v1.3.5 ([facc234](https://github.com/laravel/cashier-paddle/commit/facc2342934cfab42a8321313274600eef702a74))
-
 
 ## [v1.2.3 (2020-10-20)](https://github.com/laravel/cashier-paddle/compare/1.2.2...v1.2.3)
 
