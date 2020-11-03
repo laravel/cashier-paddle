@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.2.2...master)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.3.0...master)
+
+
+## [v1.3.0 (2020-11-03)](https://github.com/laravel/cashier-paddle/compare/1.2.3...v1.3.0)
+
+### Added
+- PHP 8 Support ([#91](https://github.com/laravel/cashier-paddle/pull/91))
 
 
 ## [v1.2.3 (2020-10-20)](https://github.com/laravel/cashier-paddle/compare/1.2.2...v1.2.3)
