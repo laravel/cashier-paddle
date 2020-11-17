@@ -40,7 +40,7 @@ class ModifierBuilder
      * @param  \Laravel\Paddle\Subscription  $subscription
      * @return void
      */
-    public function __construct($subscription)
+    public function __construct(Subscription $subscription)
     {
         $this->subscription = $subscription;
     }
@@ -72,14 +72,13 @@ class ModifierBuilder
     }
 
     /**
-     * Specify whether the modifier should recur.
+     * Specify whether the modifier should be applied only one time.
      *
-     * @param  bool  $amount
      * @return $this
      */
-    public function recurring($recurring)
+    public function oneTime()
     {
-        $this->recurring = $recurring;
+        $this->recurring = false;
 
         return $this;
     }

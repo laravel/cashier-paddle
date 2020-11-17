@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Modifier extends Model
 {
+    /**
+     * The name of the "updated at" column.
+     *
+     * @var string
+     */
     const UPDATED_AT = null;
 
     /**

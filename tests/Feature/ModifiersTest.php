@@ -32,7 +32,7 @@ class ModifiersTest extends FeatureTestCase
         $modifier = $subscription->newModifier()
             ->amount(15.00)
             ->description('Our test description')
-            ->recurring(false)
+            ->oneTime()
             ->create();
 
         Http::assertSent(function ($request) {
