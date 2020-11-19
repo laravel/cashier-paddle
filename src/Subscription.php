@@ -671,7 +671,7 @@ class Subscription extends Model
      */
     public function modifier($id)
     {
-        return $this->modifiers()->find($id);
+        return $this->modifiers->find($id);
     }
 
     /**
