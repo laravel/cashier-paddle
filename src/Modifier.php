@@ -2,42 +2,101 @@
 
 namespace Laravel\Paddle;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Modifier extends Model
+class Modifier
 {
-    const UPDATED_AT = null;
+    /**
+     * The Paddle identifier of the modifier
+     *
+     * @var string
+     */
+    protected $id;
 
     /**
-     * The attributes that are not mass assignable.
+     * The Subscription model the modifier belongs to.
      *
-     * @var array
+     * @var \Laravel\Paddle\Subscription
      */
-    protected $guarded = [];
+    protected $subscription;
 
     /**
-     * Get the subscription related to the modifier.
+     * The amount of the modifier.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @var int
      */
+    protected $amount;
+
+    /**
+     * The currency of the modifier.
+     *
+     * @var int
+     */
+    protected $currency;
+
+    /**
+     * The description of the modifier.
+     *
+     * @var string
+     */
+    protected $description;
+
+    /**
+     * Indicates whether the modifier should recur.
+     *
+     * @var bool
+     */
+    protected $recurring;
+
+    public function __construct($id, $subscription, $amount, $currency, $description, $recurring)
+    {
+        $this->id = $id;
+        $this->subscription = $subscription;
+        $this->amount = $amount;
+        $this->currency = $currency;
+        $this->description = $description;
+        $this->recurring = $recurring;
+    }
+
+    public function id()
+    {
+        return $this->id;
+    }
+
     public function subscription()
     {
-        return $this->belongsTo(Subscription::class);
+        return $this->subscription;
+    }
+
+    public function amount()
+    {
+        return $this->amount;
+    }
+
+    public function currency()
+    {
+        return $this->currency;
+    }
+
+    public function description()
+    {
+        return $this->description;
+    }
+
+    public function recurring()
+    {
+        return $this->recurring;
     }
 
     /**
-     * Deletes itself in the database and on Paddle.
+     * Deletes itself on Paddle.
      *
      * @return bool|null
      */
     public function delete()
     {
         $payload = $this->subscription->billable->paddleOptions([
-            'modifier_id' => $this->paddle_id,
+            'modifier_id' => $this->id(),
         ]);
 
-        Cashier::post('/subscription/modifiers/delete', $payload);
-
-        return parent::delete();
+        return Cashier::post('/subscription/modifiers/delete', $payload);
     }
 }

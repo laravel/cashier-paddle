@@ -656,11 +656,24 @@ class Subscription extends Model
     /**
      * Get all of the modifiers for this subscription.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Support\Collection
      */
     public function modifiers()
     {
-        return $this->hasMany(Modifier::class);
+        $result = Cashier::post("/subscription/modifiers", array_merge([
+             'subscription_id' => $this->paddle_id,
+         ], $this->billable->paddleOptions()));
+
+        return collect($result['response'])->map(function (array $modifier) {
+            return new Modifier(
+                $modifier['modifier_id'],
+                $this,
+                $modifier['amount'],
+                $modifier['currency'],
+                $modifier['description'],
+                $modifier['is_recurring']
+            );
+        });
     }
 
     /**
@@ -671,7 +684,9 @@ class Subscription extends Model
      */
     public function modifier($id)
     {
-        return $this->modifiers->find($id);
+        return $this->modifiers()->first(function (Modifier $modifier) use ($id) {
+            return $modifier->id() == $id;
+        });
     }
 
     /**
