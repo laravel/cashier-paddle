@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Modifier;
 use Laravel\Paddle\Subscription;
-use Illuminate\Support\Facades\Http;
 
 class ModifiersTest extends FeatureTestCase
 {
