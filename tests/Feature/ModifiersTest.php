@@ -56,6 +56,19 @@ class ModifiersTest extends FeatureTestCase
     public function test_subscriptions_can_create_modifiers()
     {
         Http::fake([
+            'https://vendors.paddle.com/api/2.0/subscription/users' => Http::response([
+                'success' => true,
+                'response' => [
+                    [
+                        'last_payment' => [
+                            'amount' => 0.00,
+                            'currency' => 'EUR',
+                            'date' => '',
+                        ],
+                    ],
+                ],
+            ]),
+
             'https://vendors.paddle.com/api/2.0/subscription/modifiers/create' => Http::response([
                 'success' => true,
                 'response' => [
@@ -89,10 +102,14 @@ class ModifiersTest extends FeatureTestCase
         $this->assertEquals($modifier->recurring(), false);
 
         Http::assertSent(function ($request) {
-            return $request['subscription_id'] == $_SERVER['PADDLE_TEST_SUBSCRIPTION'] &&
+            if ($request->url() == 'https://vendors.paddle.com/api/2.0/subscription/modifiers/create') {
+                return $request['subscription_id'] == $_SERVER['PADDLE_TEST_SUBSCRIPTION'] &&
                    $request['modifier_amount'] == 15.00 &&
                    $request['modifier_description'] == 'Our test description' &&
                    $request['modifier_recurring'] == false;
+            }
+
+            return true;
         });
     }
 

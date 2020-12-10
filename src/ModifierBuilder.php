@@ -107,7 +107,7 @@ class ModifierBuilder
         return new Modifier($this->subscription, [
                 'modifier_id'       => $response['modifier_id'],
                 'amount'            => $this->amount,
-                'currency'          => 'EUR',
+                'currency'          => $this->subscription->lastPayment()->currency,
                 'is_recurring'      => $this->recurring,
                 'description'       => $this->description,
             ]
