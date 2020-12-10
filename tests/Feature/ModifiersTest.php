@@ -114,7 +114,14 @@ class ModifiersTest extends FeatureTestCase
             'quantity' => 1,
         ]);
 
-        $modifier = new Modifier(6789, $subscription, 15.00, 'EUR', 'Description', false);
+        $modifier = new Modifier($subscription, [
+                'modifier_id'       => 6789,
+                'amount'            => 15.00,
+                'currency'          => 'EUR',
+                'is_recurring'      => false,
+                'description'       => 'Description',
+            ]
+        );
 
         $modifier->delete();
 

@@ -2,14 +2,16 @@
 
 namespace Laravel\Paddle;
 
+use Laravel\Paddle\Subscription;
+
 class Modifier
 {
     /**
-     * The Paddle identifier of the modifier
+     * The raw modifier array as returned by Paddle
      *
-     * @var string
+     * @var array
      */
-    protected $id;
+    protected $modifier;
 
     /**
      * The Subscription model the modifier belongs to.
@@ -19,72 +21,74 @@ class Modifier
     protected $subscription;
 
     /**
-     * The amount of the modifier.
+     * Create a new modifier instance.
      *
-     * @var int
+     * @param  \Laravel\Paddle\Subscription  $subscription
+     * @param  array $modifier
+     * @return void
      */
-    protected $amount;
-
-    /**
-     * The currency of the modifier.
-     *
-     * @var int
-     */
-    protected $currency;
-
-    /**
-     * The description of the modifier.
-     *
-     * @var string
-     */
-    protected $description;
-
-    /**
-     * Indicates whether the modifier should recur.
-     *
-     * @var bool
-     */
-    protected $recurring;
-
-    public function __construct($id, $subscription, $amount, $currency, $description, $recurring)
+    public function __construct(Subscription $subscription, array $modifier)
     {
-        $this->id = $id;
         $this->subscription = $subscription;
-        $this->amount = $amount;
-        $this->currency = $currency;
-        $this->description = $description;
-        $this->recurring = $recurring;
+        $this->modifier = $modifier;
     }
 
+    /**
+     * Get the modifiers Paddle id
+     *
+     * @return int
+     */
     public function id()
     {
-        return $this->id;
+        return $this->modifier['modifier_id'];
     }
 
+    /**
+     * Get the related subscription.
+     *
+     * @return \Laravel\Paddle\Subscription
+     */
     public function subscription()
     {
         return $this->subscription;
     }
 
-    public function amount()
-    {
-        return $this->amount;
+    /**
+     * Get the total amount
+     *
+     * @return int
+     */
+    public function amount() {
+        return $this->modifier['amount'];
     }
 
-    public function currency()
-    {
-        return $this->currency;
+    /**
+     * Get the currency
+     *
+     * @return string
+     */
+    public function currency() {
+        return $this->modifier['currency'];
     }
 
-    public function description()
-    {
-        return $this->description;
+    /**
+     * Get the description
+     *
+     * @return string
+     */
+    public function description() {
+        return $this->modifier['description'];
     }
 
-    public function recurring()
-    {
-        return $this->recurring;
+    /**
+     * Indicates whether the modifier is recurring.
+     *
+     * @return int
+     */
+    public function recurring() {
+        return $this->modifier['is_recurring'];
     }
+
 
     /**
      * Deletes itself on Paddle.

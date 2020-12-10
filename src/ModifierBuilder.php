@@ -3,6 +3,7 @@
 namespace Laravel\Paddle;
 
 use InvalidArgumentException;
+use Laravel\Paddle\Modifier;
 
 class ModifierBuilder
 {
@@ -103,13 +104,13 @@ class ModifierBuilder
 
         $response = Cashier::post('/subscription/modifiers/create', $this->buildPayload())['response'];
 
-        return new Modifier(
-            $response['modifier_id'],
-            $this->subscription,
-            $this->amount,
-            'EUR',
-            $this->description,
-            $this->recurring
+        return new Modifier($this->subscription, [
+                'modifier_id'       => $response['modifier_id'],
+                'amount'            => $this->amount,
+                'currency'          => 'EUR',
+                'is_recurring'      => $this->recurring,
+                'description'       => $this->description,
+            ]
         );
     }
 

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Paddle\Concerns\Prorates;
+use Laravel\Paddle\Modifier;
 use LogicException;
 
 /**
@@ -665,14 +666,7 @@ class Subscription extends Model
          ], $this->billable->paddleOptions()));
 
         return collect($result['response'])->map(function (array $modifier) {
-            return new Modifier(
-                $modifier['modifier_id'],
-                $this,
-                $modifier['amount'],
-                $modifier['currency'],
-                $modifier['description'],
-                $modifier['is_recurring']
-            );
+            return new Modifier($this, $modifier);
         });
     }
 
