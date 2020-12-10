@@ -671,7 +671,7 @@ class Subscription extends Model
     }
 
     /**
-     * Get a modifier instance by name.
+     * Get a modifier instance by ID.
      *
      * @param  int  $id
      * @return \Laravel\Paddle\Modifier|null
