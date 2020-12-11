@@ -91,7 +91,6 @@ class Modifier
         return $this->modifier['is_recurring'];
     }
 
-
     /**
      * Deletes itself on Paddle.
      *

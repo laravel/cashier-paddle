@@ -660,7 +660,7 @@ class Subscription extends Model
      */
     public function modifiers()
     {
-        $result = Cashier::post("/subscription/modifiers", array_merge([
+        $result = Cashier::post('/subscription/modifiers', array_merge([
             'subscription_id' => $this->paddle_id,
         ], $this->billable->paddleOptions()));
 
