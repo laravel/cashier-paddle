@@ -2,47 +2,106 @@
 
 namespace Laravel\Paddle;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Modifier extends Model
+class Modifier
 {
     /**
-     * The name of the "updated at" column.
-     *
-     * @var string
-     */
-    const UPDATED_AT = null;
-
-    /**
-     * The attributes that are not mass assignable.
+     * The raw modifier array as returned by Paddle.
      *
      * @var array
      */
-    protected $guarded = [];
+    protected $modifier;
 
     /**
-     * Get the subscription related to the modifier.
+     * The Subscription model the modifier belongs to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @var \Laravel\Paddle\Subscription
      */
-    public function subscription()
+    protected $subscription;
+
+    /**
+     * Create a new modifier instance.
+     *
+     * @param  \Laravel\Paddle\Subscription  $subscription
+     * @param  array $modifier
+     * @return void
+     */
+    public function __construct(Subscription $subscription, array $modifier)
     {
-        return $this->belongsTo(Subscription::class);
+        $this->subscription = $subscription;
+        $this->modifier = $modifier;
     }
 
     /**
-     * Deletes itself in the database and on Paddle.
+     * Get the modifiers Paddle id.
      *
-     * @return bool|null
+     * @return int
+     */
+    public function id()
+    {
+        return $this->modifier['modifier_id'];
+    }
+
+    /**
+     * Get the related subscription.
+     *
+     * @return \Laravel\Paddle\Subscription
+     */
+    public function subscription()
+    {
+        return $this->subscription;
+    }
+
+    /**
+     * Get the total amount.
+     *
+     * @return int
+     */
+    public function amount()
+    {
+        return $this->modifier['amount'];
+    }
+
+    /**
+     * Get the currency.
+     *
+     * @return string
+     */
+    public function currency()
+    {
+        return $this->modifier['currency'];
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return string
+     */
+    public function description()
+    {
+        return $this->modifier['description'];
+    }
+
+    /**
+     * Indicates whether the modifier is recurring.
+     *
+     * @return bool
+     */
+    public function recurring()
+    {
+        return $this->modifier['is_recurring'];
+    }
+
+    /**
+     * Deletes itself on Paddle.
+     *
+     * @return \Illuminate\Http\Client\Response
      */
     public function delete()
     {
         $payload = $this->subscription->billable->paddleOptions([
-            'modifier_id' => $this->paddle_id,
+            'modifier_id' => $this->id(),
         ]);
 
-        Cashier::post('/subscription/modifiers/delete', $payload);
-
-        return parent::delete();
+        return Cashier::post('/subscription/modifiers/delete', $payload);
     }
 }

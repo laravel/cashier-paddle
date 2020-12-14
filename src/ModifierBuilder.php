@@ -102,11 +102,12 @@ class ModifierBuilder
 
         $response = Cashier::post('/subscription/modifiers/create', $this->buildPayload())['response'];
 
-        return $this->subscription->modifiers()->create([
-            'paddle_id' => $response['modifier_id'],
-            'amount' => $this->amount,
-            'description' => $this->description,
-            'recurring' => $this->recurring,
+        return new Modifier($this->subscription, [
+            'modifier_id'       => $response['modifier_id'],
+            'amount'            => $this->amount,
+            'currency'          => $this->subscription->lastPayment()->currency,
+            'is_recurring'      => $this->recurring,
+            'description'       => $this->description,
         ]);
     }
 
