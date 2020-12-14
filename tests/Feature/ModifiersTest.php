@@ -109,7 +109,7 @@ class ModifiersTest extends FeatureTestCase
         $this->assertEquals($modifier->recurring(), false);
 
         Http::assertSent(function ($request) {
-            if ($request->url() == 'https://vendors.paddle.com/api/2.0/subscription/modifiers/create') {
+            if ($request->url() === 'https://vendors.paddle.com/api/2.0/subscription/modifiers/create') {
                 return $request['subscription_id'] == $_SERVER['PADDLE_TEST_SUBSCRIPTION'] &&
                    $request['modifier_amount'] == 15.00 &&
                    $request['modifier_description'] == 'Our test description' &&

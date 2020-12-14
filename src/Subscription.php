@@ -679,7 +679,7 @@ class Subscription extends Model
     public function modifier($id)
     {
         return $this->modifiers()->first(function (Modifier $modifier) use ($id) {
-            return $modifier->id() == $id;
+            return $modifier->id() === $id;
         });
     }
 
