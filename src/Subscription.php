@@ -646,11 +646,12 @@ class Subscription extends Model
     /**
      * Begin creating a new modifier.
      *
+     * @param  float  $amount
      * @return \Laravel\Paddle\ModifierBuilder
      */
-    public function newModifier()
+    public function newModifier($amount)
     {
-        return new ModifierBuilder($this);
+        return new ModifierBuilder($this, $amount);
     }
 
     /**

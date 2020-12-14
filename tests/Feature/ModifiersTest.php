@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Modifier;
 use Laravel\Paddle\Subscription;
+use Money\Currency;
 
 class ModifiersTest extends FeatureTestCase
 {
@@ -39,16 +40,20 @@ class ModifiersTest extends FeatureTestCase
         $modifier = $subscription->modifiers()->first();
         $this->assertEquals($modifier->id(), 6789);
         $this->assertEquals($modifier->subscription()->paddle_id, $subscription->paddle_id);
-        $this->assertEquals($modifier->amount(), 15.00);
-        $this->assertEquals($modifier->currency(), 'EUR');
+        $this->assertEquals($modifier->amount(), '€15.00');
+        $this->assertEquals($modifier->rawAmount(), 15.00);
+        $this->assertInstanceOf(Currency::class, $modifier->currency());
+        $this->assertEquals($modifier->currency()->getCode(), 'EUR');
         $this->assertEquals($modifier->description(), 'This is a test modifier');
         $this->assertEquals($modifier->recurring(), false);
 
         $modifier = $subscription->modifier(6789);
         $this->assertEquals($modifier->id(), 6789);
         $this->assertEquals($modifier->subscription()->paddle_id, $subscription->paddle_id);
-        $this->assertEquals($modifier->amount(), 15.00);
-        $this->assertEquals($modifier->currency(), 'EUR');
+        $this->assertEquals($modifier->amount(), '€15.00');
+        $this->assertEquals($modifier->rawAmount(), 15.00);
+        $this->assertInstanceOf(Currency::class, $modifier->currency());
+        $this->assertEquals($modifier->currency()->getCode(), 'EUR');
         $this->assertEquals($modifier->description(), 'This is a test modifier');
         $this->assertEquals($modifier->recurring(), false);
     }
@@ -88,16 +93,18 @@ class ModifiersTest extends FeatureTestCase
             'quantity' => 1,
         ]);
 
-        $modifier = $subscription->newModifier()
-            ->amount(15.00)
+        /** @var \Laravel\Paddle\Modifier $modifier */
+        $modifier = $subscription->newModifier(15.00)
             ->description('Our test description')
             ->oneTime()
             ->create();
 
         $this->assertEquals($modifier->id(), 6789);
         $this->assertEquals($modifier->subscription()->paddle_id, $subscription->paddle_id);
-        $this->assertEquals($modifier->amount(), 15.00);
-        $this->assertEquals($modifier->currency(), 'EUR');
+        $this->assertEquals($modifier->amount(), '€15.00');
+        $this->assertEquals($modifier->rawAmount(), 15.00);
+        $this->assertInstanceOf(Currency::class, $modifier->currency());
+        $this->assertEquals($modifier->currency()->getCode(), 'EUR');
         $this->assertEquals($modifier->description(), 'Our test description');
         $this->assertEquals($modifier->recurring(), false);
 
@@ -132,11 +139,11 @@ class ModifiersTest extends FeatureTestCase
         ]);
 
         $modifier = new Modifier($subscription, [
-            'modifier_id'       => 6789,
-            'amount'            => 15.00,
-            'currency'          => 'EUR',
-            'is_recurring'      => false,
-            'description'       => 'Description',
+            'modifier_id' => 6789,
+            'amount' => 15.00,
+            'currency' => 'EUR',
+            'is_recurring' => false,
+            'description' => 'Description',
         ]);
 
         $modifier->delete();

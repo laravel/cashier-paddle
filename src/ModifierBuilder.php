@@ -16,7 +16,7 @@ class ModifierBuilder
     /**
      * The amount of the modifier.
      *
-     * @var int
+     * @var float
      */
     protected $amount;
 
@@ -38,24 +38,13 @@ class ModifierBuilder
      * Create a new modifier builder instance.
      *
      * @param  \Laravel\Paddle\Subscription  $subscription
+     * @param  float  $amount
      * @return void
      */
-    public function __construct(Subscription $subscription)
+    public function __construct(Subscription $subscription, $amount)
     {
         $this->subscription = $subscription;
-    }
-
-    /**
-     * Specify the amount of the modifier.
-     *
-     * @param  int  $amount
-     * @return $this
-     */
-    public function amount($amount)
-    {
         $this->amount = $amount;
-
-        return $this;
     }
 
     /**
@@ -88,14 +77,10 @@ class ModifierBuilder
      *
      * @return \Laravel\Paddle\Modifier
      *
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function create()
     {
-        if (is_null($this->amount)) {
-            throw new InvalidArgumentException('Amount is a required property.');
-        }
-
         if (strlen($this->description) > 255) {
             throw new InvalidArgumentException('Description has a maximum length of 255 characters.');
         }
@@ -103,11 +88,11 @@ class ModifierBuilder
         $response = Cashier::post('/subscription/modifiers/create', $this->buildPayload())['response'];
 
         return new Modifier($this->subscription, [
-            'modifier_id'       => $response['modifier_id'],
-            'amount'            => $this->amount,
-            'currency'          => $this->subscription->lastPayment()->currency,
-            'is_recurring'      => $this->recurring,
-            'description'       => $this->description,
+            'modifier_id' => $response['modifier_id'],
+            'amount' => $this->amount,
+            'currency' => $this->subscription->lastPayment()->currency,
+            'is_recurring' => $this->recurring,
+            'description' => $this->description,
         ]);
     }
 

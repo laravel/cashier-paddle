@@ -2,15 +2,10 @@
 
 namespace Laravel\Paddle;
 
+use Money\Currency;
+
 class Modifier
 {
-    /**
-     * The raw modifier array as returned by Paddle.
-     *
-     * @var array
-     */
-    protected $modifier;
-
     /**
      * The Subscription model the modifier belongs to.
      *
@@ -19,10 +14,17 @@ class Modifier
     protected $subscription;
 
     /**
+     * The raw modifier array as returned by Paddle.
+     *
+     * @var array
+     */
+    protected $modifier;
+
+    /**
      * Create a new modifier instance.
      *
      * @param  \Laravel\Paddle\Subscription  $subscription
-     * @param  array $modifier
+     * @param  array  $modifier
      * @return void
      */
     public function __construct(Subscription $subscription, array $modifier)
@@ -32,7 +34,7 @@ class Modifier
     }
 
     /**
-     * Get the modifiers Paddle id.
+     * Get the modifier's Paddle ID.
      *
      * @return int
      */
@@ -54,9 +56,19 @@ class Modifier
     /**
      * Get the total amount.
      *
-     * @return int
+     * @return string
      */
     public function amount()
+    {
+        return $this->formatAmount((int) ($this->rawAmount() * 100));
+    }
+
+    /**
+     * Get the raw total amount.
+     *
+     * @return float
+     */
+    public function rawAmount()
     {
         return $this->modifier['amount'];
     }
@@ -64,11 +76,22 @@ class Modifier
     /**
      * Get the currency.
      *
+     * @return \Money\Currency
+     */
+    public function currency(): Currency
+    {
+        return new Currency($this->modifier['currency']);
+    }
+
+    /**
+     * Format the given amount into a displayable currency.
+     *
+     * @param  int  $amount
      * @return string
      */
-    public function currency()
+    protected function formatAmount($amount)
     {
-        return $this->modifier['currency'];
+        return Cashier::formatAmount($amount, $this->currency());
     }
 
     /**
@@ -88,7 +111,7 @@ class Modifier
      */
     public function recurring()
     {
-        return $this->modifier['is_recurring'];
+        return (bool) $this->modifier['is_recurring'];
     }
 
     /**
