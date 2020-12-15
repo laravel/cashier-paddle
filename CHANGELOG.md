@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.3.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.0...1.x)
+
+
+## [v1.4.0 (2020-12-15)](https://github.com/laravel/cashier-paddle/compare/1.3.0...v1.4.0)
+
+### Added
+- Subscription Modifiers ([#95](https://github.com/laravel/cashier-paddle/pull/95))
 
 
 ## [v1.3.0 (2020-11-03)](https://github.com/laravel/cashier-paddle/compare/1.2.3...v1.3.0)
