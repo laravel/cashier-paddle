@@ -551,6 +551,46 @@ class Subscription extends Model
     }
 
     /**
+     * Begin creating a new modifier.
+     *
+     * @param  float  $amount
+     * @return \Laravel\Paddle\ModifierBuilder
+     */
+    public function newModifier($amount)
+    {
+        return new ModifierBuilder($this, $amount);
+    }
+
+    /**
+     * Get all of the modifiers for this subscription.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function modifiers()
+    {
+        $result = Cashier::post('/subscription/modifiers', array_merge([
+            'subscription_id' => $this->paddle_id,
+        ], $this->billable->paddleOptions()));
+
+        return collect($result['response'])->map(function (array $modifier) {
+            return new Modifier($this, $modifier);
+        });
+    }
+
+    /**
+     * Get a modifier instance by ID.
+     *
+     * @param  int  $id
+     * @return \Laravel\Paddle\Modifier|null
+     */
+    public function modifier($id)
+    {
+        return $this->modifiers()->first(function (Modifier $modifier) use ($id) {
+            return $modifier->id() === $id;
+        });
+    }
+
+    /**
      * Cancel the subscription.
      *
      * @return $this
