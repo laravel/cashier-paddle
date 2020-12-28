@@ -228,9 +228,11 @@ class WebhookController extends Controller
         }
 
         // Cancellation date...
-        $subscription->ends_at = $subscription->onTrial()
-            ? $subscription->trial_ends_at
-            : Carbon::createFromFormat('Y-m-d', $payload['cancellation_effective_date'], 'UTC')->startOfDay();
+        if (is_null($subscription->ends_at)) {
+            $subscription->ends_at = $subscription->onTrial()
+                ? $subscription->trial_ends_at
+                : Carbon::createFromFormat('Y-m-d', $payload['cancellation_effective_date'], 'UTC')->startOfDay();
+        }
 
         // Status...
         if (isset($payload['status'])) {
