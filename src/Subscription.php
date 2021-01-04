@@ -3,6 +3,7 @@
 namespace Laravel\Paddle;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Paddle\Concerns\Prorates;
@@ -591,7 +592,7 @@ class Subscription extends Model
     }
 
     /**
-     * Cancel the subscription.
+     * Cancel the subscription at the end of the current billing period.
      *
      * @return $this
      */
@@ -601,25 +602,15 @@ class Subscription extends Model
             return $this;
         }
 
-        $nextPayment = $this->nextPayment();
+        if ($this->onPausedGracePeriod() || $this->paused()) {
+            $endsAt = $this->paused_from;
+        } else {
+            $endsAt = $this->onTrial()
+                ? $this->trial_ends_at
+                : $this->nextPayment()->date();
+        }
 
-        $payload = $this->billable->paddleOptions([
-            'subscription_id' => $this->paddle_id,
-        ]);
-
-        Cashier::post('/subscription/users_cancel', $payload);
-
-        $this->paddle_status = self::STATUS_DELETED;
-
-        $this->ends_at = $this->onTrial()
-                    ? $this->trial_ends_at
-                    : $nextPayment->date();
-
-        $this->save();
-
-        $this->paddleInfo = null;
-
-        return $this;
+        return $this->cancelAt($endsAt);
     }
 
     /**
@@ -629,6 +620,17 @@ class Subscription extends Model
      */
     public function cancelNow()
     {
+        return $this->cancelAt(Carbon::now());
+    }
+
+    /**
+     * Cancel the subscription at a specific moment in time.
+     *
+     * @param  \DateTimeInterface  $endsAt
+     * @return $this
+     */
+    public function cancelAt(DateTimeInterface $endsAt)
+    {
         $payload = $this->billable->paddleOptions([
             'subscription_id' => $this->paddle_id,
         ]);
@@ -637,7 +639,7 @@ class Subscription extends Model
 
         $this->forceFill([
             'paddle_status' => self::STATUS_DELETED,
-            'ends_at' => Carbon::now(),
+            'ends_at' => $endsAt,
         ])->save();
 
         $this->paddleInfo = null;
