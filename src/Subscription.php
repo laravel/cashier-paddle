@@ -602,11 +602,13 @@ class Subscription extends Model
             return $this;
         }
 
-        $nextPayment = $this->nextPayment();
-
-        $endsAt = $this->onTrial()
-                    ? $this->trial_ends_at
-                    : $nextPayment->date();
+        if ($this->onPausedGracePeriod() || $this->paused()) {
+            $endsAt = $this->paused_from;
+        } else {
+            $endsAt = $this->onTrial()
+                ? $this->trial_ends_at
+                : $this->nextPayment()->date();
+        }
 
         return $this->cancelAt($endsAt);
     }
