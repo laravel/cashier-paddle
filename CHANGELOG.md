@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.1...1.x)
+
+
+## [v1.4.1 (2021-01-05)](https://github.com/laravel/cashier-paddle/compare/1.4.0...v1.4.1)
+
+### Fixed
+- Fix bug with `cancelNow` ([#99](https://github.com/laravel/cashier-paddle/pull/99))
+- Fix cancelling paused subscriptions ([#101](https://github.com/laravel/cashier-paddle/pull/101), [#102](https://github.com/laravel/cashier-paddle/pull/102))
 
 
 ## [v1.4.0 (2020-12-15)](https://github.com/laravel/cashier-paddle/compare/1.3.0...v1.4.0)
