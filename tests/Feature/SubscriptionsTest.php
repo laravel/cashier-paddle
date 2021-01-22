@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Subscription;
 use LogicException;
 
@@ -186,15 +187,29 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_subscriptions_can_retrieve_their_payment_info()
     {
-        if (! isset($_SERVER['CI'], $_SERVER['PADDLE_TEST_SUBSCRIPTION'])) {
-            $this->markTestSkipped('Plan and/or subscription not configured.');
-        }
+        Http::fake([
+            'https://vendors.paddle.com/api/2.0/subscription/users' => Http::response([
+                'success' => true,
+                'response' => [
+                    [
+                        'subscription_id' => 3423423,
+                        'user_email' => 'john@example.com',
+                        'payment_information' => [
+                            'payment_method' => 'card',
+                            'card_type' => 'visa',
+                            'last_four_digits' => '1234',
+                            'expiry_date' => '04/2022',
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
 
         $billable = $this->createBillable('taylor');
 
         $subscription = $billable->subscriptions()->create([
             'name' => 'main',
-            'paddle_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
+            'paddle_id' => 23423,
             'paddle_plan' => 12345,
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
@@ -202,5 +217,8 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertSame('john@example.com', $subscription->paddleEmail());
         $this->assertSame('card', $subscription->paymentMethod());
+        $this->assertSame('visa', $subscription->cardBrand());
+        $this->assertSame('1234', $subscription->cardLastFour());
+        $this->assertSame('04/2022', $subscription->cardExpirationDate());
     }
 }
