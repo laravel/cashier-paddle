@@ -17,7 +17,7 @@ class ModifiersTest extends FeatureTestCase
                 'response' => [
                     [
                         'modifier_id' => 6789,
-                        'subscription_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
+                        'subscription_id' => 3423423,
                         'amount' => 15.00,
                         'currency' => 'EUR',
                         'is_recurring' => false,
@@ -31,7 +31,7 @@ class ModifiersTest extends FeatureTestCase
 
         $subscription = $billable->subscriptions()->create([
             'name' => 'main',
-            'paddle_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
+            'paddle_id' => 3423423,
             'paddle_plan' => 12345,
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
@@ -77,7 +77,7 @@ class ModifiersTest extends FeatureTestCase
             'https://vendors.paddle.com/api/2.0/subscription/modifiers/create' => Http::response([
                 'success' => true,
                 'response' => [
-                    'subscription_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
+                    'subscription_id' => 3423423,
                     'modifier_id' => 6789,
                 ],
             ]),
@@ -87,7 +87,7 @@ class ModifiersTest extends FeatureTestCase
 
         $subscription = $billable->subscriptions()->create([
             'name' => 'main',
-            'paddle_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
+            'paddle_id' => 3423423,
             'paddle_plan' => 12345,
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
@@ -110,7 +110,7 @@ class ModifiersTest extends FeatureTestCase
 
         Http::assertSent(function ($request) {
             if ($request->url() === 'https://vendors.paddle.com/api/2.0/subscription/modifiers/create') {
-                return $request['subscription_id'] == $_SERVER['PADDLE_TEST_SUBSCRIPTION'] &&
+                return $request['subscription_id'] == 3423423 &&
                    $request['modifier_amount'] == 15.00 &&
                    $request['modifier_description'] == 'Our test description' &&
                    $request['modifier_recurring'] == false;
@@ -132,7 +132,7 @@ class ModifiersTest extends FeatureTestCase
 
         $subscription = $billable->subscriptions()->create([
             'name' => 'main',
-            'paddle_id' => $_SERVER['PADDLE_TEST_SUBSCRIPTION'],
+            'paddle_id' => 3423423,
             'paddle_plan' => 12345,
             'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
