@@ -221,4 +221,38 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame('1234', $subscription->cardLastFour());
         $this->assertSame('04/2022', $subscription->cardExpirationDate());
     }
+
+    public function test_subscriptions_can_retrieve_their_payment_info_for_paypal()
+    {
+        Http::fake([
+            'https://vendors.paddle.com/api/2.0/subscription/users' => Http::response([
+                'success' => true,
+                'response' => [
+                    [
+                        'subscription_id' => 3423423,
+                        'user_email' => 'john@example.com',
+                        'payment_information' => [
+                            'payment_method' => 'paypal',
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $billable = $this->createBillable('taylor');
+
+        $subscription = $billable->subscriptions()->create([
+            'name' => 'main',
+            'paddle_id' => 23423,
+            'paddle_plan' => 12345,
+            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'quantity' => 1,
+        ]);
+
+        $this->assertSame('john@example.com', $subscription->paddleEmail());
+        $this->assertSame('paypal', $subscription->paymentMethod());
+        $this->assertSame('', $subscription->cardBrand());
+        $this->assertSame('', $subscription->cardLastFour());
+        $this->assertSame('', $subscription->cardExpirationDate());
+    }
 }
