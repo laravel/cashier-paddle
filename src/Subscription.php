@@ -714,7 +714,7 @@ class Subscription extends Model
      */
     public function cardBrand()
     {
-        return (string) $this->paddleInfo()['payment_information']['card_type'];
+        return (string) ($this->paddleInfo()['payment_information']['card_type'] ?? '');
     }
 
     /**
@@ -724,7 +724,7 @@ class Subscription extends Model
      */
     public function cardLastFour()
     {
-        return (string) $this->paddleInfo()['payment_information']['last_four_digits'];
+        return (string) ($this->paddleInfo()['payment_information']['last_four_digits'] ?? '');
     }
 
     /**
@@ -734,7 +734,7 @@ class Subscription extends Model
      */
     public function cardExpirationDate()
     {
-        return (string) $this->paddleInfo()['payment_information']['expiry_date'];
+        return (string) ($this->paddleInfo()['payment_information']['expiry_date'] ?? '');
     }
 
     /**
