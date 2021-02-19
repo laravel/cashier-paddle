@@ -25,7 +25,7 @@ trait ManagesCustomer
      */
     public function customer()
     {
-        return $this->morphOne(Customer::class, 'billable');
+        return $this->morphOne(Cashier::$customerModel, 'billable');
     }
 
     /**

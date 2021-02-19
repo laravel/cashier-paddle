@@ -67,7 +67,7 @@ class Subscription extends Model
      */
     public function receipts()
     {
-        return $this->hasMany(Receipt::class, 'paddle_subscription_id', 'paddle_id')->orderByDesc('created_at');
+        return $this->hasMany(Cashier::$receiptModel, 'paddle_subscription_id', 'paddle_id')->orderByDesc('created_at');
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Laravel\Paddle\Concerns;
 
-use Laravel\Paddle\Receipt;
+use Laravel\Paddle\Cashier;
 
 trait ManagesReceipts
 {
@@ -13,6 +13,6 @@ trait ManagesReceipts
      */
     public function receipts()
     {
-        return $this->morphMany(Receipt::class, 'billable')->orderByDesc('created_at');
+        return $this->morphMany(Cashier::$receiptModel, 'billable')->orderByDesc('created_at');
     }
 }
