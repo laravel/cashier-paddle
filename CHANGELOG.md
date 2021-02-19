@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.1...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.2...1.x)
+
+
+## [v1.4.2 (2021-02-19)](https://github.com/laravel/cashier-paddle/compare/1.4.1...v1.4.2)
+
+### Fixed
+- Fix payment method calls ([#105](https://github.com/laravel/cashier-paddle/pull/105))
 
 
 ## [v1.4.1 (2021-01-05)](https://github.com/laravel/cashier-paddle/compare/1.4.0...v1.4.1)
