@@ -41,6 +41,27 @@ class Cashier
     public static $deactivatePastDue = true;
 
     /**
+     * The customer model class name.
+     *
+     * @var string
+     */
+    public static $customerModel = Customer::class;
+
+    /**
+     * The subscription model class name.
+     *
+     * @var string
+     */
+    public static $subscriptionModel = Subscription::class;
+
+    /**
+     * The receipt model class name.
+     *
+     * @var string
+     */
+    public static $receiptModel = Receipt::class;
+
+    /**
      * Get prices for a set of product ids.
      *
      * @param  array|int  $products
@@ -222,5 +243,38 @@ class Cashier
         static::$deactivatePastDue = false;
 
         return new static;
+    }
+
+    /**
+     * Set the customer model class name.
+     *
+     * @param  string  $customerModel
+     * @return void
+     */
+    public static function useCustomerModel($customerModel)
+    {
+        static::$customerModel = $customerModel;
+    }
+
+    /**
+     * Set the subscription model class name.
+     *
+     * @param  string  $subscriptionModel
+     * @return void
+     */
+    public static function useSubscriptionModel($subscriptionModel)
+    {
+        static::$subscriptionModel = $subscriptionModel;
+    }
+
+    /**
+     * Set the receipt model class name.
+     *
+     * @param  string  $receiptModel
+     * @return void
+     */
+    public static function useReceiptModel($receiptModel)
+    {
+        static::$receiptModel = $receiptModel;
     }
 }
