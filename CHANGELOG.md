@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.2...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.3...1.x)
+
+
+## [v1.4.3 (2021-02-23)](https://github.com/laravel/cashier-paddle/compare/1.4.2...v1.4.3)
+
+### Changed
+- Allow custom models ([#106](https://github.com/laravel/cashier-paddle/pull/106))
 
 
 ## [v1.4.2 (2021-02-19)](https://github.com/laravel/cashier-paddle/compare/1.4.1...v1.4.2)
