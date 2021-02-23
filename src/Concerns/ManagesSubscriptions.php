@@ -2,6 +2,7 @@
 
 namespace Laravel\Paddle\Concerns;
 
+use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Subscription;
 use Laravel\Paddle\SubscriptionBuilder;
 
@@ -26,7 +27,7 @@ trait ManagesSubscriptions
      */
     public function subscriptions()
     {
-        return $this->morphMany(Subscription::class, 'billable')->orderByDesc('created_at');
+        return $this->morphMany(Cashier::$subscriptionModel, 'billable')->orderByDesc('created_at');
     }
 
     /**

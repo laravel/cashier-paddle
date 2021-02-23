@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
+use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Customer;
 use Laravel\Paddle\Events\PaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionCancelled;
@@ -17,7 +18,6 @@ use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
 use Laravel\Paddle\Exceptions\InvalidPassthroughPayload;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
-use Laravel\Paddle\Receipt;
 use Laravel\Paddle\Subscription;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -262,7 +262,7 @@ class WebhookController extends Controller
             throw new InvalidPassthroughPayload;
         }
 
-        return Customer::firstOrCreate([
+        return Cashier::$customerModel::firstOrCreate([
             'billable_id' => $passthrough['billable_id'],
             'billable_type' => $passthrough['billable_type'],
         ])->billable;
@@ -276,7 +276,7 @@ class WebhookController extends Controller
      */
     protected function findSubscription(string $subscriptionId)
     {
-        return Subscription::firstWhere('paddle_id', $subscriptionId);
+        return Cashier::$subscriptionModel::firstWhere('paddle_id', $subscriptionId);
     }
 
     /**
@@ -287,6 +287,6 @@ class WebhookController extends Controller
      */
     protected function receiptExists(string $orderId)
     {
-        return Receipt::where('order_id', $orderId)->count() > 0;
+        return Cashier::$receiptModel::where('order_id', $orderId)->count() > 0;
     }
 }
