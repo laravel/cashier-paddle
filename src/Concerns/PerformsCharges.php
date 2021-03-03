@@ -21,7 +21,7 @@ trait PerformsCharges
     public function charge($amount, $title, array $options = [])
     {
         if (strlen($title) > 200) {
-            throw new InvalidArgumentException('Charge title has a maximum length of 100 characters.');
+            throw new InvalidArgumentException('Charge title has a maximum length of 200 characters.');
         }
 
         return $this->generatePayLink(array_merge([
