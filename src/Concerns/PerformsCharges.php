@@ -20,7 +20,7 @@ trait PerformsCharges
      */
     public function charge($amount, $title, array $options = [])
     {
-        if (strlen($title) > 100) {
+        if (strlen($title) > 200) {
             throw new InvalidArgumentException('Charge title has a maximum length of 100 characters.');
         }
 
