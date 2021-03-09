@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.3...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.4...1.x)
+
+
+## [v1.4.4 (2021-03-09)](https://github.com/laravel/cashier-paddle/compare/1.4.3...v1.4.4)
+
+### Fixed
+- Fix maxlength characters for charge title ([#112](https://github.com/laravel/cashier-paddle/pull/112))
 
 
 ## [v1.4.3 (2021-02-23)](https://github.com/laravel/cashier-paddle/compare/1.4.2...v1.4.3)
