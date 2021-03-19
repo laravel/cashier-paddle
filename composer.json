@@ -10,11 +10,11 @@
     "authors": [
         {
             "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "email": "taylor@laravel.com"
         },
         {
             "name": "Dries Vints",
-            "email": "dries@vints.io"
+            "email": "dries@laravel.com"
         }
     ],
     "require": {
