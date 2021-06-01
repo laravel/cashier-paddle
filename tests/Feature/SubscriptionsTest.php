@@ -26,7 +26,7 @@ class SubscriptionsTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
-            'paddle_status' => 'active',
+            'paddle_status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
         ]);
 
@@ -67,7 +67,7 @@ class SubscriptionsTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
-            'paddle_status' => 'trialing',
+            'paddle_status' => Subscription::STATUS_TRIALING,
             'quantity' => 1,
             'trial_ends_at' => Carbon::tomorrow(),
         ]);
