@@ -94,6 +94,24 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($subscription->ended());
     }
 
+    public function test_user_with_subscription_can_return_generic_trial_end_date()
+    {
+        $billable = $this->createBillable('taylor', ['trial_ends_at' => $tomorrow = Carbon::tomorrow()]);
+
+        $subscription = $billable->subscriptions()->create([
+            'name' => 'default',
+            'paddle_id' => 244,
+            'paddle_plan' => 2323,
+            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'quantity' => 1,
+        ]);
+
+        $this->assertTrue($billable->onGenericTrial());
+        $this->assertTrue($billable->onTrial());
+        $this->assertFalse($subscription->onTrial());
+        $this->assertEquals($tomorrow, $billable->trialEndsAt());
+    }
+
     public function test_customers_can_check_if_their_subscription_is_cancelled()
     {
         $billable = $this->createBillable('taylor');
