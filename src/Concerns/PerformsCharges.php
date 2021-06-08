@@ -73,6 +73,10 @@ trait PerformsCharges
 
         $payload['passthrough'] = json_encode($payload['passthrough']);
 
+        $payload = array_map(function ($value) {
+            return is_string($value) ? trim($value) : $value;
+        }, $payload);
+
         return Cashier::post('/product/generate_pay_link', $payload)['response']['url'];
     }
 
