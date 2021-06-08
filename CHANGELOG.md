@@ -1,72 +1,78 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.4...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.5...1.x)
 
 
-## [v1.4.4 (2021-03-09)](https://github.com/laravel/cashier-paddle/compare/1.4.3...v1.4.4)
+## [v1.4.5 (2021-06-08)](https://github.com/laravel/cashier-paddle/compare/v1.4.4...v1.4.5)
+
+### Fixed
+- Trim whitespace for pay link values ([#121](https://github.com/laravel/cashier-paddle/pull/121))
+
+
+## [v1.4.4 (2021-03-09)](https://github.com/laravel/cashier-paddle/compare/v1.4.3...v1.4.4)
 
 ### Fixed
 - Fix maxlength characters for charge title ([#112](https://github.com/laravel/cashier-paddle/pull/112))
 
 
-## [v1.4.3 (2021-02-23)](https://github.com/laravel/cashier-paddle/compare/1.4.2...v1.4.3)
+## [v1.4.3 (2021-02-23)](https://github.com/laravel/cashier-paddle/compare/v1.4.2...v1.4.3)
 
 ### Changed
 - Allow custom models ([#106](https://github.com/laravel/cashier-paddle/pull/106))
 
 
-## [v1.4.2 (2021-02-19)](https://github.com/laravel/cashier-paddle/compare/1.4.1...v1.4.2)
+## [v1.4.2 (2021-02-19)](https://github.com/laravel/cashier-paddle/compare/v1.4.1...v1.4.2)
 
 ### Fixed
 - Fix payment method calls ([#105](https://github.com/laravel/cashier-paddle/pull/105))
 
 
-## [v1.4.1 (2021-01-05)](https://github.com/laravel/cashier-paddle/compare/1.4.0...v1.4.1)
+## [v1.4.1 (2021-01-05)](https://github.com/laravel/cashier-paddle/compare/v1.4.0...v1.4.1)
 
 ### Fixed
 - Fix bug with `cancelNow` ([#99](https://github.com/laravel/cashier-paddle/pull/99))
 - Fix cancelling paused subscriptions ([#101](https://github.com/laravel/cashier-paddle/pull/101), [#102](https://github.com/laravel/cashier-paddle/pull/102))
 
 
-## [v1.4.0 (2020-12-15)](https://github.com/laravel/cashier-paddle/compare/1.3.0...v1.4.0)
+## [v1.4.0 (2020-12-15)](https://github.com/laravel/cashier-paddle/compare/v1.3.0...v1.4.0)
 
 ### Added
 - Subscription Modifiers ([#95](https://github.com/laravel/cashier-paddle/pull/95))
 
 
-## [v1.3.0 (2020-11-03)](https://github.com/laravel/cashier-paddle/compare/1.2.3...v1.3.0)
+## [v1.3.0 (2020-11-03)](https://github.com/laravel/cashier-paddle/compare/v1.2.3...v1.3.0)
 
 ### Added
 - PHP 8 Support ([#91](https://github.com/laravel/cashier-paddle/pull/91))
 
 
-## [v1.2.3 (2020-10-20)](https://github.com/laravel/cashier-paddle/compare/1.2.2...v1.2.3)
+## [v1.2.3 (2020-10-20)](https://github.com/laravel/cashier-paddle/compare/v1.2.2...v1.2.3)
 
 ### Fixed
 - Fix trial ends at ([#87](https://github.com/laravel/cashier-paddle/pull/87))
 - Ignore manual paylinks ([#89](https://github.com/laravel/cashier-paddle/pull/89))
 
 
-## [v1.2.2 (2020-10-06)](https://github.com/laravel/cashier-paddle/compare/1.2.1...v1.2.2)
+## [v1.2.2 (2020-10-06)](https://github.com/laravel/cashier-paddle/compare/v1.2.1...v1.2.2)
 
 ### Fixed
 - Missing use statement for `SubscriptionPaymentFailed` ([#81](https://github.com/laravel/cashier-paddle/pull/81))
 - Fix n+1 problem with subscription retrieval ([#83](https://github.com/laravel/cashier-paddle/pull/83))
 
 
-## [v1.2.1 (2020-09-29)](https://github.com/laravel/cashier-paddle/compare/1.2.0...v1.2.1)
+## [v1.2.1 (2020-09-29)](https://github.com/laravel/cashier-paddle/compare/v1.2.0...v1.2.1)
 
 ### Changed
 - Allow customer values in payload override ([#78](https://github.com/laravel/cashier-paddle/pull/78))
 
 
-## [v1.2.0 (2020-09-22)](https://github.com/laravel/cashier-paddle/compare/1.1.0...v1.2.0)
+## [v1.2.0 (2020-09-22)](https://github.com/laravel/cashier-paddle/compare/v1.1.0...v1.2.0)
 
 ### Added
 - Event Improvements ([#72](https://github.com/laravel/cashier-paddle/pull/72))
 
 
-## [v1.1.0 (2020-09-01)](https://github.com/laravel/cashier-paddle/compare/1.0.0...v1.1.0)
+## [v1.1.0 (2020-09-01)](https://github.com/laravel/cashier-paddle/compare/v1.0.0...v1.1.0)
 
 ### Added
 - Added function to see when the trial is ending ([#69](https://github.com/laravel/cashier-paddle/pull/69))
