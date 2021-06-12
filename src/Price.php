@@ -92,7 +92,17 @@ class Price
     {
         return $this->price['tax'];
     }
-
+    
+    /**
+     * Check if the price has tax.
+     *
+     * @return boolean
+     */
+    public function hasTax()
+    {
+        return $this->rawTax() > 0;
+    }
+    
     /**
      * Get the used currency for the price.
      *
