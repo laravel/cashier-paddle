@@ -102,7 +102,7 @@ class Price
     {
         return $this->price['tax'];
     }
-    
+
     /**
      * Get the used currency for the price.
      *
