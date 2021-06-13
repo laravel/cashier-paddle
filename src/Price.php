@@ -86,7 +86,7 @@ class Price
     /**
      * Determine if the price has tax.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasTax()
     {

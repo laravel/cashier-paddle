@@ -85,7 +85,7 @@ class ProductPriceTest extends TestCase
         $this->assertSame($data, $product->jsonSerialize());
         $this->assertSame(json_encode($data), $product->toJson());
     }
-    
+
     public function test_it_can_check_if_has_tax()
     {
         $product = $this->product();
