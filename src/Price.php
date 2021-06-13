@@ -84,6 +84,16 @@ class Price
     }
 
     /**
+     * Determine if the price has tax.
+     *
+     * @return boolean
+     */
+    public function hasTax()
+    {
+        return $this->rawTax() > 0;
+    }
+
+    /**
      * Get the raw tax amount.
      *
      * @return string
@@ -91,16 +101,6 @@ class Price
     public function rawTax()
     {
         return $this->price['tax'];
-    }
-    
-    /**
-     * Check if the price has tax.
-     *
-     * @return boolean
-     */
-    public function hasTax()
-    {
-        return $this->rawTax() > 0;
     }
     
     /**
