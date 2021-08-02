@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 
 class ChargesTest extends FeatureTestCase
@@ -30,5 +31,23 @@ class ChargesTest extends FeatureTestCase
         $url = $billable->chargeProduct($_SERVER['PADDLE_TEST_PRODUCT']);
 
         $this->assertStringContainsString(Cashier::checkoutUrl().'/checkout/custom/', $url);
+    }
+
+    public function test_payments_can_be_refunded()
+    {
+        $billable = $this->createBillable();
+
+        Http::fake([
+            'vendors.paddle.com/api/2.0/payment/refund' => Http::response([
+                'success' => true,
+                'response' => [
+                    'refund_request_id' => 12345,
+                ],
+            ]),
+        ]);
+
+        $response = $billable->refund(4321, 12.50, 'Incorrect order');
+
+        $this->assertSame(12345, $response);
     }
 }

@@ -99,6 +99,6 @@ trait PerformsCharges
             $payload['amount'] = $amount;
         }
 
-        return Cashier::post('/payment/refund', $payload)['refund_request_id'];
+        return Cashier::post('/payment/refund', $payload)['response']['refund_request_id'];
     }
 }

@@ -3,7 +3,6 @@
 namespace Laravel\Paddle\Concerns;
 
 use Laravel\Paddle\Cashier;
-use Laravel\Paddle\Customer;
 
 trait ManagesCustomer
 {
