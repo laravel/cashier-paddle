@@ -1,4 +1,4 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-cashier.svg"></p>
+<p align="center"><img src="/art/logo.svg" alt="Logo Laravel Cashier Paddle"></p>
 
 <p align="center">
     <a href="https://github.com/laravel/cashier-paddle/actions">

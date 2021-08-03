@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.5...master)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.6...master)
+
+
+## [v1.4.6 (2021-08-03)](https://github.com/laravel/cashier-paddle/compare/v1.4.5...v1.4.6)
+
+### Fixed
+- Update environment sandbox Paddle.js ([#129](https://github.com/laravel/cashier-paddle/pull/129))
+- Fix refunds ([#131](https://github.com/laravel/cashier-paddle/pull/131))
 
 
 ## [v1.4.5 (2021-06-08)](https://github.com/laravel/cashier-paddle/compare/v1.4.4...v1.4.5)
