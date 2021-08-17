@@ -662,10 +662,14 @@ class Subscription extends Model
     /**
      * Get the last payment for the subscription.
      *
-     * @return \Laravel\Paddle\Payment
+     * @return \Laravel\Paddle\Payment|null
      */
     public function lastPayment()
     {
+        if (! isset($this->paddleInfo()['last_payment'])) {
+            return;
+        }
+
         $payment = $this->paddleInfo()['last_payment'];
 
         return new Payment($payment['amount'], $payment['currency'], $payment['date']);
