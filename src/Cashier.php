@@ -116,13 +116,14 @@ class Cashier
      *
      * @param  string  $uri
      * @param  array  $payload
+     * @param  string $api_version
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Laravel\Paddle\Exceptions\PaddleException
      */
-    public static function get($uri, array $payload = [])
+    public static function get($uri, array $payload = [], $api_version = '2.0')
     {
-        return static::makeApiCall('get', static::checkoutUrl().'/api/2.0'.$uri, $payload);
+        return static::makeApiCall('get', static::checkoutUrl().'/api/'.$api_version.$uri, $payload);
     }
 
     /**
@@ -130,13 +131,14 @@ class Cashier
      *
      * @param  string  $uri
      * @param  array  $payload
+     * @param  string $api_version
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Laravel\Paddle\Exceptions\PaddleException
      */
-    public static function post($uri, array $payload = [])
+    public static function post($uri, array $payload = [], $api_version = '2.0')
     {
-        return static::makeApiCall('post', static::vendorsUrl().'/api/2.0'.$uri, $payload);
+        return static::makeApiCall('post', static::vendorsUrl().'/api/'.$api_version.$uri, $payload);
     }
 
     /**
