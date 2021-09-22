@@ -59,6 +59,7 @@ trait ManagesCustomer
      * This needs to be a 2 letter code. See the link below for supported countries.
      *
      * @return string|null
+     *
      * @link https://developer.paddle.com/reference/platform-parameters/supported-countries
      */
     public function paddleCountry()
@@ -72,6 +73,7 @@ trait ManagesCustomer
      * See the link below for countries which require this.
      *
      * @return string|null
+     *
      * @link https://developer.paddle.com/reference/platform-parameters/supported-countries#countries-requiring-postcode
      */
     public function paddlePostcode()
