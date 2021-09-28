@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Http;
-use Laravel\Paddle\Cashier;
 
 class ChargesTest extends FeatureTestCase
 {
@@ -17,7 +16,7 @@ class ChargesTest extends FeatureTestCase
 
         $url = $billable->charge(0, 'Test Product');
 
-        $this->assertStringContainsString(Cashier::checkoutUrl().'/checkout/custom/', $url);
+        $this->assertStringContainsString('/checkout/custom/', $url);
     }
 
     public function test_customers_can_retrieve_a_product_charge_link()
@@ -30,7 +29,7 @@ class ChargesTest extends FeatureTestCase
 
         $url = $billable->chargeProduct($_SERVER['PADDLE_TEST_PRODUCT']);
 
-        $this->assertStringContainsString(Cashier::checkoutUrl().'/checkout/custom/', $url);
+        $this->assertStringContainsString('/checkout/custom/', $url);
     }
 
     public function test_payments_can_be_refunded()
