@@ -19,7 +19,6 @@
     ],
     "require": {
         "php": "^7.2|^8.0",
-        "ext-bcmath": "*",
         "ext-json": "*",
         "ext-openssl": "*",
         "guzzlehttp/guzzle": "^6.5|^7.0",
