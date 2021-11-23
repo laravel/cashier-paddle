@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.6...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.7...1.x)
+
+
+## [v1.4.7 (2021-11-23)](https://github.com/laravel/cashier-paddle/compare/v1.4.6...v1.4.7)
+
+### Changed
+- Allow moneyphp version 4 ([#143](https://github.com/laravel/cashier-paddle/pull/143))
 
 
 ## [v1.4.6 (2021-08-03)](https://github.com/laravel/cashier-paddle/compare/v1.4.5...v1.4.6)
