@@ -704,7 +704,7 @@ class Subscription extends Model
      */
     public function paymentMethod()
     {
-        return (string) $this->paddleInfo()['payment_information']['payment_method'];
+        return (string) ($this->paddleInfo()['payment_information']['payment_method'] ?? '');
     }
 
     /**
