@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.4.8...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.0...1.x)
+
+
+## [v1.5.0 (2022-01-12)](https://github.com/laravel/cashier-paddle/compare/v1.4.8...v1.5.0)
+
+### Added
+- Add hasTax method ([#149](https://github.com/laravel/cashier-paddle/pull/149))
+
+### Changed
+- Laravel 9 Support ([#150](https://github.com/laravel/cashier-paddle/pull/150))
 
 
 ## [v1.4.8 (2021-11-30)](https://github.com/laravel/cashier-paddle/compare/v1.4.7...v1.4.8)
