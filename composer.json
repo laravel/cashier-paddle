@@ -30,7 +30,7 @@
         "illuminate/view": "^7.9|^8.0|^9.0",
         "moneyphp/money": "^3.2|^4.0",
         "nesbot/carbon": "^2.0",
-        "spatie/url": "^1.3.5",
+        "spatie/url": "^1.3.5|^2.0",
         "symfony/http-kernel": "^5.0|^6.0",
         "symfony/intl": "^5.0|^6.0"
     },
