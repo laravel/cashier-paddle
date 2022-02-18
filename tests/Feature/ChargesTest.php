@@ -8,7 +8,7 @@ class ChargesTest extends FeatureTestCase
 {
     public function test_customers_can_retrieve_a_single_charge_link()
     {
-        if (! isset($_SERVER['PADDLE_VENDOR_ID'], $_SERVER['PADDLE_VENDOR_AUTH_CODE'])) {
+        if (! getenv('PADDLE_VENDOR_ID') || ! getenv('PADDLE_VENDOR_AUTH_CODE')) {
             $this->markTestSkipped('Paddle vendor ID and auth code not configured.');
         }
 
@@ -21,13 +21,13 @@ class ChargesTest extends FeatureTestCase
 
     public function test_customers_can_retrieve_a_product_charge_link()
     {
-        if (! isset($_SERVER['PADDLE_TEST_PRODUCT'])) {
+        if (! getenv('PADDLE_TEST_PRODUCT')) {
             $this->markTestSkipped('Test product not configured.');
         }
 
         $billable = $this->createBillable();
 
-        $url = $billable->chargeProduct($_SERVER['PADDLE_TEST_PRODUCT']);
+        $url = $billable->chargeProduct(getenv('PADDLE_TEST_PRODUCT'));
 
         $this->assertStringContainsString('/checkout/custom/', $url);
     }
