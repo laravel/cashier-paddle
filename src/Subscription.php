@@ -93,7 +93,7 @@ class Subscription extends Model
 
     /**
      * Filter query by active, on trial, or within its grace period.
-     * 
+     *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
