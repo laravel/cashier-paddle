@@ -92,6 +92,29 @@ class Subscription extends Model
     }
 
     /**
+     * Filter query by active, on trial, or within its grace period.
+     * 
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeValid($query)
+    {
+        $query->active()
+            ->orWhere(function ($query) {
+                $query->active();
+            })
+            ->orWhere(function ($query) {
+                $query->onTrial();
+            })
+            ->orWhere(function ($query) {
+                $query->onPausedGracePeriod();
+            })
+            ->orWhere(function ($query) {
+                $query->onGracePeriod();
+            });
+    }
+
+    /**
      * Determine if the subscription is active.
      *
      * @return bool
