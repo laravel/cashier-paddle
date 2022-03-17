@@ -3,9 +3,12 @@
 namespace Laravel\Paddle;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use JsonSerializable;
 use Money\Currency;
 
-class Payment
+class Payment implements Arrayable, Jsonable, JsonSerializable
 {
     /**
      *  The amount of the payment.
@@ -92,5 +95,40 @@ class Payment
     public function date()
     {
         return Carbon::createFromFormat('Y-m-d', $this->date, 'UTC')->startOfDay();
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'amount' => $this->amount(),
+            'currency' => $this->currency,
+            'date' => $this->date()->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toJson($options = 0)
+    {
+        return json_encode($this->jsonSerialize(), $options);
+    }
+
+    /**
+     * Convert the object into something JSON serializable.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }
