@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.1...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.2...1.x)
+
+## [v1.5.2](https://github.com/laravel/cashier-paddle/compare/v1.5.1...v1.5.2) - 2022-03-18
+
+### Changed
+
+- Allow to serialize payment object by @driesvints in https://github.com/laravel/cashier-paddle/pull/157
 
 ## [v1.5.1](https://github.com/laravel/cashier-paddle/compare/v1.5.0...v1.5.1) - 2022-02-22
 
