@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.2...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.3...1.x)
+
+## [v1.5.3](https://github.com/laravel/cashier-paddle/compare/v1.5.2...v1.5.3) - 2022-03-28
+
+### Fixed
+
+- Fix type for event by @driesvints in https://github.com/laravel/cashier-paddle/pull/159
 
 ## [v1.5.2](https://github.com/laravel/cashier-paddle/compare/v1.5.1...v1.5.2) - 2022-03-18
 
