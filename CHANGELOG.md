@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.3...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.4...1.x)
+
+## [v1.5.4](https://github.com/laravel/cashier-paddle/compare/v1.5.3...v1.5.4) - 2022-04-01
+
+### Changed
+
+- Pass locale to custom format amount by @driesvints in https://github.com/laravel/cashier-paddle/pull/160
 
 ## [v1.5.3](https://github.com/laravel/cashier-paddle/compare/v1.5.2...v1.5.3) - 2022-03-28
 
