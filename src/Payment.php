@@ -125,7 +125,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array
+     * @return mixed
      */
     public function jsonSerialize(): mixed
     {
