@@ -180,9 +180,10 @@ class ProductPrice implements Arrayable, Jsonable, JsonSerializable
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return mixed
+     * @return array
      */
-    public function jsonSerialize(): mixed
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
     {
         return $this->toArray();
     }
