@@ -127,6 +127,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();
