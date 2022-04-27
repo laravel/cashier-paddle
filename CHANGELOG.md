@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.4...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.5...1.x)
+
+## [v1.5.5](https://github.com/laravel/cashier-paddle/compare/v1.5.4...v1.5.5) - 2022-04-22
+
+### Changed
+
+- Add options to formatAmount by @driesvints in https://github.com/laravel/cashier-paddle/pull/162
 
 ## [v1.5.4](https://github.com/laravel/cashier-paddle/compare/v1.5.3...v1.5.4) - 2022-04-01
 
