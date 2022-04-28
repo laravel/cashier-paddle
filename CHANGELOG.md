@@ -1,6 +1,30 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.1...master)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.5...master)
+
+## [v1.5.5](https://github.com/laravel/cashier-paddle/compare/v1.5.4...v1.5.5) - 2022-04-22
+
+### Changed
+
+- Add options to formatAmount by @driesvints in https://github.com/laravel/cashier-paddle/pull/162
+
+## [v1.5.4](https://github.com/laravel/cashier-paddle/compare/v1.5.3...v1.5.4) - 2022-04-01
+
+### Changed
+
+- Pass locale to custom format amount by @driesvints in https://github.com/laravel/cashier-paddle/pull/160
+
+## [v1.5.3](https://github.com/laravel/cashier-paddle/compare/v1.5.2...v1.5.3) - 2022-03-28
+
+### Fixed
+
+- Fix type for event by @driesvints in https://github.com/laravel/cashier-paddle/pull/159
+
+## [v1.5.2](https://github.com/laravel/cashier-paddle/compare/v1.5.1...v1.5.2) - 2022-03-18
+
+### Changed
+
+- Allow to serialize payment object by @driesvints in https://github.com/laravel/cashier-paddle/pull/157
 
 ## [v1.5.1](https://github.com/laravel/cashier-paddle/compare/v1.5.0...v1.5.1) - 2022-02-22
 

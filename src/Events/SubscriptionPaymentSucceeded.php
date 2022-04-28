@@ -54,6 +54,6 @@ class SubscriptionPaymentSucceeded
      */
     public function isInitialPayment()
     {
-        return $this->payload['initial_payment'] === 1;
+        return ((int) $this->payload['initial_payment']) === 1;
     }
 }

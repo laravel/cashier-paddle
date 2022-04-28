@@ -16,4 +16,15 @@ class PaymentTest extends FeatureTestCase
         $this->assertInstanceOf(Currency::class, $payment->currency());
         $this->assertSame('EUR', $payment->currency()->getCode());
     }
+
+    public function test_it_can_be_serialized_to_an_array()
+    {
+        $payment = new Payment('12.45', 'EUR', '2020-05-07');
+
+        $this->assertSame([
+            'amount' => '€12.45',
+            'currency' => 'EUR',
+            'date' => '2020-05-07T00:00:00+00:00',
+        ], $payment->toArray());
+    }
 }
