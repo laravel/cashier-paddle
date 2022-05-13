@@ -188,7 +188,11 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_subscriptions_can_retrieve_their_payment_info()
     {
-        Cashier::fake()->card();
+        Cashier::fake()->card([
+            'card_type' => $brand = 'visa',
+            'last_four_digits' => $last4 = '1234',
+            'expiry_date' => $expiry = '04/2022',
+        ]);
 
         $billable = $this->createBillable('taylor');
 
@@ -202,9 +206,9 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertSame('john@example.com', $subscription->paddleEmail());
         $this->assertSame('card', $subscription->paymentMethod());
-        $this->assertSame('visa', $subscription->cardBrand());
-        $this->assertSame('1234', $subscription->cardLastFour());
-        $this->assertSame('04/2022', $subscription->cardExpirationDate());
+        $this->assertSame($brand, $subscription->cardBrand());
+        $this->assertSame($last4, $subscription->cardLastFour());
+        $this->assertSame($expiry, $subscription->cardExpirationDate());
     }
 
     public function test_subscriptions_can_retrieve_their_payment_info_for_paypal()
