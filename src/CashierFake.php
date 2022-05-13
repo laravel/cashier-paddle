@@ -32,7 +32,7 @@ class CashierFake
     public function __construct(array $endpoints = [], $events = [])
     {
         // Merge user provided endpoints with our initial ones for mocking
-        foreach (array_merge($this->initialEndpoints(), $endpoints) as $endpoint => $data) {
+        foreach (array_merge($this->endpoints(), $endpoints) as $endpoint => $data) {
             $this->mockEndpoint($endpoint, $data);
         }
 
@@ -192,7 +192,7 @@ class CashierFake
      *
      * @return array
      */
-    protected function initialEndpoints()
+    protected function endpoints()
     {
         return [
             static::PATH_PAYMENT_REFUND => [
