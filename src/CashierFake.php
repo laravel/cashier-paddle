@@ -15,27 +15,6 @@ use Laravel\Paddle\Events\SubscriptionUpdated;
 class CashierFake
 {
     /**
-     * The endpoints that need to be faked
-     *
-     * @var array
-     */
-    protected $endpoints;
-
-    /**
-     * The events that need to be faked
-     *
-     * @var array
-     */
-    protected $events = [
-        PaymentSucceeded::class,
-        SubscriptionCreated::class,
-        SubscriptionCancelled::class,
-        SubscriptionPaymentFailed::class,
-        SubscriptionPaymentSucceeded::class,
-        SubscriptionUpdated::class,
-    ];
-
-    /**
      * The payment provider to mock the user as (either "paypal" or "card")
      *
      * @var string
@@ -43,18 +22,27 @@ class CashierFake
     public static $paymentProvider = 'card';
 
     /**
-     * Merge the provided endpoints into the default ones for mocking
+     * Initialize the fake instance
      *
      * @param array $endpoints
      * @return void
      */
     public function __construct(array $endpoints = [])
     {
-        foreach (array_merge(static::initialEndpoints(), $endpoints) as $endpoint => $data) {
+        // Merge user provided endpoints with our initial ones for mocking
+        foreach (array_merge($this->initialEndpoints(), $endpoints) as $endpoint => $data) {
             $this->mockEndpoint($endpoint, $data);
         }
 
-        Event::fake($this->events);
+        // Mock the given Cashier events
+        Event::fake([
+            PaymentSucceeded::class,
+            SubscriptionCreated::class,
+            SubscriptionCancelled::class,
+            SubscriptionPaymentFailed::class,
+            SubscriptionPaymentSucceeded::class,
+            SubscriptionUpdated::class,
+        ]);
     }
 
     /**
@@ -65,22 +53,6 @@ class CashierFake
     public static function fake(array $endpoints = [])
     {
         return new static($endpoints);
-    }
-
-    /**
-     * Mock a given endpoint with the provided response data
-     *
-     * @param string $endpoint
-     * @param mixed  $data
-     * @return void
-     */
-    public function mockEndpoint(string $endpoint, $data = [])
-    {
-        $response = ! is_callable($data) ? Http::response($data) : $data;
-
-        Http::fake([
-            $this->formatEndpoint($endpoint) => $data
-        ]);
     }
 
     /**
@@ -105,19 +77,6 @@ class CashierFake
         static::$paymentProvider = 'card';
 
         return $this;
-    }
-
-    /**
-     * Format the given path into a full url
-     *
-     * @param string $path
-     * @return string
-     */
-    protected function formatEndpoint(string $path): string
-    {
-        return Cashier::vendorsUrl()
-               .'/api/'.static::API_VERSION
-               .Str::start($path, '/');
     }
 
     /**
@@ -198,11 +157,40 @@ class CashierFake
     }
 
     /**
+     * Format the given path into a full url
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function retrieveEndpoint(string $path): string
+    {
+        return Cashier::vendorsUrl()
+               .'/api/'.static::API_VERSION
+               .Str::start($path, '/');
+    }
+
+    /**
+     * Mock a given endpoint with the provided response data
+     *
+     * @param string $endpoint
+     * @param mixed  $data
+     * @return void
+     */
+    protected function mockEndpoint(string $endpoint, $data = [])
+    {
+        $response = ! is_callable($data) ? Http::response($data) : $data;
+
+        Http::fake([
+            static::retrieveEndpoint($endpoint) => $data
+        ]);
+    }
+
+    /**
      * Returns the default endpoints with their fake data.
      *
      * @return array
      */
-    public static function initialEndpoints()
+    protected function initialEndpoints()
     {
         return [
             static::PATH_PAYMENT_REFUND => [
