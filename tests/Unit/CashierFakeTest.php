@@ -25,7 +25,7 @@ class CashierFakeTest extends TestCase
 
     public function test_a_user_may_append_additional_events_to_mock()
     {
-        Cashier::fake(events: [CapturedTestEvent::class]);
+        Cashier::fake([], [CapturedTestEvent::class]);
 
         event(new CapturedTestEvent);
         event(new UncapturedTestEvent);
