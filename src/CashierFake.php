@@ -27,22 +27,22 @@ class CashierFake
      * @param array $endpoints
      * @return void
      */
-    public function __construct(array $endpoints = [])
+    public function __construct(array $endpoints = [], array $events = [])
     {
         // Merge user provided endpoints with our initial ones for mocking
         foreach (array_merge($this->initialEndpoints(), $endpoints) as $endpoint => $data) {
             $this->mockEndpoint($endpoint, $data);
         }
 
-        // Mock the given Cashier events
-        Event::fake([
+        // Merge user provided events and mock
+        Event::fake(array_merge([
             PaymentSucceeded::class,
             SubscriptionCreated::class,
             SubscriptionCancelled::class,
             SubscriptionPaymentFailed::class,
             SubscriptionPaymentSucceeded::class,
             SubscriptionUpdated::class,
-        ]);
+        ], $events));
     }
 
     /**
