@@ -243,7 +243,7 @@ class CashierFake
                         'amount' => 15.00,
                         'currency' => 'EUR',
                         'is_recurring' => false,
-                        'description' => 'This is a test modifier'
+                        'description' => 'This is a test modifier',
                     ],
                 ],
             ],
