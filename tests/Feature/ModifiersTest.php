@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Money\Currency;
+use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Modifier;
 use Laravel\Paddle\Subscription;
-use Illuminate\Support\Facades\Http;
+use Money\Currency;
 
 class ModifiersTest extends FeatureTestCase
 {

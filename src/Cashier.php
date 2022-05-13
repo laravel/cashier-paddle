@@ -2,14 +2,14 @@
 
 namespace Laravel\Paddle;
 
-use Money\Money;
-use Money\Currency;
-use NumberFormatter;
-use Money\Currencies\ISOCurrencies;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Event;
-use Money\Formatter\IntlMoneyFormatter;
+use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Exceptions\PaddleException;
+use Money\Currencies\ISOCurrencies;
+use Money\Currency;
+use Money\Formatter\IntlMoneyFormatter;
+use Money\Money;
+use NumberFormatter;
 
 class Cashier
 {

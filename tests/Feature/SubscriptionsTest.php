@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use Carbon\Carbon;
-use LogicException;
+use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Subscription;
-use Illuminate\Support\Facades\Http;
+use LogicException;
 
 class SubscriptionsTest extends FeatureTestCase
 {

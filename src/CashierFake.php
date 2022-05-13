@@ -2,18 +2,18 @@
 
 namespace Laravel\Paddle;
 
-use Illuminate\Support\Str;
-use Mockery\Generator\Method;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Event;
-use Laravel\Paddle\Events\WebhookHandled;
-use Laravel\Paddle\Events\WebhookReceived;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Laravel\Paddle\Events\PaymentSucceeded;
-use Laravel\Paddle\Events\SubscriptionCreated;
-use Laravel\Paddle\Events\SubscriptionUpdated;
 use Laravel\Paddle\Events\SubscriptionCancelled;
+use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionPaymentFailed;
 use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
+use Laravel\Paddle\Events\SubscriptionUpdated;
+use Laravel\Paddle\Events\WebhookHandled;
+use Laravel\Paddle\Events\WebhookReceived;
+use Mockery\Generator\Method;
 
 class CashierFake
 {
