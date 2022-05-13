@@ -2,6 +2,7 @@
 
 namespace Laravel\Paddle;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -24,10 +25,11 @@ class CashierFake
     /**
      * Initialize the fake instance
      *
-     * @param array $endpoints
+     * @param array         $endpoints
+     * @param string|array  $events
      * @return void
      */
-    public function __construct(array $endpoints = [], array $events = [])
+    public function __construct(array $endpoints = [], $events = [])
     {
         // Merge user provided endpoints with our initial ones for mocking
         foreach (array_merge($this->initialEndpoints(), $endpoints) as $endpoint => $data) {
@@ -42,17 +44,17 @@ class CashierFake
             SubscriptionPaymentFailed::class,
             SubscriptionPaymentSucceeded::class,
             SubscriptionUpdated::class,
-        ], $events));
+        ], Arr::wrap($events)));
     }
 
     /**
-     * Syntactic sugar for the constructor
+     * Static constructor for syntactic sugar
      *
      * @return static
      */
-    public static function fake(array $endpoints = [])
+    public static function fake(...$arguments)
     {
-        return new static($endpoints);
+        return new static(...$arguments);
     }
 
     /**
@@ -178,7 +180,7 @@ class CashierFake
      */
     protected function mockEndpoint(string $endpoint, $data = [])
     {
-        $response = ! is_callable($data) ? Http::response($data) : $data;
+        $response = is_array($data) ? Http::response($data) : $data;
 
         Http::fake([
             static::retrieveEndpoint($endpoint) => $data

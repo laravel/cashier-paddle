@@ -62,14 +62,13 @@ class Cashier
     public static $receiptModel = Receipt::class;
 
     /**
-     * Fakes the Http responses from the API's endpoints.
+     * Set up faker instance for Cashier-provided API calls and events
      *
-     * @param array $endpoints
      * @return \Laravel\Paddle\CashierFake
      */
-    public static function fake(array $endpoints = [])
+    public static function fake(...$arguments)
     {
-        return CashierFake::fake($endpoints);
+        return CashierFake::fake(...$arguments);
     }
 
     /**
