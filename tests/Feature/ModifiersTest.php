@@ -2,30 +2,17 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Support\Facades\Http;
+use Money\Currency;
+use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Modifier;
 use Laravel\Paddle\Subscription;
-use Money\Currency;
+use Illuminate\Support\Facades\Http;
 
 class ModifiersTest extends FeatureTestCase
 {
     public function test_subscriptions_can_return_their_modifiers()
     {
-        Http::fake([
-            'https://vendors.paddle.com/api/2.0/subscription/modifiers' => Http::response([
-                'success' => true,
-                'response' => [
-                    [
-                        'modifier_id' => 6789,
-                        'subscription_id' => 3423423,
-                        'amount' => 15.00,
-                        'currency' => 'EUR',
-                        'is_recurring' => false,
-                        'description' => 'This is a test modifier',
-                    ],
-                ],
-            ]),
-        ]);
+        Cashier::fake();
 
         $billable = $this->createBillable('taylor');
 
@@ -60,28 +47,7 @@ class ModifiersTest extends FeatureTestCase
 
     public function test_subscriptions_can_create_modifiers()
     {
-        Http::fake([
-            'https://vendors.paddle.com/api/2.0/subscription/users' => Http::response([
-                'success' => true,
-                'response' => [
-                    [
-                        'last_payment' => [
-                            'amount' => 0.00,
-                            'currency' => 'EUR',
-                            'date' => '',
-                        ],
-                    ],
-                ],
-            ]),
-
-            'https://vendors.paddle.com/api/2.0/subscription/modifiers/create' => Http::response([
-                'success' => true,
-                'response' => [
-                    'subscription_id' => 3423423,
-                    'modifier_id' => 6789,
-                ],
-            ]),
-        ]);
+        Cashier::fake();
 
         $billable = $this->createBillable('taylor');
 
@@ -122,11 +88,7 @@ class ModifiersTest extends FeatureTestCase
 
     public function test_a_modifier_can_delete_itself()
     {
-        Http::fake([
-            'https://vendors.paddle.com/api/2.0/subscription/modifiers/delete' => Http::response([
-                'success' => true,
-            ]),
-        ]);
+        Cashier::fake();
 
         $billable = $this->createBillable('taylor');
 

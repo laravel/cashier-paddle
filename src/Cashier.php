@@ -2,13 +2,14 @@
 
 namespace Laravel\Paddle;
 
-use Illuminate\Support\Facades\Http;
-use Laravel\Paddle\Exceptions\PaddleException;
-use Money\Currencies\ISOCurrencies;
-use Money\Currency;
-use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
+use Money\Currency;
 use NumberFormatter;
+use Money\Currencies\ISOCurrencies;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Event;
+use Money\Formatter\IntlMoneyFormatter;
+use Laravel\Paddle\Exceptions\PaddleException;
 
 class Cashier
 {
@@ -60,6 +61,17 @@ class Cashier
      * @var string
      */
     public static $receiptModel = Receipt::class;
+
+    /**
+     * Fakes the Http responses from the API's endpoints.
+     *
+     * @param array $endpoints
+     * @return \Laravel\Paddle\CashierFake
+     */
+    public static function fake(array $endpoints = [])
+    {
+        return CashierFake::fake($endpoints);
+    }
 
     /**
      * Get prices for a set of product ids.
@@ -282,5 +294,82 @@ class Cashier
     public static function useReceiptModel($receiptModel)
     {
         static::$receiptModel = $receiptModel;
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertPaymentSucceeded($callback = null)
+    {
+        CashierFake::assertPaymentSucceeded($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionPaymentSucceeded($callback = null)
+    {
+        CashierFake::assertSubscriptionPaymentSucceeded($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionPaymentFailed($callback = null)
+    {
+        CashierFake::assertSubscriptionPaymentFailed($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionCreated($callback = null)
+    {
+        CashierFake::assertSubscriptionCreated($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionNotCreated($callback = null)
+    {
+        CashierFake::assertSubscriptionNotCreated($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionUpdated($callback = null)
+    {
+        CashierFake::assertSubscriptionUpdated($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionCancelled($callback = null)
+    {
+        CashierFake::assertSubscriptionCancelled($callback);
     }
 }
