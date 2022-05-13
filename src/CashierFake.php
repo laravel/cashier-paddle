@@ -22,6 +22,11 @@ class CashierFake
      */
     protected static $paymentProvider = 'card';
 
+    /**
+     * The card data to be returned by our mocked API calls
+     *
+     * @var array
+     */
     protected static $cardData = [
         'card_type' => 'visa',
         'last_four_digits' => '1234',
@@ -31,8 +36,8 @@ class CashierFake
     /**
      * Initialize the fake instance
      *
-     * @param array         $endpoints
-     * @param string|array  $events
+     * @param  array  $endpoints
+     * @param  string|array  $events
      * @return void
      */
     public function __construct(array $endpoints = [], $events = [])
@@ -168,7 +173,7 @@ class CashierFake
     /**
      * Format the given path into a full url
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     public static function retrieveEndpoint(string $path): string
@@ -181,8 +186,8 @@ class CashierFake
     /**
      * Mock a given endpoint with the provided response data
      *
-     * @param string $endpoint
-     * @param mixed  $data
+     * @param  string  $endpoint
+     * @param  mixed  $data
      * @return void
      */
     protected function mockEndpoint(string $endpoint, $data = [])
