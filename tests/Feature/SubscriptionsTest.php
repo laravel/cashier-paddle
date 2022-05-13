@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Subscription;
 use LogicException;

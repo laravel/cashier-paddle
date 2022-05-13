@@ -62,7 +62,7 @@ class Cashier
     public static $receiptModel = Receipt::class;
 
     /**
-     * Set up faker instance for Cashier-provided API calls and events
+     * Set up faker instance for Cashier-provided API calls and events.
      *
      * @return \Laravel\Paddle\CashierFake
      */
@@ -295,7 +295,7 @@ class Cashier
     }
 
     /**
-     * Pass-thru to the CashierFake method of the same name
+     * Pass-thru to the CashierFake method of the same name.
      *
      * @param  callable|int|null  $callback
      * @return void
@@ -306,7 +306,7 @@ class Cashier
     }
 
     /**
-     * Pass-thru to the CashierFake method of the same name
+     * Pass-thru to the CashierFake method of the same name.
      *
      * @param  callable|int|null  $callback
      * @return void
@@ -317,7 +317,7 @@ class Cashier
     }
 
     /**
-     * Pass-thru to the CashierFake method of the same name
+     * Pass-thru to the CashierFake method of the same name.
      *
      * @param  callable|int|null  $callback
      * @return void
@@ -328,7 +328,7 @@ class Cashier
     }
 
     /**
-     * Pass-thru to the CashierFake method of the same name
+     * Pass-thru to the CashierFake method of the same name.
      *
      * @param  callable|int|null  $callback
      * @return void
@@ -339,7 +339,7 @@ class Cashier
     }
 
     /**
-     * Pass-thru to the CashierFake method of the same name
+     * Pass-thru to the CashierFake method of the same name.
      *
      * @param  callable|int|null  $callback
      * @return void
@@ -350,7 +350,7 @@ class Cashier
     }
 
     /**
-     * Pass-thru to the CashierFake method of the same name
+     * Pass-thru to the CashierFake method of the same name.
      *
      * @param  callable|int|null  $callback
      * @return void
@@ -361,7 +361,7 @@ class Cashier
     }
 
     /**
-     * Pass-thru to the CashierFake method of the same name
+     * Pass-thru to the CashierFake method of the same name.
      *
      * @param  callable|int|null  $callback
      * @return void

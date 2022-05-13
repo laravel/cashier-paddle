@@ -16,14 +16,14 @@ use Laravel\Paddle\Events\SubscriptionUpdated;
 class CashierFake
 {
     /**
-     * The payment provider to mock the user as (either "paypal" or "card")
+     * The payment provider to mock the user as (either "paypal" or "card").
      *
      * @var string
      */
     protected static $paymentProvider = 'card';
 
     /**
-     * The card data to be returned by our mocked API calls
+     * The card data to be returned by our mocked API calls.
      *
      * @var array
      */
@@ -34,7 +34,7 @@ class CashierFake
     ];
 
     /**
-     * Initialize the fake instance
+     * Initialize the fake instance.
      *
      * @param  array  $endpoints
      * @param  string|array  $events
@@ -59,7 +59,7 @@ class CashierFake
     }
 
     /**
-     * Static constructor for syntactic sugar
+     * Static constructor for syntactic sugar.
      *
      * @return static
      */
@@ -69,7 +69,7 @@ class CashierFake
     }
 
     /**
-     * Mock the user as if they used PayPal as a payment provider
+     * Mock the user as if they used PayPal as a payment provider.
      *
      * @return self
      */
@@ -81,7 +81,7 @@ class CashierFake
     }
 
     /**
-     * Mock the user as if they used a credit card as a payment provider
+     * Mock the user as if they used a credit card as a payment provider.
      *
      * @return self
      */
@@ -171,7 +171,7 @@ class CashierFake
     }
 
     /**
-     * Format the given path into a full url
+     * Format the given path into a full url.
      *
      * @param  string  $path
      * @return string
@@ -184,7 +184,7 @@ class CashierFake
     }
 
     /**
-     * Mock a given endpoint with the provided response data
+     * Mock a given endpoint with the provided response data.
      *
      * @param  string  $endpoint
      * @param  mixed  $data
@@ -195,7 +195,7 @@ class CashierFake
         $response = is_array($data) ? Http::response($data) : $data;
 
         Http::fake([
-            static::retrieveEndpoint($endpoint) => $data
+            static::retrieveEndpoint($endpoint) => $data,
         ]);
     }
 
@@ -229,8 +229,8 @@ class CashierFake
                                 'currency' => 'EUR',
                                 'date' => '',
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ];
             },
 
@@ -244,8 +244,8 @@ class CashierFake
                         'currency' => 'EUR',
                         'is_recurring' => false,
                         'description' => 'This is a test modifier'
-                    ]
-                ]
+                    ],
+                ],
             ],
 
             static::PATH_SUBSCRIPTION_MODIFIERS_CREATE => [
@@ -257,7 +257,7 @@ class CashierFake
             ],
 
             static::PATH_SUBSCRIPTION_MODIFIERS_DELETE => [
-                'success' => true
+                'success' => true,
             ],
         ];
     }
