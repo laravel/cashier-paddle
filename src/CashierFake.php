@@ -20,7 +20,7 @@ class CashierFake
      *
      * @var string
      */
-    public static $paymentProvider = 'card';
+    protected static $paymentProvider = 'card';
 
     /**
      * Initialize the fake instance
