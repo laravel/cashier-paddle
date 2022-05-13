@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 
 class ChargesTest extends FeatureTestCase

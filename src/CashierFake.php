@@ -11,9 +11,6 @@ use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionPaymentFailed;
 use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionUpdated;
-use Laravel\Paddle\Events\WebhookHandled;
-use Laravel\Paddle\Events\WebhookReceived;
-use Mockery\Generator\Method;
 
 class CashierFake
 {

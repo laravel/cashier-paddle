@@ -2,7 +2,6 @@
 
 namespace Laravel\Paddle;
 
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Exceptions\PaddleException;
 use Money\Currencies\ISOCurrencies;
