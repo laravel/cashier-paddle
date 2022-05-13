@@ -22,6 +22,12 @@ class CashierFake
      */
     protected static $paymentProvider = 'card';
 
+    protected static $cardData = [
+        'card_type' => 'visa',
+        'last_four_digits' => '1234',
+        'expiry_date' => '04/2022',
+    ];
+
     /**
      * Initialize the fake instance
      *
@@ -74,9 +80,10 @@ class CashierFake
      *
      * @return self
      */
-    public function card()
+    public function card($data = [])
     {
         static::$paymentProvider = 'card';
+        static::$cardData = array_merge(static::$cardData, $data);
 
         return $this;
     }
@@ -211,12 +218,7 @@ class CashierFake
                             'user_email' => 'john@example.com',
                             'payment_information' => static::$paymentProvider === 'paypal'
                                 ? ['payment_method' => 'paypal']
-                                : [
-                                    'payment_method' => 'card',
-                                    'card_type' => 'visa',
-                                    'last_four_digits' => '1234',
-                                    'expiry_date' => '04/2022',
-                                ],
+                                : array_merge(['payment_method' => 'card'], static::$cardData),
                             'last_payment' => [
                                 'amount' => 0.00,
                                 'currency' => 'EUR',
