@@ -19,7 +19,7 @@ class CashierFakeTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            Http::get(CashierFake::retrieveEndpoint(CashierFake::PATH_PAYMENT_REFUND))->json()
+            Http::get(CashierFake::getFormattedVendorUrl(CashierFake::PATH_PAYMENT_REFUND))->json()
         );
     }
 
@@ -38,7 +38,7 @@ class CashierFakeTest extends TestCase
     {
         Cashier::fake()->card([$key = 'last_four_digits' => $expected = '9876']);
 
-        $response = Http::get(CashierFake::retrieveEndpoint(CashierFake::PATH_SUBSCRIPTION_USERS))->json();
+        $response = Http::get(CashierFake::getFormattedVendorUrl(CashierFake::PATH_SUBSCRIPTION_USERS))->json();
 
         $this->assertEquals($expected, Arr::get($response, 'response.0.payment_information.'.$key));
     }

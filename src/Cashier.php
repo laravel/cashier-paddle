@@ -62,7 +62,7 @@ class Cashier
     public static $receiptModel = Receipt::class;
 
     /**
-     * Set up faker instance for Cashier-provided API calls and events.
+     * Set up CashierFake instance.
      *
      * @return \Laravel\Paddle\CashierFake
      */

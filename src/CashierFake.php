@@ -16,25 +16,19 @@ use Laravel\Paddle\Events\SubscriptionUpdated;
 class CashierFake
 {
     /**
-     * The payment provider to mock the user as (either "paypal" or "card").
+     * The payment information to mock.
      *
      * @var string
      */
-    protected static $paymentProvider = 'card';
-
-    /**
-     * The card data to be returned by our mocked API calls.
-     *
-     * @var array
-     */
-    protected static $cardData = [
+    protected static $paymentInformation = [
+        'payment_method' => 'card',
         'card_type' => 'visa',
         'last_four_digits' => '1234',
         'expiry_date' => '04/2022',
     ];
 
     /**
-     * Initialize the fake instance.
+     * Initialize the fake instance and fake Cashier's events and API calls.
      *
      * @param  array  $endpoints
      * @param  string|array  $events
@@ -42,24 +36,23 @@ class CashierFake
      */
     public function __construct(array $endpoints = [], $events = [])
     {
-        // Merge user provided endpoints with our initial ones for mocking
-        foreach (array_merge($this->endpoints(), $endpoints) as $endpoint => $data) {
-            $this->mockEndpoint($endpoint, $data);
+        foreach (array_merge($this->defaultVendorEndpoints(), $endpoints) as $endpoint => $response) {
+            Http::fake([static::getFormattedVendorUrl($endpoint) => $response]);
         }
 
         // Merge user provided events and mock
         Event::fake(array_merge([
             PaymentSucceeded::class,
             SubscriptionCreated::class,
+            SubscriptionUpdated::class,
             SubscriptionCancelled::class,
             SubscriptionPaymentFailed::class,
             SubscriptionPaymentSucceeded::class,
-            SubscriptionUpdated::class,
         ], Arr::wrap($events)));
     }
 
     /**
-     * Static constructor for syntactic sugar.
+     * Syntactic sugar for the constructor.
      *
      * @return static
      */
@@ -69,26 +62,34 @@ class CashierFake
     }
 
     /**
-     * Mock the user as if they used PayPal as a payment provider.
+     * Mock the user as if they used PayPal as a payment method.
      *
+     * @param  array  $paymentInformation
      * @return self
      */
-    public function paypal()
+    public function paypal(array $paymentInformation = [])
     {
-        static::$paymentProvider = 'paypal';
+        static::$paymentInformation = array_merge([
+            'payment_method' => 'paypal'
+        ], $paymentInformation);
 
         return $this;
     }
 
     /**
-     * Mock the user as if they used a credit card as a payment provider.
+     * Mock the user as if they used a credit card as a payment method.
      *
+     * @param  array  $paymentInformation
      * @return self
      */
-    public function card($data = [])
+    public function card(array $paymentInformation = [])
     {
-        static::$paymentProvider = 'card';
-        static::$cardData = array_merge(static::$cardData, $data);
+        static::$paymentInformation = array_merge([
+            'payment_method' => 'card',
+            'card_type' => 'visa',
+            'last_four_digits' => '1234',
+            'expiry_date' => '04/2022',
+        ], $paymentInformation);
 
         return $this;
     }
@@ -171,12 +172,12 @@ class CashierFake
     }
 
     /**
-     * Format the given path into a full url.
+     * Format the given path into a full API url.
      *
      * @param  string  $path
      * @return string
      */
-    public static function retrieveEndpoint(string $path): string
+    public static function getFormattedVendorUrl(string $path): string
     {
         return Cashier::vendorsUrl()
                .'/api/'.static::API_VERSION
@@ -184,27 +185,11 @@ class CashierFake
     }
 
     /**
-     * Mock a given endpoint with the provided response data.
-     *
-     * @param  string  $endpoint
-     * @param  mixed  $data
-     * @return void
-     */
-    protected function mockEndpoint(string $endpoint, $data = [])
-    {
-        $response = is_array($data) ? Http::response($data) : $data;
-
-        Http::fake([
-            static::retrieveEndpoint($endpoint) => $data,
-        ]);
-    }
-
-    /**
-     * Returns the default endpoints with their fake data.
+     * Returns the default endpoints and their faked responses.
      *
      * @return array
      */
-    protected function endpoints()
+    protected function defaultVendorEndpoints()
     {
         return [
             static::PATH_PAYMENT_REFUND => [
@@ -221,9 +206,7 @@ class CashierFake
                         [
                             'subscription_id' => 3423423,
                             'user_email' => 'john@example.com',
-                            'payment_information' => static::$paymentProvider === 'paypal'
-                                ? ['payment_method' => 'paypal']
-                                : array_merge(['payment_method' => 'card'], static::$cardData),
+                            'payment_information' => static::$paymentInformation,
                             'last_payment' => [
                                 'amount' => 0.00,
                                 'currency' => 'EUR',
