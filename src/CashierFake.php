@@ -70,7 +70,7 @@ class CashierFake
     public function paypal(array $paymentInformation = [])
     {
         static::$paymentInformation = array_merge([
-            'payment_method' => 'paypal'
+            'payment_method' => 'paypal',
         ], $paymentInformation);
 
         return $this;
