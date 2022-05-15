@@ -14,12 +14,12 @@ class CashierFakeTest extends TestCase
     public function test_a_user_may_overwrite_its_api_responses()
     {
         Cashier::fake([
-            CashierFake::PATH_PAYMENT_REFUND => $expected = ['fake' => 'response'],
+            'payment/refund' => $expected = ['fake' => 'response'],
         ]);
 
         $this->assertEquals(
             $expected,
-            Http::get(CashierFake::getFormattedVendorUrl(CashierFake::PATH_PAYMENT_REFUND))->json()
+            Http::get(CashierFake::getFormattedVendorUrl('payment/refund'))->json()
         );
     }
 
@@ -38,7 +38,7 @@ class CashierFakeTest extends TestCase
     {
         Cashier::fake()->card([$key = 'last_four_digits' => $expected = '9876']);
 
-        $response = Http::get(CashierFake::getFormattedVendorUrl(CashierFake::PATH_SUBSCRIPTION_USERS))->json();
+        $response = Http::get(CashierFake::getFormattedVendorUrl('subscription/users'))->json();
 
         $this->assertEquals($expected, Arr::get($response, 'response.0.payment_information.'.$key));
     }

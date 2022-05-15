@@ -180,7 +180,7 @@ class CashierFake
     public static function getFormattedVendorUrl(string $path): string
     {
         return Cashier::vendorsUrl()
-               .'/api/'.static::API_VERSION
+               .'/api/2.0'
                .Str::start($path, '/');
     }
 
@@ -192,14 +192,14 @@ class CashierFake
     protected function defaultVendorEndpoints()
     {
         return [
-            static::PATH_PAYMENT_REFUND => [
+            'payment/refund' => [
                 'success' => true,
                 'response' => [
                     'refund_request_id' => 12345,
                 ],
             ],
 
-            static::PATH_SUBSCRIPTION_USERS => function () {
+            'subscription/users' => function () {
                 return [
                     'success' => true,
                     'response' => [
@@ -217,7 +217,7 @@ class CashierFake
                 ];
             },
 
-            static::PATH_SUBSCRIPTION_MODIFIERS => [
+            'subscription/modifiers' => [
                 'success' => true,
                 'response' => [
                     [
@@ -231,7 +231,7 @@ class CashierFake
                 ],
             ],
 
-            static::PATH_SUBSCRIPTION_MODIFIERS_CREATE => [
+            'subscription/modifiers/create' => [
                 'success' => true,
                 'response' => [
                     'subscription_id' => 3423423,
@@ -239,16 +239,9 @@ class CashierFake
                 ],
             ],
 
-            static::PATH_SUBSCRIPTION_MODIFIERS_DELETE => [
+            'subscription/modifiers/delete' => [
                 'success' => true,
             ],
         ];
     }
-
-    const API_VERSION = '2.0';
-    const PATH_PAYMENT_REFUND = 'payment/refund';
-    const PATH_SUBSCRIPTION_USERS = 'subscription/users';
-    const PATH_SUBSCRIPTION_MODIFIERS = 'subscription/modifiers';
-    const PATH_SUBSCRIPTION_MODIFIERS_CREATE = 'subscription/modifiers/create';
-    const PATH_SUBSCRIPTION_MODIFIERS_DELETE = 'subscription/modifiers/delete';
 }
