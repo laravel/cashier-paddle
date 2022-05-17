@@ -4,8 +4,8 @@ namespace Tests\Unit;
 
 use Carbon\Carbon;
 use Laravel\Paddle\Customer;
-use Tests\Fixtures\User;
 use PHPUnit\Framework\TestCase;
+use Tests\Fixtures\User;
 
 class CustomerTest extends TestCase
 {
