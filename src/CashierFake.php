@@ -16,18 +16,6 @@ use Laravel\Paddle\Events\SubscriptionUpdated;
 class CashierFake
 {
     /**
-     * The payment information to mock.
-     *
-     * @var string
-     */
-    protected static $paymentInformation = [
-        'payment_method' => 'card',
-        'card_type' => 'visa',
-        'last_four_digits' => '1234',
-        'expiry_date' => '04/2022',
-    ];
-
-    /**
      * Initialize the fake instance and fake Cashier's events and API calls.
      *
      * @param  array  $endpoints
@@ -36,8 +24,24 @@ class CashierFake
      */
     public function __construct(array $endpoints = [], $events = [])
     {
-        foreach (array_merge($this->defaultVendorEndpoints(), $endpoints) as $endpoint => $response) {
-            Http::fake([static::getFormattedVendorUrl($endpoint) => $response]);
+        foreach (
+            $endpoints = array_merge([
+                'payment/refund',
+                'subscription/users',
+                'subscription/modifiers',
+                'subscription/modifiers/create',
+                'subscription/modifiers/delete',
+            ], $endpoints)
+            as $endpoint => $response
+        ) {
+            if (! Arr::isAssoc($endpoints)) {
+                $endpoint = $response;
+                $response = null;
+            }
+
+            Http::fake([
+                static::getFormattedVendorUrl($endpoint) => array_merge(['success' => true], Arr::wrap($response))
+            ]);
         }
 
         // Merge user provided events and mock
@@ -62,36 +66,16 @@ class CashierFake
     }
 
     /**
-     * Mock the user as if they used PayPal as a payment method.
+     * Format the given path into a full API url.
      *
-     * @param  array  $paymentInformation
-     * @return self
+     * @param  string  $path
+     * @return string
      */
-    public function paypal(array $paymentInformation = [])
+    public static function getFormattedVendorUrl(string $path): string
     {
-        static::$paymentInformation = array_merge([
-            'payment_method' => 'paypal',
-        ], $paymentInformation);
-
-        return $this;
-    }
-
-    /**
-     * Mock the user as if they used a credit card as a payment method.
-     *
-     * @param  array  $paymentInformation
-     * @return self
-     */
-    public function card(array $paymentInformation = [])
-    {
-        static::$paymentInformation = array_merge([
-            'payment_method' => 'card',
-            'card_type' => 'visa',
-            'last_four_digits' => '1234',
-            'expiry_date' => '04/2022',
-        ], $paymentInformation);
-
-        return $this;
+        return Cashier::vendorsUrl()
+               .'/api/2.0'
+               .Str::start($path, '/');
     }
 
     /**
@@ -169,79 +153,5 @@ class CashierFake
     public static function assertSubscriptionCancelled($callback = null)
     {
         Event::assertDispatched(SubscriptionCancelled::class, $callback);
-    }
-
-    /**
-     * Format the given path into a full API url.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    public static function getFormattedVendorUrl(string $path): string
-    {
-        return Cashier::vendorsUrl()
-               .'/api/2.0'
-               .Str::start($path, '/');
-    }
-
-    /**
-     * Returns the default endpoints and their faked responses.
-     *
-     * @return array
-     */
-    protected function defaultVendorEndpoints()
-    {
-        return [
-            'payment/refund' => [
-                'success' => true,
-                'response' => [
-                    'refund_request_id' => 12345,
-                ],
-            ],
-
-            'subscription/users' => function () {
-                return [
-                    'success' => true,
-                    'response' => [
-                        [
-                            'subscription_id' => 3423423,
-                            'user_email' => 'john@example.com',
-                            'payment_information' => static::$paymentInformation,
-                            'last_payment' => [
-                                'amount' => 0.00,
-                                'currency' => 'EUR',
-                                'date' => '',
-                            ],
-                        ],
-                    ],
-                ];
-            },
-
-            'subscription/modifiers' => [
-                'success' => true,
-                'response' => [
-                    [
-                        'modifier_id' => 6789,
-                        'sucscription_id' => 3423423,
-                        'amount' => 15.00,
-                        'currency' => 'EUR',
-                        'is_recurring' => false,
-                        'description' => 'This is a test modifier',
-                    ],
-                ],
-            ],
-
-            'subscription/modifiers/create' => [
-                'success' => true,
-                'response' => [
-                    'subscription_id' => 3423423,
-                    'modifier_id' => 6789,
-                ],
-            ],
-
-            'subscription/modifiers/delete' => [
-                'success' => true,
-            ],
-        ];
     }
 }

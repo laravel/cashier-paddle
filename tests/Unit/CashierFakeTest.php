@@ -14,7 +14,7 @@ class CashierFakeTest extends TestCase
     public function test_a_user_may_overwrite_its_api_responses()
     {
         Cashier::fake([
-            'payment/refund' => $expected = ['fake' => 'response'],
+            'payment/refund' => $expected = ['success' => true, 'response' => ['faked' => 'response']],
         ]);
 
         $this->assertEquals(
@@ -32,15 +32,6 @@ class CashierFakeTest extends TestCase
 
         Event::assertDispatched(CapturedTestEvent::class);
         Event::assertNotDispatched(UncapturedTestEvent::class);
-    }
-
-    public function test_a_user_may_overwrite_the_standard_card_data()
-    {
-        Cashier::fake()->card([$key = 'last_four_digits' => $expected = '9876']);
-
-        $response = Http::get(CashierFake::getFormattedVendorUrl('subscription/users'))->json();
-
-        $this->assertEquals($expected, Arr::get($response, 'response.0.payment_information.'.$key));
     }
 }
 

@@ -12,7 +12,18 @@ class ModifiersTest extends FeatureTestCase
 {
     public function test_subscriptions_can_return_their_modifiers()
     {
-        Cashier::fake();
+        Cashier::fake([
+            'subscription/modifiers' => [
+                'response' => [[
+                    'modifier_id' => 6789,
+                    'sucscription_id' => 3423423,
+                    'amount' => 15.00,
+                    'currency' => 'EUR',
+                    'is_recurring' => false,
+                    'description' => 'This is a test modifier',
+                ]]
+            ]
+        ]);
 
         $billable = $this->createBillable('taylor');
 
@@ -47,7 +58,25 @@ class ModifiersTest extends FeatureTestCase
 
     public function test_subscriptions_can_create_modifiers()
     {
-        Cashier::fake();
+        Cashier::fake([
+            'subscription/users' => [
+                'response' => [
+                    [
+                        'last_payment' => [
+                            'amount' => 0.00,
+                            'currency' => 'EUR',
+                            'date' => '',
+                        ],
+                    ],
+                ]
+            ],
+            'subscription/modifiers/create' => [
+                'response' => [
+                    'subscription_id' => 3423423,
+                    'modifier_id' => 6789,
+                ]
+            ]
+        ]);
 
         $billable = $this->createBillable('taylor');
 

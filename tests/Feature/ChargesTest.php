@@ -34,9 +34,17 @@ class ChargesTest extends FeatureTestCase
 
     public function test_payments_can_be_refunded()
     {
+        Cashier::fake([
+            'payment/refund' => [
+                'success' => true,
+                'response' => [
+                    'refund_request_id' => 12345,
+                ]
+            ]
+        ]);
+
         $billable = $this->createBillable();
 
-        Cashier::fake();
 
         $response = $billable->refund(4321, 12.50, 'Incorrect order');
 
