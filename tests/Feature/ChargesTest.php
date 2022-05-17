@@ -45,7 +45,6 @@ class ChargesTest extends FeatureTestCase
 
         $billable = $this->createBillable();
 
-
         $response = $billable->refund(4321, 12.50, 'Incorrect order');
 
         $this->assertSame(12345, $response);
