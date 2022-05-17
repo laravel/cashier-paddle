@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.5.5...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.6.0...1.x)
+
+## [v1.6.0](https://github.com/laravel/cashier-paddle/compare/v1.5.5...v1.6.0) - 2022-05-17
+
+### Added
+
+- Add trial expired methods by @driesvints in https://github.com/laravel/cashier-paddle/pull/166
 
 ## [v1.5.5](https://github.com/laravel/cashier-paddle/compare/v1.5.4...v1.5.5) - 2022-04-22
 
