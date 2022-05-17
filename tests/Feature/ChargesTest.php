@@ -39,8 +39,8 @@ class ChargesTest extends FeatureTestCase
                 'success' => true,
                 'response' => [
                     'refund_request_id' => 12345,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $billable = $this->createBillable();

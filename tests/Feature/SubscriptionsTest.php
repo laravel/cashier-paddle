@@ -201,7 +201,7 @@ class SubscriptionsTest extends FeatureTestCase
                         ],
                     ],
                 ],
-            ]
+            ],
         ]);
 
         $billable = $this->createBillable('taylor');
@@ -234,7 +234,7 @@ class SubscriptionsTest extends FeatureTestCase
                         ],
                     ],
                 ],
-            ]
+            ],
         ]);
 
         $billable = $this->createBillable('taylor');

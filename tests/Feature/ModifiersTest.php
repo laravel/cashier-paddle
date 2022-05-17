@@ -21,8 +21,8 @@ class ModifiersTest extends FeatureTestCase
                     'currency' => 'EUR',
                     'is_recurring' => false,
                     'description' => 'This is a test modifier',
-                ]]
-            ]
+                ]],
+            ],
         ]);
 
         $billable = $this->createBillable('taylor');
@@ -68,14 +68,14 @@ class ModifiersTest extends FeatureTestCase
                             'date' => '',
                         ],
                     ],
-                ]
+                ],
             ],
             'subscription/modifiers/create' => [
                 'response' => [
                     'subscription_id' => 3423423,
                     'modifier_id' => 6789,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $billable = $this->createBillable('taylor');

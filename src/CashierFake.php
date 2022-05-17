@@ -40,7 +40,7 @@ class CashierFake
             }
 
             Http::fake([
-                static::getFormattedVendorUrl($endpoint) => array_merge(['success' => true], Arr::wrap($response))
+                static::getFormattedVendorUrl($endpoint) => array_merge(['success' => true], Arr::wrap($response)),
             ]);
         }
 
