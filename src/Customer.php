@@ -44,4 +44,14 @@ class Customer extends Model
     {
         return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }
+
+    /**
+     * Determine if the Paddle model has an expired "generic" trial at the model level.
+     *
+     * @return bool
+     */
+    public function hasExpiredGenericTrial()
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isPast();
+    }
 }
