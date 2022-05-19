@@ -3,15 +3,15 @@
 namespace Laravel\Paddle;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Event;
 use Laravel\Paddle\Events\PaymentSucceeded;
-use Laravel\Paddle\Events\SubscriptionCancelled;
 use Laravel\Paddle\Events\SubscriptionCreated;
+use Laravel\Paddle\Events\SubscriptionUpdated;
+use Laravel\Paddle\Events\SubscriptionCancelled;
 use Laravel\Paddle\Events\SubscriptionPaymentFailed;
 use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
-use Laravel\Paddle\Events\SubscriptionUpdated;
 
 class CashierFake
 {
@@ -73,9 +73,7 @@ class CashierFake
      */
     public static function getFormattedVendorUrl(string $path): string
     {
-        return Cashier::vendorsUrl()
-               .'/api/2.0'
-               .Str::start($path, '/');
+        return Cashier::vendorsUrl().'/api/2.0'.Str::start($path, '/');
     }
 
     /**
