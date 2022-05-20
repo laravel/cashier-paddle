@@ -130,7 +130,9 @@ class CashierFake
         $this->responses[$endpoint] = $response;
 
         if ($notFaked) {
-            Http::fake([static::getFormattedVendorUrl($endpoint) => fn () => $this->responses[$endpoint]]);
+            Http::fake([static::getFormattedVendorUrl($endpoint) => function () use ($endpoint) {
+                return $this->responses[$endpoint];
+            }]);
         }
     }
 
