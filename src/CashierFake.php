@@ -81,7 +81,7 @@ class CashierFake
     }
 
     /**
-     * Set a response for the given endpoint
+     * Set the successful response for a given endpoint.
      *
      * @param  string  $endpoint
      * @param  mixed  $response
@@ -98,7 +98,7 @@ class CashierFake
     }
 
     /**
-     * Make the API given endpoint throw an error and attach an error
+     * Set an error response for a given endpoint.
      *
      * @param  string  $endpoint
      * @param  string  $message
@@ -107,7 +107,7 @@ class CashierFake
      *
      * @see https://developer.paddle.com/api-reference/ZG9jOjI1MzUzOTkw-api-error-codes
      */
-    public function error(string $endpoint, string $message = '', int $code = 0)
+    public function error(string $endpoint, $message = '', $code = 0)
     {
         $this->fakeHttpResponse($endpoint, [
             'success' => false,
@@ -118,9 +118,13 @@ class CashierFake
     }
 
     /**
-     * Fakes
+     * Fake the given endpoint with the provided response.
+     *
+     * @param  string  $endpoint
+     * @param  mixed  $response
+     * @return void
      */
-    protected function fakeHttpResponse($endpoint, $response)
+    protected function fakeHttpResponse(string $endpoint, $response)
     {
         $notFaked = ! Arr::exists($this->responses, $endpoint);
         $this->responses[$endpoint] = $response;

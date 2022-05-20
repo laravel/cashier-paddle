@@ -65,7 +65,7 @@ class ModifiersTest extends FeatureTestCase
                     'amount' => 0.00,
                     'currency' => 'EUR',
                     'date' => '',
-                ]
+                ],
             ]])
             ->response('subscription/modifiers/create', [
                 'subscription_id' => 3423423,
