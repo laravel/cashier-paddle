@@ -14,6 +14,7 @@ class ModifiersTest extends FeatureTestCase
     {
         Cashier::fake([
             'subscription/modifiers' => [
+                'success' => true,
                 'response' => [[
                     'modifier_id' => 6789,
                     'sucscription_id' => 3423423,
@@ -58,25 +59,18 @@ class ModifiersTest extends FeatureTestCase
 
     public function test_subscriptions_can_create_modifiers()
     {
-        Cashier::fake([
-            'subscription/users' => [
-                'response' => [
-                    [
-                        'last_payment' => [
-                            'amount' => 0.00,
-                            'currency' => 'EUR',
-                            'date' => '',
-                        ],
-                    ],
-                ],
-            ],
-            'subscription/modifiers/create' => [
-                'response' => [
-                    'subscription_id' => 3423423,
-                    'modifier_id' => 6789,
-                ],
-            ],
-        ]);
+        Cashier::fake()
+            ->response('subscription/users', [[
+                'last_payment' => [
+                    'amount' => 0.00,
+                    'currency' => 'EUR',
+                    'date' => '',
+                ]
+            ]])
+            ->response('subscription/modifiers/create', [
+                'subscription_id' => 3423423,
+                'modifier_id' => 6789,
+            ]);
 
         $billable = $this->createBillable('taylor');
 

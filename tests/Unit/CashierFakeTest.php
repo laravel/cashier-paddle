@@ -6,20 +6,43 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\CashierFake;
+use Laravel\Paddle\Exceptions\PaddleException;
+use Tests\Feature\FeatureTestCase;
 use Tests\TestCase;
 
-class CashierFakeTest extends TestCase
+class CashierFakeTest extends FeatureTestCase
 {
     public function test_a_user_may_overwrite_its_api_responses()
     {
         Cashier::fake([
-            'payment/refund' => $expected = ['success' => true, 'response' => ['faked' => 'response']],
+            $endpoint = 'payment/refund' => $expected = ['success' => true, 'response' => ['faked' => 'response']],
         ]);
 
         $this->assertEquals(
             $expected,
-            Http::get(CashierFake::getFormattedVendorUrl('payment/refund'))->json()
+            Http::get(CashierFake::getFormattedVendorUrl($endpoint))->json()
         );
+    }
+
+    public function test_a_user_may_use_the_response_method_to_mock_an_endpoint()
+    {
+        Cashier::fake()->response(
+            $endpoint = 'payment/refund',
+            $expected = ['custom' => 'response']
+        );
+
+        $this->assertEquals(
+            ['success' => true, 'response' => $expected],
+            Http::get(CashierFake::getFormattedVendorUrl($endpoint))->json()
+        );
+    }
+
+    public function test_a_user_may_use_the_error_method_to_error_an_endpoint()
+    {
+        $this->expectException(PaddleException::class);
+        Cashier::fake()->error('payment/refund');
+
+        $this->createBillable()->refund(4321, 12.50, 'Incorrect order');
     }
 
     public function test_a_user_may_append_additional_events_to_mock()

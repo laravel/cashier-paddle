@@ -16,6 +16,13 @@ use Laravel\Paddle\Events\SubscriptionUpdated;
 class CashierFake
 {
     /**
+     * The array of callbacks for each response.
+     *
+     * @var array
+     */
+    protected $responses = [];
+
+    /**
      * Initialize the fake instance and fake Cashier's events and API calls.
      *
      * @param  array  $endpoints
@@ -39,12 +46,9 @@ class CashierFake
                 $response = null;
             }
 
-            Http::fake([
-                static::getFormattedVendorUrl($endpoint) => array_merge(['success' => true], Arr::wrap($response)),
-            ]);
+            $this->fakeHttpResponse($endpoint, array_merge(['success' => true], Arr::wrap($response)));
         }
 
-        // Merge user provided events and mock
         Event::fake(array_merge([
             PaymentSucceeded::class,
             SubscriptionCreated::class,
@@ -74,6 +78,56 @@ class CashierFake
     public static function getFormattedVendorUrl(string $path): string
     {
         return Cashier::vendorsUrl().'/api/2.0'.Str::start($path, '/');
+    }
+
+    /**
+     * Set a response for the given endpoint
+     *
+     * @param  string  $endpoint
+     * @param  mixed  $response
+     * @return self
+     */
+    public function response(string $endpoint, $response = null)
+    {
+        $this->fakeHttpResponse($endpoint, [
+            'success' => true,
+            'response' => $response,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Make the API given endpoint throw an error and attach an error
+     *
+     * @param  string  $endpoint
+     * @param  string  $message
+     * @param  int  $code
+     * @return self
+     *
+     * @see https://developer.paddle.com/api-reference/ZG9jOjI1MzUzOTkw-api-error-codes
+     */
+    public function error(string $endpoint, string $message = '', int $code = 0)
+    {
+        $this->fakeHttpResponse($endpoint, [
+            'success' => false,
+            'error' => ['message' => $message, 'code' => $code],
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Fakes
+     */
+    protected function fakeHttpResponse($endpoint, $response)
+    {
+        $notFaked = ! Arr::exists($this->responses, $endpoint);
+        $this->responses[$endpoint] = $response;
+
+        if ($notFaked) {
+            Http::fake([static::getFormattedVendorUrl($endpoint) => fn () => $this->responses[$endpoint]]);
+        }
     }
 
     /**

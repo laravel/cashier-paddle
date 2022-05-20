@@ -36,6 +36,7 @@ class ChargesTest extends FeatureTestCase
     {
         Cashier::fake([
             'payment/refund' => [
+                'success' => true,
                 'response' => [
                     'refund_request_id' => 12345,
                 ],
