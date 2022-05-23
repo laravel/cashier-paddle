@@ -46,7 +46,9 @@ class CashierFake
                 $response = null;
             }
 
-            $this->fakeHttpResponse($endpoint, array_merge(['success' => true], Arr::wrap($response)));
+            $this->fakeHttpResponse($endpoint, array_merge([
+                'success' => true,
+            ], Arr::wrap($response)));
         }
 
         Event::fake(array_merge([
@@ -67,17 +69,6 @@ class CashierFake
     public static function fake(...$arguments)
     {
         return new static(...$arguments);
-    }
-
-    /**
-     * Format the given path into a full API url.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    public static function getFormattedVendorUrl(string $path): string
-    {
-        return Cashier::vendorsUrl().'/api/2.0'.Str::start($path, '/');
     }
 
     /**
@@ -134,6 +125,17 @@ class CashierFake
                 return $this->responses[$endpoint];
             }]);
         }
+    }
+
+    /**
+     * Format the given path into a full API url.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public static function getFormattedVendorUrl(string $path): string
+    {
+        return Cashier::vendorsUrl().'/api/2.0'.Str::start($path, '/');
     }
 
     /**
