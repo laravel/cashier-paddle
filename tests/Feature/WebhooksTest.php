@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Support\Facades\Event;
+use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Events\PaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionCancelled;
 use Laravel\Paddle\Events\SubscriptionCreated;
@@ -21,7 +21,7 @@ class WebhooksTest extends FeatureTestCase
 
     public function test_it_can_handle_a_payment_succeeded_event()
     {
-        Event::fake();
+        Cashier::fake();
 
         $user = $this->createUser();
 
@@ -61,14 +61,14 @@ class WebhooksTest extends FeatureTestCase
             'receipt_url' => 'https://example.com/receipt.pdf',
         ]);
 
-        Event::assertDispatched(PaymentSucceeded::class, function (PaymentSucceeded $event) use ($user) {
+        Cashier::assertPaymentSucceeded(function (PaymentSucceeded $event) use ($user) {
             return $event->billable->id === $user->id && $event->receipt->order_id === 'foo';
         });
     }
 
     public function test_it_can_handle_a_payment_succeeded_event_when_billable_already_exists()
     {
-        Event::fake();
+        Cashier::fake();
 
         $user = $this->createBillable('taylor', [
             'trial_ends_at' => now('UTC')->addDays(5),
@@ -110,14 +110,14 @@ class WebhooksTest extends FeatureTestCase
             'receipt_url' => 'https://example.com/receipt.pdf',
         ]);
 
-        Event::assertDispatched(PaymentSucceeded::class, function (PaymentSucceeded $event) use ($user) {
+        Cashier::assertPaymentSucceeded(function (PaymentSucceeded $event) use ($user) {
             return $event->billable->id === $user->id && $event->receipt->order_id === 'foo';
         });
     }
 
     public function test_it_can_handle_a_subscription_payment_succeeded_event()
     {
-        Event::fake();
+        Cashier::fake();
 
         $user = $this->createBillable();
 
@@ -166,14 +166,14 @@ class WebhooksTest extends FeatureTestCase
             'receipt_url' => 'https://example.com/receipt.pdf',
         ]);
 
-        Event::assertDispatched(SubscriptionPaymentSucceeded::class, function (SubscriptionPaymentSucceeded $event) use ($user) {
+        Cashier::assertSubscriptionPaymentSucceeded(function (SubscriptionPaymentSucceeded $event) use ($user) {
             return $event->billable->id === $user->id && $event->receipt->order_id === 'foo';
         });
     }
 
     public function test_it_can_handle_a_subscription_created_event()
     {
-        Event::fake();
+        Cashier::fake();
 
         $user = $this->createUser();
 
@@ -208,14 +208,14 @@ class WebhooksTest extends FeatureTestCase
             'trial_ends_at' => null,
         ]);
 
-        Event::assertDispatched(SubscriptionCreated::class, function (SubscriptionCreated $event) use ($user) {
+        Cashier::assertSubscriptionCreated(function (SubscriptionCreated $event) use ($user) {
             return $event->billable->id === $user->id && $event->subscription->paddle_plan === 1234;
         });
     }
 
     public function test_it_can_handle_a_subscription_created_event_if_billable_already_exists()
     {
-        Event::fake();
+        Cashier::fake();
 
         $user = $this->createUser();
         $user->customer()->create([
@@ -253,14 +253,14 @@ class WebhooksTest extends FeatureTestCase
             'trial_ends_at' => null,
         ]);
 
-        Event::assertDispatched(SubscriptionCreated::class, function (SubscriptionCreated $event) use ($user) {
+        Cashier::assertSubscriptionCreated(function (SubscriptionCreated $event) use ($user) {
             return $event->billable->id === $user->id && $event->subscription->paddle_plan === 1234;
         });
     }
 
     public function test_it_can_handle_a_subscription_updated_event()
     {
-        Event::fake();
+        Cashier::fake();
 
         $billable = $this->createBillable('taylor');
 
@@ -293,14 +293,14 @@ class WebhooksTest extends FeatureTestCase
             'paused_from' => $date,
         ]);
 
-        Event::assertDispatched(SubscriptionUpdated::class, function (SubscriptionUpdated $event) {
+        Cashier::assertSubscriptionUpdated(function (SubscriptionUpdated $event) {
             return $event->subscription->paddle_plan === 1234;
         });
     }
 
     public function test_it_can_handle_a_subscription_cancelled_event()
     {
-        Event::fake();
+        Cashier::fake();
 
         $billable = $this->createBillable('taylor');
 
@@ -330,14 +330,14 @@ class WebhooksTest extends FeatureTestCase
             'ends_at' => $date,
         ]);
 
-        Event::assertDispatched(SubscriptionCancelled::class, function (SubscriptionCancelled $event) {
+        Cashier::assertSubscriptionCancelled(function (SubscriptionCancelled $event) {
             return $event->subscription->paddle_plan === 2323;
         });
     }
 
     public function test_manual_created_paylinks_without_passthrough_values_are_ignored()
     {
-        Event::fake();
+        Cashier::fake();
 
         $user = $this->createUser();
 
@@ -368,6 +368,6 @@ class WebhooksTest extends FeatureTestCase
             'trial_ends_at' => null,
         ]);
 
-        Event::assertNotDispatched(SubscriptionCreated::class);
+        Cashier::assertSubscriptionNotCreated();
     }
 }

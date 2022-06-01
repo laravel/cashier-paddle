@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Support\Facades\Http;
+use Laravel\Paddle\Cashier;
 
 class ChargesTest extends FeatureTestCase
 {
@@ -34,16 +34,16 @@ class ChargesTest extends FeatureTestCase
 
     public function test_payments_can_be_refunded()
     {
-        $billable = $this->createBillable();
-
-        Http::fake([
-            'vendors.paddle.com/api/2.0/payment/refund' => Http::response([
+        Cashier::fake([
+            'payment/refund' => [
                 'success' => true,
                 'response' => [
                     'refund_request_id' => 12345,
                 ],
-            ]),
+            ],
         ]);
+
+        $billable = $this->createBillable();
 
         $response = $billable->refund(4321, 12.50, 'Incorrect order');
 

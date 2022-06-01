@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Http;
+use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Subscription;
 use LogicException;
 
@@ -187,23 +187,16 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_subscriptions_can_retrieve_their_payment_info()
     {
-        Http::fake([
-            'https://vendors.paddle.com/api/2.0/subscription/users' => Http::response([
-                'success' => true,
-                'response' => [
-                    [
-                        'subscription_id' => 3423423,
-                        'user_email' => 'john@example.com',
-                        'payment_information' => [
-                            'payment_method' => 'card',
-                            'card_type' => 'visa',
-                            'last_four_digits' => '1234',
-                            'expiry_date' => '04/2022',
-                        ],
-                    ],
-                ],
-            ]),
-        ]);
+        Cashier::fake()->response('subscription/users', [[
+            'subscription_id' => 3423423,
+            'user_email' => 'john@example.com',
+            'payment_information' => [
+                'payment_method' => 'card',
+                'card_type' => 'visa',
+                'last_four_digits' => '1234',
+                'expiry_date' => '04/2022',
+            ],
+        ]]);
 
         $billable = $this->createBillable('taylor');
 
@@ -224,20 +217,13 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_subscriptions_can_retrieve_their_payment_info_for_paypal()
     {
-        Http::fake([
-            'https://vendors.paddle.com/api/2.0/subscription/users' => Http::response([
-                'success' => true,
-                'response' => [
-                    [
-                        'subscription_id' => 3423423,
-                        'user_email' => 'john@example.com',
-                        'payment_information' => [
-                            'payment_method' => 'paypal',
-                        ],
-                    ],
-                ],
-            ]),
-        ]);
+        Cashier::fake()->response('subscription/users', [[
+            'subscription_id' => 3423423,
+            'user_email' => 'john@example.com',
+            'payment_information' => [
+                'payment_method' => 'paypal',
+            ],
+        ]]);
 
         $billable = $this->createBillable('taylor');
 
