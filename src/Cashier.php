@@ -62,16 +62,6 @@ class Cashier
     public static $receiptModel = Receipt::class;
 
     /**
-     * Set up CashierFake instance.
-     *
-     * @return \Laravel\Paddle\CashierFake
-     */
-    public static function fake(...$arguments)
-    {
-        return CashierFake::fake(...$arguments);
-    }
-
-    /**
      * Get prices for a set of product ids.
      *
      * @param  array|int  $products
@@ -292,6 +282,16 @@ class Cashier
     public static function useReceiptModel($receiptModel)
     {
         static::$receiptModel = $receiptModel;
+    }
+
+    /**
+     * Create a fake Cashier instance.
+     *
+     * @return \Laravel\Paddle\CashierFake
+     */
+    public static function fake(...$arguments)
+    {
+        return CashierFake::fake(...$arguments);
     }
 
     /**

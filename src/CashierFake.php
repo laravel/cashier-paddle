@@ -118,6 +118,7 @@ class CashierFake
     protected function fakeHttpResponse(string $endpoint, $response)
     {
         $notFaked = ! Arr::exists($this->responses, $endpoint);
+
         $this->responses[$endpoint] = $response;
 
         if ($notFaked) {
