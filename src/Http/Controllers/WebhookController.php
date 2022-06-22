@@ -154,7 +154,7 @@ class WebhookController extends Controller
         $passthrough = json_decode($payload['passthrough'], true);
 
         if (! is_array($passthrough) || ! isset($passthrough['subscription_name'])) {
-            throw new InvalidPassthroughPayload;
+            throw new InvalidPassthroughPayload();
         }
 
         $customer = $this->findOrCreateCustomer($payload['passthrough']);
@@ -258,7 +258,7 @@ class WebhookController extends Controller
         $passthrough = json_decode($passthrough, true);
 
         if (! is_array($passthrough) || ! isset($passthrough['billable_id'], $passthrough['billable_type'])) {
-            throw new InvalidPassthroughPayload;
+            throw new InvalidPassthroughPayload();
         }
 
         return Cashier::$customerModel::firstOrCreate([

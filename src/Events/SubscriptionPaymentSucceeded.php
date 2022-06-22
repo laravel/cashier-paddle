@@ -9,7 +9,8 @@ use Laravel\Paddle\Receipt;
 
 class SubscriptionPaymentSucceeded
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * The billable entity.

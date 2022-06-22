@@ -9,7 +9,8 @@ use Laravel\Paddle\Subscription;
 
 class SubscriptionCreated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * The billable entity.

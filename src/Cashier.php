@@ -224,7 +224,7 @@ class Cashier
     {
         static::$runsMigrations = false;
 
-        return new static;
+        return new static();
     }
 
     /**
@@ -236,7 +236,7 @@ class Cashier
     {
         static::$registersRoutes = false;
 
-        return new static;
+        return new static();
     }
 
     /**
@@ -248,7 +248,7 @@ class Cashier
     {
         static::$deactivatePastDue = false;
 
-        return new static;
+        return new static();
     }
 
     /**

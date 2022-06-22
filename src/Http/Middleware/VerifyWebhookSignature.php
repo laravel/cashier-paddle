@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class VerifyWebhookSignature
 {
-    const SIGNATURE_KEY = 'p_signature';
+    public const SIGNATURE_KEY = 'p_signature';
 
     /**
      * Handle the incoming request.

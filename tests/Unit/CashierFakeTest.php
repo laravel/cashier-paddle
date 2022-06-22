@@ -48,8 +48,8 @@ class CashierFakeTest extends FeatureTestCase
     {
         Cashier::fake([], [CapturedTestEvent::class]);
 
-        event(new CapturedTestEvent);
-        event(new UncapturedTestEvent);
+        event(new CapturedTestEvent());
+        event(new UncapturedTestEvent());
 
         Event::assertDispatched(CapturedTestEvent::class);
         Event::assertNotDispatched(UncapturedTestEvent::class);

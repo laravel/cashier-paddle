@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ProductPriceTest extends TestCase
 {
-    const DEFAULTS = [
+    public const DEFAULTS = [
         'product_id' => 232,
         'product_title' => 232,
         'currency' => 'EUR',

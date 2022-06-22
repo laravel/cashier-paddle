@@ -227,7 +227,8 @@ class SubscriptionBuilder
     protected function getPlanPricesForPayload($trialing = true)
     {
         $plan = Cashier::post(
-            '/subscription/plans', $this->billable->paddleOptions(['plan' => $this->plan])
+            '/subscription/plans',
+            $this->billable->paddleOptions(['plan' => $this->plan])
         )['response'][0];
 
         return collect($plan[$trialing ? 'initial_price' : 'recurring_price'])

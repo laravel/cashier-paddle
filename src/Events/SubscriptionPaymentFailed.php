@@ -8,7 +8,8 @@ use Illuminate\Queue\SerializesModels;
 
 class SubscriptionPaymentFailed
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * The billable entity.

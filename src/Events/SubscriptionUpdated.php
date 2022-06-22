@@ -8,7 +8,8 @@ use Laravel\Paddle\Subscription;
 
 class SubscriptionUpdated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * The subscription instance.

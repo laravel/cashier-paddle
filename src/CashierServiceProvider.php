@@ -17,7 +17,8 @@ class CashierServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/cashier.php', 'cashier'
+            __DIR__.'/../config/cashier.php',
+            'cashier'
         );
     }
 

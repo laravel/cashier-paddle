@@ -16,11 +16,11 @@ class Subscription extends Model
 {
     use Prorates;
 
-    const STATUS_ACTIVE = 'active';
-    const STATUS_TRIALING = 'trialing';
-    const STATUS_PAST_DUE = 'past_due';
-    const STATUS_PAUSED = 'paused';
-    const STATUS_DELETED = 'deleted';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_TRIALING = 'trialing';
+    public const STATUS_PAST_DUE = 'past_due';
+    public const STATUS_PAUSED = 'paused';
+    public const STATUS_DELETED = 'deleted';
 
     /**
      * The attributes that are not mass assignable.

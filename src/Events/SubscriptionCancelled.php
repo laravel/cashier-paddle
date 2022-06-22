@@ -8,7 +8,8 @@ use Laravel\Paddle\Subscription;
 
 class SubscriptionCancelled
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * The subscription instance.
