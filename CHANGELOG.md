@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.6.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.6.1...1.x)
+
+## [v1.6.1](https://github.com/laravel/cashier-paddle/compare/v1.6.0...v1.6.1) - 2022-06-22
+
+### Changed
+
+- Replace heavy `symfony/intl` dependency by @jbrooksuk in https://github.com/laravel/cashier-paddle/pull/167
 
 ## [v1.6.0](https://github.com/laravel/cashier-paddle/compare/v1.5.5...v1.6.0) - 2022-05-17
 
