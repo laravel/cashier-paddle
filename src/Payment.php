@@ -11,7 +11,7 @@ use Money\Currency;
 class Payment implements Arrayable, Jsonable, JsonSerializable
 {
     /**
-     *  The amount of the payment.
+     * The amount of the payment.
      *
      * @var string
      */

@@ -409,7 +409,7 @@ class Subscription extends Model
     }
 
     /**
-     *  Increment the quantity of the subscription, and invoice immediately.
+     * Increment the quantity of the subscription, and invoice immediately.
      *
      * @param  int  $count
      * @return $this
