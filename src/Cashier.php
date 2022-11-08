@@ -283,4 +283,91 @@ class Cashier
     {
         static::$receiptModel = $receiptModel;
     }
+
+    /**
+     * Create a fake Cashier instance.
+     *
+     * @return \Laravel\Paddle\CashierFake
+     */
+    public static function fake(...$arguments)
+    {
+        return CashierFake::fake(...$arguments);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name.
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertPaymentSucceeded($callback = null)
+    {
+        CashierFake::assertPaymentSucceeded($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name.
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionPaymentSucceeded($callback = null)
+    {
+        CashierFake::assertSubscriptionPaymentSucceeded($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name.
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionPaymentFailed($callback = null)
+    {
+        CashierFake::assertSubscriptionPaymentFailed($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name.
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionCreated($callback = null)
+    {
+        CashierFake::assertSubscriptionCreated($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name.
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionNotCreated($callback = null)
+    {
+        CashierFake::assertSubscriptionNotCreated($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name.
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionUpdated($callback = null)
+    {
+        CashierFake::assertSubscriptionUpdated($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name.
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionCancelled($callback = null)
+    {
+        CashierFake::assertSubscriptionCancelled($callback);
+    }
 }

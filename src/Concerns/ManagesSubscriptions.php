@@ -64,6 +64,28 @@ trait ManagesSubscriptions
     }
 
     /**
+     * Determine if the Billable model's trial has ended.
+     *
+     * @param  string  $name
+     * @param  int|null  $plan
+     * @return bool
+     */
+    public function hasExpiredTrial($name = 'default', $plan = null)
+    {
+        if (func_num_args() === 0 && $this->hasExpiredGenericTrial()) {
+            return true;
+        }
+
+        $subscription = $this->subscription($name);
+
+        if (! $subscription || ! $subscription->hasExpiredTrial()) {
+            return false;
+        }
+
+        return $plan ? $subscription->hasPlan($plan) : true;
+    }
+
+    /**
      * Determine if the Billable model is on a "generic" trial at the model level.
      *
      * @return bool
@@ -75,6 +97,20 @@ trait ManagesSubscriptions
         }
 
         return $this->customer->onGenericTrial();
+    }
+
+    /**
+     * Determine if the Billable model's "generic" trial at the model level has expired.
+     *
+     * @return bool
+     */
+    public function hasExpiredGenericTrial()
+    {
+        if (is_null($this->customer)) {
+            return false;
+        }
+
+        return $this->customer->hasExpiredGenericTrial();
     }
 
     /**
