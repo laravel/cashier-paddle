@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('receipts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('billable_id');
+            $table->foreignId('billable_id');
             $table->string('billable_type');
             $table->unsignedBigInteger('paddle_subscription_id')->nullable()->index();
             $table->string('checkout_id');
