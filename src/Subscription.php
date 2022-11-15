@@ -445,7 +445,7 @@ class Subscription extends Model
     {
         $this->guardAgainstUpdates('update quantities');
 
-        if ($quantity == 0) {
+        if ($quantity < 0) {
             throw new LogicException('Paddle does not allow subscriptions to have a quantity of zero.');
         }
 
