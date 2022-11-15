@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.6.1...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.6.2...1.x)
+
+## [v1.6.2](https://github.com/laravel/cashier-paddle/compare/v1.6.1...v1.6.2) - 2022-11-15
+
+### Changed
+
+- Do not allow updating quantities to zero by @driesvints in https://github.com/laravel/cashier-paddle/pull/174
 
 ## [v1.6.1](https://github.com/laravel/cashier-paddle/compare/v1.6.0...v1.6.1) - 2022-06-22
 
