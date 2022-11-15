@@ -445,6 +445,10 @@ class Subscription extends Model
     {
         $this->guardAgainstUpdates('update quantities');
 
+        if ($quantity == 0) {
+            throw new LogicException('Paddle does not allow subscriptions to have a quantity of zero.');
+        }
+
         $this->updatePaddleSubscription(array_merge($options, [
             'quantity' => $quantity,
             'prorate' => $this->prorate,
