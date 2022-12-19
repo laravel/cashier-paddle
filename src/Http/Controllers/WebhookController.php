@@ -151,9 +151,9 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionCreated(array $payload)
     {
-        $passthrough = json_decode($payload['passthrough'], true);
+        $passthrough = isset($payload['passthrough']) ? json_decode($payload['passthrough'], true) : null;
 
-        if (! is_array($passthrough) || ! isset($passthrough['subscription_name'])) {
+        if (! isset($passthrough) || ! is_array($passthrough) || ! isset($passthrough['subscription_name'])) {
             throw new InvalidPassthroughPayload;
         }
 
