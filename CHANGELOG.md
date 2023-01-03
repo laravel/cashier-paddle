@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.6.2...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.7.0...1.x)
+
+## [v1.7.0](https://github.com/laravel/cashier-paddle/compare/v1.6.2...v1.7.0) - 2023-01-03
+
+### Changed
+
+- Uses PHP Native Type Declarations 🐘  by @nunomaduro in https://github.com/laravel/cashier-paddle/pull/171
 
 ## [v1.6.2](https://github.com/laravel/cashier-paddle/compare/v1.6.1...v1.6.2) - 2022-11-15
 
