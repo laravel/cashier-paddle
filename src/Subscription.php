@@ -569,7 +569,7 @@ class Subscription extends Model
     /**
      * Get the Paddle update url.
      *
-     * @return array
+     * @return string
      */
     public function updateUrl()
     {
@@ -677,7 +677,7 @@ class Subscription extends Model
     /**
      * Get the Paddle cancellation url.
      *
-     * @return array
+     * @return string
      */
     public function cancelUrl()
     {
