@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.8.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.8.1...1.x)
+
+## [v1.8.1](https://github.com/laravel/cashier-paddle/compare/v1.8.0...v1.8.1) - 2023-01-19
+
+### Fixed
+
+- Modify return type of updateUrl and cancelUrl on Subscription by @LasseRafn in https://github.com/laravel/cashier-paddle/pull/179
 
 ## [v1.8.0](https://github.com/laravel/cashier-paddle/compare/v1.7.0...v1.8.0) - 2023-01-06
 
