@@ -89,7 +89,7 @@ class ProductPrice implements Arrayable, Jsonable, JsonSerializable
     /**
      * Get the recurring price for the subscription plan with a coupon applied.
      *
-     * @return \Laravel\Paddle\Price
+     * @return \Laravel\Paddle\Price|null
      */
     public function recurringPrice()
     {
