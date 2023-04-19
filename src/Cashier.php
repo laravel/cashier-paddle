@@ -76,7 +76,9 @@ class Cashier
 
         $response = static::get('/prices', $payload)['response'];
 
-        return collect($response['products'])->map(function (array $product) use ($response) {
+        return collect($response['products'])->keyBy(function (array $product) use ($products) {
+            return array_search($product['product_id'], (array) $products, false);
+        })->map(function (array $product) use ($response) {
             return new ProductPrice($response['customer_country'], $product);
         });
     }
