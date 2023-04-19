@@ -25,13 +25,28 @@ class PricesTest extends FeatureTestCase
             $this->markTestSkipped('Test products not configured.');
         }
 
-        $prices = Cashier::productPrices([getenv('PADDLE_TEST_PRODUCT'), getenv('PADDLE_TEST_PRODUCT_LOWER_ID')]);
+        $prices = Cashier::productPrices([getenv('PADDLE_TEST_PRODUCT'), getenv('PADDLE_TEST_PRODUCT_LOWER_ID')], preserveOrder: true);
 
         $this->assertNotEmpty($prices);
         $this->assertCount(2, $prices);
         $this->assertContainsOnlyInstancesOf(ProductPrice::class, $prices->all());
         $this->assertEquals($prices[0]->product_id, getenv('PADDLE_TEST_PRODUCT'));
         $this->assertEquals($prices[1]->product_id, getenv('PADDLE_TEST_PRODUCT_LOWER_ID'));
+    }
+
+    public function test_it_can_fetch_the_prices_of_multiple_products_and_does_not_sort_them_by_default()
+    {
+        if (! getenv('PADDLE_TEST_PRODUCT') || ! getenv('PADDLE_TEST_PRODUCT_LOWER_ID')) {
+            $this->markTestSkipped('Test products not configured.');
+        }
+
+        $prices = Cashier::productPrices([getenv('PADDLE_TEST_PRODUCT'), getenv('PADDLE_TEST_PRODUCT_LOWER_ID')]);
+
+        $this->assertNotEmpty($prices);
+        $this->assertCount(2, $prices);
+        $this->assertContainsOnlyInstancesOf(ProductPrice::class, $prices->all());
+        $this->assertEquals($prices[0]->product_id, getenv('PADDLE_TEST_PRODUCT_LOWER_ID'));
+        $this->assertEquals($prices[1]->product_id, getenv('PADDLE_TEST_PRODUCT'));
     }
 
     public function test_it_can_fetch_the_prices_of_products_when_the_input_is_a_string()
