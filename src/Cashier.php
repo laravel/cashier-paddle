@@ -66,9 +66,10 @@ class Cashier
      *
      * @param  array|int  $products
      * @param  array  $options
+     * @param  bool  $preserveOrder
      * @return \Illuminate\Support\Collection
      */
-    public static function productPrices($products, array $options = [])
+    public static function productPrices($products, array $options = [], bool $preserveOrder = false)
     {
         $payload = array_merge($options, [
             'product_ids' => implode(',', (array) $products),
@@ -76,9 +77,15 @@ class Cashier
 
         $response = static::get('/prices', $payload)['response'];
 
-        return collect($response['products'])->keyBy(function (array $product) use ($products) {
-            return array_search($product['product_id'], (array) $products, false);
-        })->map(function (array $product) use ($response) {
+        $prices = collect($response['products']);
+
+        if ($preserveOrder) {
+            $prices = $prices->keyBy(function (array $product) use ($products) {
+                return array_search($product['product_id'], (array) $products, false);
+            });
+        }
+
+        return $prices->map(function (array $product) use ($response) {
             return new ProductPrice($response['customer_country'], $product);
         });
     }
