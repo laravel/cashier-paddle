@@ -25,7 +25,7 @@ class PricesTest extends FeatureTestCase
             $this->markTestSkipped('Test products not configured.');
         }
 
-        $prices = Cashier::productPrices([getenv('PADDLE_TEST_PRODUCT'), getenv('PADDLE_TEST_PRODUCT_LOWER_ID')], preserveOrder: true);
+        $prices = Cashier::productPrices([getenv('PADDLE_TEST_PRODUCT'), getenv('PADDLE_TEST_PRODUCT_LOWER_ID')], [], true);
 
         $this->assertNotEmpty($prices);
         $this->assertCount(2, $prices);
