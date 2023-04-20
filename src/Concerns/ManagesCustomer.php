@@ -32,15 +32,16 @@ trait ManagesCustomer
      *
      * @param  array|int  $products
      * @param  array  $options
+     * @param  bool  $preserveOrder
      * @return \Illuminate\Support\Collection
      */
-    public function productPrices($products, array $options = [])
+    public function productPrices($products, array $options = [], bool $preserveOrder = false)
     {
         $options = array_merge([
             'customer_country' => $this->paddleCountry(),
         ], $options);
 
-        return Cashier::productPrices($products, $options);
+        return Cashier::productPrices($products, $options, $preserveOrder);
     }
 
     /**
