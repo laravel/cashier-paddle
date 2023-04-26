@@ -53,6 +53,10 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      */
     public function amount()
     {
+        if ($this->currency()->getCode() === 'JPY') {
+            return $this->formatAmount((int) $this->rawAmount());
+        }
+
         return $this->formatAmount((int) ($this->rawAmount() * 100));
     }
 
