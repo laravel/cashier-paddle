@@ -218,12 +218,12 @@ class Cashier
     /**
      * Determine if the given currency uses cents.
      *
-     * @param \Money\Currency $currency
+     * @param  \Money\Currency  $currency
      * @return bool
      */
-    public static function currencyUsesCents(Currency $currency): bool
+    public static function currencyUsesCents(Currency $currency)
     {
-        return !in_array($currency->getCode(), ['JPY', 'KRW'], true);
+        return ! in_array($currency->getCode(), ['JPY', 'KRW'], true);
     }
 
     /**
