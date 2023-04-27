@@ -20,7 +20,7 @@ trait ManagesAmounts
     /**
      * Format the Paddle decimal into a displayable currency.
      *
-     * @param  $amount
+     * @param  string  $amount
      * @return string
      */
     protected function formatDecimalAmount($amount)
