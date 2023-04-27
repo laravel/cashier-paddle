@@ -216,6 +216,17 @@ class Cashier
     }
 
     /**
+     * Determine if the given currency uses cents.
+     *
+     * @param  \Money\Currency  $currency
+     * @return bool
+     */
+    public static function currencyUsesCents(Currency $currency)
+    {
+        return ! in_array($currency->getCode(), ['JPY', 'KRW'], true);
+    }
+
+    /**
      * Configure Cashier to not register its migrations.
      *
      * @return static

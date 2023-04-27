@@ -40,7 +40,7 @@ class Price
      */
     public function gross()
     {
-        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
+        if (! Cashier::currencyUsesCents($this->currency())) {
             return $this->formatAmount((int) $this->rawGross());
         }
 
@@ -64,7 +64,7 @@ class Price
      */
     public function net()
     {
-        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
+        if (! Cashier::currencyUsesCents($this->currency())) {
             return $this->formatAmount((int) $this->rawNet());
         }
 
@@ -88,7 +88,7 @@ class Price
      */
     public function tax()
     {
-        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
+        if (! Cashier::currencyUsesCents($this->currency())) {
             return $this->formatAmount((int) $this->rawTax());
         }
 

@@ -53,7 +53,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      */
     public function amount()
     {
-        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
+        if (! Cashier::currencyUsesCents($this->currency())) {
             return $this->formatAmount((int) $this->rawAmount());
         }
 
