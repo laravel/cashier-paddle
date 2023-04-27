@@ -51,7 +51,7 @@ class Receipt extends Model
      */
     public function amount()
     {
-        if ($this->currency()->getCode() === 'JPY') {
+        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
             return $this->formatAmount((int) $this->amount);
         }
 
@@ -65,7 +65,7 @@ class Receipt extends Model
      */
     public function tax()
     {
-        if ($this->currency()->getCode() === 'JPY') {
+        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
             return $this->formatAmount((int) $this->tax);
         }
 
