@@ -40,7 +40,7 @@ class Price
      */
     public function gross()
     {
-        if ($this->currency()->getCode() === 'JPY') {
+        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
             return $this->formatAmount((int) $this->rawGross());
         }
 
@@ -64,7 +64,7 @@ class Price
      */
     public function net()
     {
-        if ($this->currency()->getCode() === 'JPY') {
+        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
             return $this->formatAmount((int) $this->rawNet());
         }
 
@@ -88,7 +88,7 @@ class Price
      */
     public function tax()
     {
-        if ($this->currency()->getCode() === 'JPY') {
+        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
             return $this->formatAmount((int) $this->rawTax());
         }
 

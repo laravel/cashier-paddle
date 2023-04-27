@@ -23,4 +23,10 @@ class CashierTest extends TestCase
         $this->assertSame('¥1,000', Cashier::formatAmount(1000, 'JPY'));
         $this->assertSame('¥1,010', Cashier::formatAmount(1010, 'JPY'));
     }
+
+    public function test_it_can_format_krw_amounts()
+    {
+        $this->assertSame('₩1,000', Cashier::formatAmount(1000, 'KRW'));
+        $this->assertSame('₩1,010', Cashier::formatAmount(1010, 'KRW'));
+    }
 }

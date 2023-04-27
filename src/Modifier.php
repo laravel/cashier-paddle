@@ -60,7 +60,7 @@ class Modifier
      */
     public function amount()
     {
-        if ($this->currency()->getCode() === 'JPY') {
+        if (in_array($this->currency()->getCode(), ['JPY', 'KRW'])) {
             return $this->formatAmount((int) $this->rawAmount());
         }
 
