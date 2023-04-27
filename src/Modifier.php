@@ -2,10 +2,13 @@
 
 namespace Laravel\Paddle;
 
+use Laravel\Paddle\Concerns\ManagesAmounts;
 use Money\Currency;
 
 class Modifier
 {
+    use ManagesAmounts;
+
     /**
      * The Subscription model the modifier belongs to.
      *
@@ -60,11 +63,7 @@ class Modifier
      */
     public function amount()
     {
-        if (! Cashier::currencyUsesCents($this->currency())) {
-            return $this->formatAmount((int) $this->rawAmount());
-        }
-
-        return $this->formatAmount((int) ($this->rawAmount() * 100));
+        return $this->formatDecimalAmount($this->rawAmount());
     }
 
     /**
@@ -85,17 +84,6 @@ class Modifier
     public function currency(): Currency
     {
         return new Currency($this->modifier['currency']);
-    }
-
-    /**
-     * Format the given amount into a displayable currency.
-     *
-     * @param  int  $amount
-     * @return string
-     */
-    protected function formatAmount($amount)
-    {
-        return Cashier::formatAmount($amount, $this->currency());
     }
 
     /**

@@ -3,10 +3,13 @@
 namespace Laravel\Paddle;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Paddle\Concerns\ManagesAmounts;
 use Money\Currency;
 
 class Receipt extends Model
 {
+    use ManagesAmounts;
+
     /**
      * The attributes that are not mass assignable.
      *
@@ -51,11 +54,7 @@ class Receipt extends Model
      */
     public function amount()
     {
-        if (! Cashier::currencyUsesCents($this->currency())) {
-            return $this->formatAmount((int) $this->amount);
-        }
-
-        return $this->formatAmount((int) ($this->amount * 100));
+        return $this->formatDecimalAmount($this->amount);
     }
 
     /**
@@ -65,11 +64,7 @@ class Receipt extends Model
      */
     public function tax()
     {
-        if (! Cashier::currencyUsesCents($this->currency())) {
-            return $this->formatAmount((int) $this->tax);
-        }
-
-        return $this->formatAmount((int) ($this->tax * 100));
+        return $this->formatDecimalAmount($this->tax);
     }
 
     /**
@@ -80,16 +75,5 @@ class Receipt extends Model
     public function currency(): Currency
     {
         return new Currency($this->currency);
-    }
-
-    /**
-     * Format the given amount into a displayable currency.
-     *
-     * @param  int  $amount
-     * @return string
-     */
-    protected function formatAmount($amount)
-    {
-        return Cashier::formatAmount($amount, $this->currency);
     }
 }
