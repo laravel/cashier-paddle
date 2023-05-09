@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.8.1...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.8.2...1.x)
+
+## [v1.8.2](https://github.com/laravel/cashier-paddle/compare/v1.8.1...v1.8.2) - 2023-04-27
+
+- Fix Japanese Yen amounts by @driesvints in https://github.com/laravel/cashier-paddle/pull/184
+- Fix Korean Won amounts by @patrickomeara in https://github.com/laravel/cashier-paddle/pull/185
+- Move the logic into a Cashier static method by @patrickomeara in https://github.com/laravel/cashier-paddle/pull/186
+- Handle the paddle decimal amount by @patrickomeara in https://github.com/laravel/cashier-paddle/pull/187
 
 ## [v1.8.1](https://github.com/laravel/cashier-paddle/compare/v1.8.0...v1.8.1) - 2023-01-19
 
