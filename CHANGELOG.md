@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.8.2...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.9.0...1.x)
+
+## [v1.9.0](https://github.com/laravel/cashier-paddle/compare/v1.8.2...v1.9.0) - 2023-05-22
+
+- Drop PHP 7.2 & 7.3 and Laravel 7 by @driesvints in https://github.com/laravel/cashier-paddle/pull/188
 
 ## [v1.8.2](https://github.com/laravel/cashier-paddle/compare/v1.8.1...v1.8.2) - 2023-04-27
 
