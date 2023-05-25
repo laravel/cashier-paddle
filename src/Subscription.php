@@ -175,7 +175,7 @@ class Subscription extends Model
      */
     public function paused()
     {
-        return $this->paddle_status === self::STATUS_PAUSED;
+        return $this->paddle_status === self::STATUS_PAUSED || $this->onPausedGracePeriod();
     }
 
     /**
