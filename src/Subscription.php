@@ -10,6 +10,12 @@ use Laravel\Paddle\Concerns\Prorates;
 use LogicException;
 
 /**
+ * @property int $id
+ * @property int $billable_id
+ * @property string $name
+ * @property Carbon $ends_at
+ * @property int $paddle_plan
+ * @property Carbon $trial_ends_at
  * @property \Laravel\Paddle\Billable $billable
  */
 class Subscription extends Model
