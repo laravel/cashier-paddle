@@ -157,6 +157,10 @@ class WebhookController extends Controller
             throw new InvalidPassthroughPayload;
         }
 
+        if ($this->subscriptionExists($payload['subscription_id'])) {
+            return;
+        }
+
         $customer = $this->findOrCreateCustomer($payload['passthrough']);
 
         $trialEndsAt = $payload['status'] === Subscription::STATUS_TRIALING
@@ -276,6 +280,17 @@ class WebhookController extends Controller
     protected function findSubscription(string $subscriptionId)
     {
         return Cashier::$subscriptionModel::firstWhere('paddle_id', $subscriptionId);
+    }
+
+    /**
+     * Determine if a subscription with a given Paddle ID already exists.
+     *
+     * @param  string  $subscriptionId
+     * @return bool
+     */
+    protected function subscriptionExists(string $subscriptionId)
+    {
+        return Cashier::$subscriptionModel::where('paddle_id', $subscriptionId)->exists();
     }
 
     /**
