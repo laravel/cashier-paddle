@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.9.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.9.1...1.x)
+
+## [v1.9.1](https://github.com/laravel/cashier-paddle/compare/v1.9.0...v1.9.1) - 2023-08-24
+
+- Handle duplicated subscription created event by [@AcTiv3MineD](https://github.com/AcTiv3MineD) in https://github.com/laravel/cashier-paddle/pull/194
 
 ## [v1.9.0](https://github.com/laravel/cashier-paddle/compare/v1.8.2...v1.9.0) - 2023-05-22
 
