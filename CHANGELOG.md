@@ -1,6 +1,45 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.6.1...master)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.9.1...master)
+
+## [v1.9.1](https://github.com/laravel/cashier-paddle/compare/v1.9.0...v1.9.1) - 2023-08-24
+
+- Handle duplicated subscription created event by [@AcTiv3MineD](https://github.com/AcTiv3MineD) in https://github.com/laravel/cashier-paddle/pull/194
+
+## [v1.9.0](https://github.com/laravel/cashier-paddle/compare/v1.8.2...v1.9.0) - 2023-05-22
+
+- Drop PHP 7.2 & 7.3 and Laravel 7 by @driesvints in https://github.com/laravel/cashier-paddle/pull/188
+
+## [v1.8.2](https://github.com/laravel/cashier-paddle/compare/v1.8.1...v1.8.2) - 2023-04-27
+
+- Fix Japanese Yen amounts by @driesvints in https://github.com/laravel/cashier-paddle/pull/184
+- Fix Korean Won amounts by @patrickomeara in https://github.com/laravel/cashier-paddle/pull/185
+- Move the logic into a Cashier static method by @patrickomeara in https://github.com/laravel/cashier-paddle/pull/186
+- Handle the paddle decimal amount by @patrickomeara in https://github.com/laravel/cashier-paddle/pull/187
+
+## [v1.8.1](https://github.com/laravel/cashier-paddle/compare/v1.8.0...v1.8.1) - 2023-01-19
+
+### Fixed
+
+- Modify return type of updateUrl and cancelUrl on Subscription by @LasseRafn in https://github.com/laravel/cashier-paddle/pull/179
+
+## [v1.8.0](https://github.com/laravel/cashier-paddle/compare/v1.7.0...v1.8.0) - 2023-01-06
+
+### Added
+
+- Laravel v10 Support by @driesvints in https://github.com/laravel/cashier-paddle/pull/178
+
+## [v1.7.0](https://github.com/laravel/cashier-paddle/compare/v1.6.2...v1.7.0) - 2023-01-03
+
+### Changed
+
+- Uses PHP Native Type Declarations 🐘  by @nunomaduro in https://github.com/laravel/cashier-paddle/pull/171
+
+## [v1.6.2](https://github.com/laravel/cashier-paddle/compare/v1.6.1...v1.6.2) - 2022-11-15
+
+### Changed
+
+- Do not allow updating quantities to zero by @driesvints in https://github.com/laravel/cashier-paddle/pull/174
 
 ## [v1.6.1](https://github.com/laravel/cashier-paddle/compare/v1.6.0...v1.6.1) - 2022-06-22
 

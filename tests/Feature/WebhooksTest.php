@@ -258,6 +258,50 @@ class WebhooksTest extends FeatureTestCase
         });
     }
 
+    public function test_it_can_handle_a_duplicated_subscription_created_event()
+    {
+        Cashier::fake();
+
+        $user = $this->createUser();
+
+        for ($i = 0; $i < 2; $i++) {
+            $this->postJson('paddle/webhook', [
+                'alert_name' => 'subscription_created',
+                'user_id' => 'foo',
+                'email' => $user->paddleEmail(),
+                'passthrough' => json_encode([
+                    'billable_id' => $user->id,
+                    'billable_type' => $user->getMorphClass(),
+                    'subscription_name' => 'main',
+                ]),
+                'quantity' => 1,
+                'status' => Subscription::STATUS_ACTIVE,
+                'subscription_id' => 'bar',
+                'subscription_plan_id' => 1234,
+            ])->assertOk();
+        }
+
+        $this->assertDatabaseHas('customers', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+        ]);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'name' => 'main',
+            'paddle_id' => 'bar',
+            'paddle_plan' => 1234,
+            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'quantity' => 1,
+            'trial_ends_at' => null,
+        ]);
+
+        Cashier::assertSubscriptionCreated(function (SubscriptionCreated $event) use ($user) {
+            return $event->billable->id === $user->id && $event->subscription->paddle_plan === 1234;
+        });
+    }
+
     public function test_it_can_handle_a_subscription_updated_event()
     {
         Cashier::fake();

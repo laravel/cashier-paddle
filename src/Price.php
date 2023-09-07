@@ -2,10 +2,13 @@
 
 namespace Laravel\Paddle;
 
+use Laravel\Paddle\Concerns\ManagesAmounts;
 use Money\Currency;
 
 class Price
 {
+    use ManagesAmounts;
+
     /**
      * The price attributes.
      *
@@ -40,7 +43,7 @@ class Price
      */
     public function gross()
     {
-        return $this->formatAmount((int) ($this->rawGross() * 100));
+        return $this->formatDecimalAmount($this->rawGross());
     }
 
     /**
@@ -60,7 +63,7 @@ class Price
      */
     public function net()
     {
-        return $this->formatAmount((int) ($this->rawNet() * 100));
+        return $this->formatDecimalAmount($this->rawNet());
     }
 
     /**
@@ -80,7 +83,7 @@ class Price
      */
     public function tax()
     {
-        return $this->formatAmount((int) ($this->rawTax() * 100));
+        return $this->formatDecimalAmount($this->rawTax());
     }
 
     /**
@@ -111,17 +114,6 @@ class Price
     public function currency(): Currency
     {
         return $this->currency;
-    }
-
-    /**
-     * Format the given amount into a displayable currency.
-     *
-     * @param  int  $amount
-     * @return string
-     */
-    protected function formatAmount($amount)
-    {
-        return Cashier::formatAmount($amount, $this->currency);
     }
 
     /**

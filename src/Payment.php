@@ -6,10 +6,13 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use Laravel\Paddle\Concerns\ManagesAmounts;
 use Money\Currency;
 
 class Payment implements Arrayable, Jsonable, JsonSerializable
 {
+    use ManagesAmounts;
+
     /**
      * The amount of the payment.
      *
@@ -53,7 +56,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      */
     public function amount()
     {
-        return $this->formatAmount((int) ($this->rawAmount() * 100));
+        return $this->formatDecimalAmount($this->rawAmount());
     }
 
     /**
@@ -74,17 +77,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     public function currency(): Currency
     {
         return new Currency($this->currency);
-    }
-
-    /**
-     * Format the given amount into a displayable currency.
-     *
-     * @param  int  $amount
-     * @return string
-     */
-    protected function formatAmount($amount)
-    {
-        return Cashier::formatAmount($amount, $this->currency);
     }
 
     /**

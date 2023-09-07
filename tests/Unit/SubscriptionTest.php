@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use Laravel\Paddle\Subscription;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 
 class SubscriptionTest extends TestCase
@@ -35,5 +36,14 @@ class SubscriptionTest extends TestCase
         $subscription->trial_ends_at = now()->addDay();
 
         $this->assertFalse($subscription->hasExpiredTrial());
+    }
+
+    public function test_it_cannot_update_its_quantity_to_zero()
+    {
+        $subscription = new Subscription();
+
+        $this->expectException(LogicException::class);
+
+        $subscription->updateQuantity(0);
     }
 }
