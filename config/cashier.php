@@ -79,8 +79,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option allows you to toggle between the Paddle live environment
-    | and its sandboxed environment. This feature is only available for
-    | a select group of vendors and not a publicly available feature.
+    | and its sandboxed environment.
     |
     */
 
