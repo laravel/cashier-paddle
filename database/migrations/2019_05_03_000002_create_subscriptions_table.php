@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('billable_id');
             $table->string('billable_type');
             $table->string('name');
-            $table->integer('paddle_id')->unique();
+            $table->string('paddle_id')->unique();
             $table->string('paddle_status');
             $table->integer('paddle_plan');
             $table->integer('quantity');

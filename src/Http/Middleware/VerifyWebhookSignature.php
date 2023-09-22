@@ -67,7 +67,7 @@ class VerifyWebhookSignature
         return openssl_verify(
             serialize($fields),
             base64_decode($signature),
-            openssl_get_publickey(config('cashier.public_key')),
+            openssl_get_publickey(config('cashier.webhook_secret')),
             OPENSSL_ALGO_SHA1
         ) !== 1;
     }

@@ -42,7 +42,7 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
         env:
-          PADDLE_VENDOR_ID: ${{ secrets.PADDLE_VENDOR_ID }}
-          PADDLE_VENDOR_AUTH_CODE: ${{ secrets.PADDLE_VENDOR_AUTH_CODE }}
-          PADDLE_PUBLIC_KEY: ${{ secrets.PADDLE_PUBLIC_KEY }}
+          PADDLE_SELLER_ID: ${{ secrets.PADDLE_SELLER_ID }}
+          PADDLE_AUTH_CODE: ${{ secrets.PADDLE_AUTH_CODE }}
+          PADDLE_WEBHOOK_SECRET: ${{ secrets.PADDLE_WEBHOOK_SECRET }}
           PADDLE_TEST_PRODUCT: ${{ secrets.PADDLE_TEST_PRODUCT }}

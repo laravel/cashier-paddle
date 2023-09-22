@@ -29,7 +29,7 @@ class WebhookController extends Controller
      */
     public function __construct()
     {
-        if (config('cashier.public_key')) {
+        if (config('cashier.webhook_secret')) {
             $this->middleware(VerifyWebhookSignature::class);
         }
     }

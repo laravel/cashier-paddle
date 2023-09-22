@@ -169,8 +169,8 @@ class Cashier
     public static function paddleOptions(array $options = [])
     {
         return array_merge([
-            'vendor_id' => (int) config('cashier.vendor_id'),
-            'vendor_auth_code' => config('cashier.vendor_auth_code'),
+            'seller_id' => (int) config('cashier.seller_id'),
+            'auth_code' => config('cashier.auth_code'),
         ], $options);
     }
 
