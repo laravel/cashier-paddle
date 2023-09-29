@@ -32,7 +32,7 @@ class Checkout
                 'priceId' => $item,
                 'quantity' => 1,
             ];
-        })->all();
+        })->values()->all();
     }
 
     /**
