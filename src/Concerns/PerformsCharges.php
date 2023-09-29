@@ -2,47 +2,25 @@
 
 namespace Laravel\Paddle\Concerns;
 
-use InvalidArgumentException;
 use Laravel\Paddle\Cashier;
+use Laravel\Paddle\Checkout;
 use LogicException;
 
 trait PerformsCharges
 {
     /**
-     * Generate a pay link for a "one off" charge on the customer for the given amount.
+     * Get a checkout for a given list of prices.
      *
-     * @param  float|array  $amount
-     * @param  string  $title
+     * @param  string|array  $prices
+     * @param  int  $quantity
      * @param  array  $options
-     * @return string
-     *
-     * @throws \Exception
+     * @return \Laravel\Paddle\Checkout
      */
-    public function charge($amount, $title, array $options = [])
+    public function checkout($prices, int $quantity = 1)
     {
-        if (strlen($title) > 200) {
-            throw new InvalidArgumentException('Charge title has a maximum length of 200 characters.');
-        }
-
-        return $this->generatePayLink(array_merge([
-            'title' => $title,
-            'webhook_url' => Cashier::webhookUrl(),
-            'prices' => is_array($amount) ? $amount : [config('cashier.currency').':'.$amount],
-        ], $options, $this->paddleOptions()));
-    }
-
-    /**
-     * Generate a pay link for a product.
-     *
-     * @param  int  $productId
-     * @param  array  $options
-     * @return string
-     */
-    public function chargeProduct($productId, array $options = [])
-    {
-        return $this->generatePayLink(array_merge([
-            'product_id' => $productId,
-        ], $options, $this->paddleOptions()));
+        return Checkout::make(
+            is_array($prices) ? $prices : [$prices => $quantity]
+        );
     }
 
     /**

@@ -6,19 +6,6 @@ use Laravel\Paddle\Cashier;
 
 class ChargesTest extends FeatureTestCase
 {
-    public function test_customers_can_retrieve_a_single_charge_link()
-    {
-        if (! getenv('PADDLE_SELLER_ID') || ! getenv('PADDLE_AUTH_CODE')) {
-            $this->markTestSkipped('Paddle seller ID and auth code not configured.');
-        }
-
-        $billable = $this->createBillable();
-
-        $url = $billable->charge(0, 'Test Product');
-
-        $this->assertStringContainsString('/checkout/custom/', $url);
-    }
-
     public function test_customers_can_retrieve_a_product_charge_link()
     {
         if (! getenv('PADDLE_TEST_PRODUCT')) {
