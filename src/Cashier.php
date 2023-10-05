@@ -131,13 +131,13 @@ class Cashier
             throw new Exception('Paddle API key not set.');
         }
 
-        $host = (config('cashier.sandbox') ? 'sandbox-' : '').'api.paddle.com';
+        $host = static::apiUrl();
 
         /** @var \Illuminate\Http\Client\Response $response */
         $response = Http::withToken($apiKey)
             ->withUserAgent('Laravel\Paddle/'.static::VERSION)
             ->withHeaders(['Paddle-Version' => 1])
-            ->$method("https://{$host}/{$uri}", $payload);
+            ->$method("{$host}/{$uri}", $payload);
 
         if (isset($response['error'])) {
             throw new PaddleException($response['error']['detail']);
