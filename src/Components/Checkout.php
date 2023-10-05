@@ -36,14 +36,20 @@ class Checkout extends Component
      */
     public function options()
     {
-        return [
+        $options = [
             'settings' => array_merge([
                 'displayMode' => 'inline',
                 'frameTarget' => $this->id,
                 'frameInitialHeight' => $this->height,
                 'frameStyle' => 'width: 100%; background-color: transparent; border: none;',
             ], $this->settings),
-            'items' => $this->checkout->items(),
+            'items' => $this->checkout->getItems(),
         ];
+
+        if ($customer = $this->checkout->getCustomer()) {
+            $options['customer'] = ['id' => $customer->paddle_id];
+        }
+
+        return $options;
     }
 }

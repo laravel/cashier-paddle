@@ -2,6 +2,7 @@
 
 namespace Laravel\Paddle;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Exceptions\PaddleException;
 use Money\Currencies\ISOCurrencies;
@@ -12,6 +13,8 @@ use NumberFormatter;
 
 class Cashier
 {
+    const VERSION = '2.0.0-dev';
+
     /**
      * The custom currency formatter.
      *
@@ -82,6 +85,17 @@ class Cashier
     }
 
     /**
+     * Get the customer instance by its Paddle ID.
+     *
+     * @param  string  $paddleId
+     * @return \Laravel\Paddle\Billable|null
+     */
+    public static function findBillable($paddleId)
+    {
+        return $paddleId ? (new static::$customerModel)->where('paddle_', $paddleId)->first() : null;
+    }
+
+    /**
      * Get the Paddle webhook url.
      *
      * @return string
@@ -92,51 +106,13 @@ class Cashier
     }
 
     /**
-     * Get the Paddle vendors API url.
+     * Get the Paddle API url.
      *
      * @return string
      */
-    public static function vendorsUrl()
+    public static function apiUrl()
     {
-        return 'https://'.(config('cashier.sandbox') ? 'sandbox-' : '').'vendors.paddle.com';
-    }
-
-    /**
-     * Get the Paddle checkout API url.
-     *
-     * @return string
-     */
-    public static function checkoutUrl()
-    {
-        return 'https://'.(config('cashier.sandbox') ? 'sandbox-' : '').'checkout.paddle.com';
-    }
-
-    /**
-     * Perform a GET Paddle API call.
-     *
-     * @param  string  $uri
-     * @param  array  $payload
-     * @return \Illuminate\Http\Client\Response
-     *
-     * @throws \Laravel\Paddle\Exceptions\PaddleException
-     */
-    public static function get($uri, array $payload = [])
-    {
-        return static::makeApiCall('get', static::checkoutUrl().'/api/2.0'.$uri, $payload);
-    }
-
-    /**
-     * Perform a POST Paddle API call.
-     *
-     * @param  string  $uri
-     * @param  array  $payload
-     * @return \Illuminate\Http\Client\Response
-     *
-     * @throws \Laravel\Paddle\Exceptions\PaddleException
-     */
-    public static function post($uri, array $payload = [])
-    {
-        return static::makeApiCall('post', static::vendorsUrl().'/api/2.0'.$uri, $payload);
+        return 'https://'.(config('cashier.sandbox') ? 'sandbox-' : '').'api.paddle.com';
     }
 
     /**
@@ -149,29 +125,25 @@ class Cashier
      *
      * @throws \Laravel\Paddle\Exceptions\PaddleException
      */
-    protected static function makeApiCall($method, $uri, array $payload = [])
+    public static function api($method, $uri, array $payload = [])
     {
-        $response = Http::$method($uri, $payload);
+        if (empty($apiKey = config('cashier.auth_code'))) {
+            throw new Exception('Paddle API key not set.');
+        }
 
-        if ($response['success'] === false) {
-            throw new PaddleException($response['error']['message'], $response['error']['code']);
+        $host = (config('cashier.sandbox') ? 'sandbox-' : '').'api.paddle.com';
+
+        /** @var \Illuminate\Http\Client\Response $response */
+        $response = Http::withToken($apiKey)
+            ->withUserAgent('Laravel\Paddle/'.static::VERSION)
+            ->withHeaders(['Paddle-Version' => 1])
+            ->$method("https://{$host}/{$uri}", $payload);
+
+        if (isset($response['error'])) {
+            throw new PaddleException($response['error']['detail']);
         }
 
         return $response;
-    }
-
-    /**
-     * Get the default Paddle API options.
-     *
-     * @param  array  $options
-     * @return array
-     */
-    public static function paddleOptions(array $options = [])
-    {
-        return array_merge([
-            'seller_id' => (int) config('cashier.seller_id'),
-            'auth_code' => config('cashier.auth_code'),
-        ], $options);
     }
 
     /**

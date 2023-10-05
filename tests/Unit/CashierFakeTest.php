@@ -19,7 +19,7 @@ class CashierFakeTest extends FeatureTestCase
 
         $this->assertEquals(
             $expected,
-            Http::get(CashierFake::getFormattedVendorUrl($endpoint))->json()
+            Http::get(CashierFake::getFormattedApiUrl($endpoint))->json()
         );
     }
 
@@ -32,7 +32,7 @@ class CashierFakeTest extends FeatureTestCase
 
         $this->assertEquals(
             ['success' => true, 'response' => $expected],
-            Http::get(CashierFake::getFormattedVendorUrl($endpoint))->json()
+            Http::get(CashierFake::getFormattedApiUrl($endpoint))->json()
         );
     }
 

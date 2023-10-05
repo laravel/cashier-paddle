@@ -13,15 +13,4 @@ trait Billable
     use ManagesSubscriptions;
     use ManagesReceipts;
     use PerformsCharges;
-
-    /**
-     * Get the default Paddle API options for the current Billable model.
-     *
-     * @param  array  $options
-     * @return array
-     */
-    public function paddleOptions(array $options = [])
-    {
-        return Cashier::paddleOptions($options);
-    }
 }

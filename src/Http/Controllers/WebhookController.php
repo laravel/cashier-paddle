@@ -48,7 +48,7 @@ class WebhookController extends Controller
             return new Response();
         }
 
-        $method = 'handle'.Str::studly($payload['alert_name']);
+        $method = 'handle'.Str::studly($payload['event_type']);
 
         WebhookReceived::dispatch($payload);
 
@@ -250,25 +250,14 @@ class WebhookController extends Controller
     }
 
     /**
-     * Find or create a customer based on the passthrough values and return the billable model.
+     * Get the customer instance by its Paddle ID.
      *
-     * @param  string  $passthrough
-     * @return \Laravel\Paddle\Billable
-     *
-     * @throws \Laravel\Paddle\Exceptions\InvalidPassthroughPayload
+     * @param  string  $paddleId
+     * @return \Laravel\Paddle\Billable|null
      */
-    protected function findOrCreateCustomer(string $passthrough)
+    protected function findCustomer($paddleId)
     {
-        $passthrough = json_decode($passthrough, true);
-
-        if (! is_array($passthrough) || ! isset($passthrough['billable_id'], $passthrough['billable_type'])) {
-            throw new InvalidPassthroughPayload;
-        }
-
-        return Cashier::$customerModel::firstOrCreate([
-            'billable_id' => $passthrough['billable_id'],
-            'billable_type' => $passthrough['billable_type'],
-        ])->billable;
+        return Cashier::findBillable($paddleId);
     }
 
     /**

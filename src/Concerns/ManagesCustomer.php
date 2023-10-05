@@ -3,18 +3,54 @@
 namespace Laravel\Paddle\Concerns;
 
 use Laravel\Paddle\Cashier;
+use Laravel\Paddle\Customer;
+use Laravel\Paddle\Exceptions\CustomerAlreadyCreated;
+use Laravel\Paddle\Exceptions\InvalidCustomer;
 
 trait ManagesCustomer
 {
     /**
-     * Create a customer record for the billable model.
+     * Determine if the customer has a Paddle customer ID and throw an exception if not.
      *
-     * @param  array  $attributes
-     * @return \Laravel\Paddle\Customer
+     * @return void
+     *
+     * @throws \Laravel\Paddle\Exceptions\InvalidCustomer
      */
-    public function createAsCustomer(array $attributes = [])
+    protected function assertCustomerExists()
     {
-        return $this->customer()->create($attributes);
+        if (is_null($this->customer)) {
+            throw InvalidCustomer::notYetCreated($this);
+        }
+    }
+
+    /**
+     * Create a Paddle customer for the given model.
+     *
+     * @throws \Laravel\Paddle\Exceptions\CustomerAlreadyCreated
+     */
+    public function createAsCustomer(array $options = []): Customer
+    {
+        if ($customer = $this->customer) {
+            throw CustomerAlreadyCreated::exists($customer);
+        }
+
+        if (! array_key_exists('name', $options) && $name = $this->paddleName()) {
+            $options['name'] = $name;
+        }
+
+        if (! array_key_exists('email', $options) && $email = $this->paddleEmail()) {
+            $options['email'] = $email;
+        }
+
+        $response = Cashier::api('POST', 'customers', $options)['data'];
+
+        $customer = $this->customer()->make();
+
+        $customer->paddle_id = $response['id'];
+
+        $customer->save();
+
+        return $customer;
     }
 
     /**
@@ -41,6 +77,16 @@ trait ManagesCustomer
         ], $options);
 
         return Cashier::productPrices($products, $options);
+    }
+
+    /**
+     * Get the billable model's name to associate with Paddle.
+     *
+     * @return string|null
+     */
+    public function paddleName()
+    {
+        return $this->name;
     }
 
     /**

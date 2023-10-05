@@ -13,14 +13,15 @@ trait PerformsCharges
      *
      * @param  string|array  $prices
      * @param  int  $quantity
-     * @param  array  $options
      * @return \Laravel\Paddle\Checkout
      */
     public function checkout($prices, int $quantity = 1)
     {
-        return Checkout::make(
-            is_array($prices) ? $prices : [$prices => $quantity]
-        );
+        if (! $customer = $this->customer) {
+            $customer = $this->createAsCustomer();
+        }
+
+        return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity]);
     }
 
     /**

@@ -122,7 +122,7 @@ class CashierFake
         $this->responses[$endpoint] = $response;
 
         if ($notFaked) {
-            Http::fake([static::getFormattedVendorUrl($endpoint) => function () use ($endpoint) {
+            Http::fake([static::getFormattedApiUrl($endpoint) => function () use ($endpoint) {
                 return $this->responses[$endpoint];
             }]);
         }
@@ -134,9 +134,9 @@ class CashierFake
      * @param  string  $path
      * @return string
      */
-    public static function getFormattedVendorUrl(string $path): string
+    public static function getFormattedApiUrl(string $path): string
     {
-        return Cashier::vendorsUrl().'/api/2.0'.Str::start($path, '/');
+        return Cashier::apiUrl().'/'.Str::start($path, '/');
     }
 
     /**
