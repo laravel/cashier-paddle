@@ -37,12 +37,13 @@ class Checkout extends Component
     public function options()
     {
         $options = [
-            'settings' => array_merge([
+            'settings' => array_filter(array_merge([
                 'displayMode' => 'inline',
                 'frameTarget' => $this->id,
                 'frameInitialHeight' => $this->height,
                 'frameStyle' => 'width: 100%; background-color: transparent; border: none;',
-            ], $this->settings),
+                'successUrl' => $this->checkout->getReturnUrl(),
+            ], $this->settings)),
             'items' => $this->checkout->getItems(),
         ];
 

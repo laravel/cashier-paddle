@@ -5,6 +5,11 @@ namespace Laravel\Paddle;
 class Checkout
 {
     /**
+     * The return url which will be triggered upon starting the subscription.
+     */
+    protected string $returnTo = null;
+
+    /**
      * Create a new checkout instance.
      */
     public function __construct(protected ?Customer $customer, protected array $items = [])
@@ -45,6 +50,16 @@ class Checkout
     }
 
     /**
+     * The return url to the success page.
+     */
+    public function returnTo(string $returnTo): self
+    {
+        $this->returnTo = $returnTo;
+
+        return $this;
+    }
+
+    /**
      * Return the items for the checkout.
      */
     public function getItems(): array
@@ -54,11 +69,17 @@ class Checkout
 
     /**
      * Return the customer for the checkout.
-     *
-     * @return \Laravel\Paddle\Customer|null
      */
     public function getCustomer(): ?Customer
     {
         return $this->customer;
+    }
+
+    /**
+     * Return the return url for the checkout.
+     */
+    public function getReturnUrl(): ?string
+    {
+        return $this->returnTo;
     }
 }
