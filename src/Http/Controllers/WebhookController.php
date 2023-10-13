@@ -48,7 +48,7 @@ class WebhookController extends Controller
             return new Response();
         }
 
-        $method = 'handle'.Str::studly($payload['event_type']);
+        $method = 'handle'.Str::studly(Str::replace('.', ' ', $payload['event_type']));
 
         WebhookReceived::dispatch($payload);
 
