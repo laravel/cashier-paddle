@@ -7,13 +7,16 @@ class Checkout
     /**
      * The return url which will be triggered upon starting the subscription.
      */
-    protected string $returnTo = null;
+    protected ?string $returnTo = null;
 
     /**
      * Create a new checkout instance.
      */
-    public function __construct(protected ?Customer $customer, protected array $items = [])
-    {
+    public function __construct(
+        protected ?Customer $customer,
+        protected array $items = [],
+        protected array $custom = []
+    ) {
         $this->items = collect($items)->map(function ($item, $key) {
             if (is_array($item)) {
                 return $item;
@@ -36,17 +39,17 @@ class Checkout
     /**
      * Create a new checkout instance for a guest.
      */
-    public static function guest(array $items = []): self
+    public static function guest(array $items = [], array $custom = []): self
     {
-        return new static(null, $items);
+        return new static(null, $items, $custom);
     }
 
     /**
      * Create a new checkout instance for an existing customer.
      */
-    public static function customer(Customer $customer, array $items = []): self
+    public static function customer(Customer $customer, array $items = [], array $custom = []): self
     {
-        return new static($customer, $items);
+        return new static($customer, $items, $custom);
     }
 
     /**
@@ -73,6 +76,14 @@ class Checkout
     public function getCustomer(): ?Customer
     {
         return $this->customer;
+    }
+
+    /**
+     * Return the custom data for the checkout.
+     */
+    public function getCustom(): array
+    {
+        return $this->custom;
     }
 
     /**

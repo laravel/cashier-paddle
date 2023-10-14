@@ -4,6 +4,7 @@ namespace Laravel\Paddle\Concerns;
 
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Checkout;
+use Laravel\Paddle\Subscription;
 use LogicException;
 
 trait PerformsCharges
@@ -13,15 +14,31 @@ trait PerformsCharges
      *
      * @param  string|array  $prices
      * @param  int  $quantity
+     * @param  array  $custom
      * @return \Laravel\Paddle\Checkout
      */
-    public function checkout($prices, int $quantity = 1)
+    public function checkout($prices, int $quantity = 1, array $custom = [])
     {
         if (! $customer = $this->customer) {
             $customer = $this->createAsCustomer();
         }
 
-        return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity]);
+        return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity], $custom);
+    }
+
+    /**
+     * Subscribe the customer to a new plan variant.
+     *
+     * @param  string|array  $prices
+     * @param  string  $type
+     * @param  array  $custom
+     * @return \Laravel\Paddle\Checkout
+     */
+    public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE, array $options = [], array $custom = [])
+    {
+        return $this->checkout($prices, 1, array_merge($custom, [
+            'subscription_type' => $type,
+        ]));
     }
 
     /**
@@ -46,9 +63,6 @@ trait PerformsCharges
         if (! is_array($payload['passthrough'])) {
             throw new LogicException('The value for "passthrough" always needs to be an array.');
         }
-
-        $payload['passthrough']['billable_id'] = $this->getKey();
-        $payload['passthrough']['billable_type'] = $this->getMorphClass();
 
         $payload['passthrough'] = json_encode($payload['passthrough']);
 

@@ -5,6 +5,7 @@ namespace Laravel\Paddle;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Exceptions\PaddleException;
+use Laravel\Paddle\SubscriptionItem;
 use Money\Currencies\ISOCurrencies;
 use Money\Currency;
 use Money\Formatter\IntlMoneyFormatter;
@@ -58,6 +59,13 @@ class Cashier
     public static $subscriptionModel = Subscription::class;
 
     /**
+     * The subscription item model class name.
+     *
+     * @var string
+     */
+    public static $subscriptionItemModel = SubscriptionItem::class;
+
+    /**
      * The receipt model class name.
      *
      * @var string
@@ -85,14 +93,14 @@ class Cashier
     }
 
     /**
-     * Get the customer instance by its Paddle ID.
+     * Get the customer instance by its Paddle customer ID.
      *
      * @param  string  $paddleId
      * @return \Laravel\Paddle\Billable|null
      */
     public static function findBillable($paddleId)
     {
-        return $paddleId ? (new static::$customerModel)->where('paddle_', $paddleId)->first() : null;
+        return (new static::$customerModel)->where('paddle_id', $paddleId)->first()?->billable;
     }
 
     /**

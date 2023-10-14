@@ -15,7 +15,6 @@ use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionUpdated;
 use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
-use Laravel\Paddle\Exceptions\InvalidPassthroughPayload;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Paddle\Subscription;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,20 +43,12 @@ class WebhookController extends Controller
     {
         $payload = $request->all();
 
-        if (! isset($payload['alert_name'])) {
-            return new Response();
-        }
-
         $method = 'handle'.Str::studly(Str::replace('.', ' ', $payload['event_type']));
 
         WebhookReceived::dispatch($payload);
 
         if (method_exists($this, $method)) {
-            try {
-                $this->{$method}($payload);
-            } catch (InvalidPassthroughPayload $e) {
-                return new Response('Webhook Skipped');
-            }
+            $this->{$method}($payload);
 
             WebhookHandled::dispatch($payload);
 
@@ -146,35 +137,34 @@ class WebhookController extends Controller
      *
      * @param  array  $payload
      * @return void
-     *
-     * @throws \Laravel\Paddle\Exceptions\InvalidPassthroughPayload
      */
     protected function handleSubscriptionCreated(array $payload)
     {
-        $passthrough = isset($payload['passthrough']) ? json_decode($payload['passthrough'], true) : null;
+        $data = $payload['data'];
 
-        if (! isset($passthrough) || ! is_array($passthrough) || ! isset($passthrough['subscription_name'])) {
-            throw new InvalidPassthroughPayload;
-        }
-
-        if ($this->subscriptionExists($payload['subscription_id'])) {
+        if ($this->subscriptionExists($data['id'])) {
             return;
         }
 
-        $customer = $this->findOrCreateCustomer($payload['passthrough']);
-
-        $trialEndsAt = $payload['status'] === Subscription::STATUS_TRIALING
-            ? Carbon::createFromFormat('Y-m-d', $payload['next_bill_date'], 'UTC')->startOfDay()
-            : null;
+        if (! $customer = $this->findCustomer($data['customer_id'])) {
+            return;
+        }
 
         $subscription = $customer->subscriptions()->create([
-            'name' => $passthrough['subscription_name'],
-            'paddle_id' => $payload['subscription_id'],
-            'paddle_plan' => $payload['subscription_plan_id'],
-            'paddle_status' => $payload['status'],
-            'quantity' => $payload['quantity'],
-            'trial_ends_at' => $trialEndsAt,
+            'type' => $data['custom_data']['subscription_type'] ?? Subscription::DEFAULT_TYPE,
+            'paddle_id' => $data['id'],
+            'status' => $data['status'],
+            'trial_ends_at' => null,
         ]);
+
+        foreach ($data['items'] as $item) {
+            $subscription->items()->create([
+                'product_id' => $item['price']['product_id'],
+                'price_id' => $item['price']['id'],
+                'status' => $item['status'],
+                'quantity' => $item['quantity'] ?? 1,
+            ]);
+        }
 
         SubscriptionCreated::dispatch($customer, $subscription, $payload);
     }
@@ -250,18 +240,18 @@ class WebhookController extends Controller
     }
 
     /**
-     * Get the customer instance by its Paddle ID.
+     * Get the customer instance by its Paddle customer ID.
      *
      * @param  string  $paddleId
      * @return \Laravel\Paddle\Billable|null
      */
-    protected function findCustomer($paddleId)
+    protected function findCustomer($customerId)
     {
-        return Cashier::findBillable($paddleId);
+        return Cashier::findBillable($customerId);
     }
 
     /**
-     * Find the first subscription matching a Paddle subscription id.
+     * Find the first subscription matching a Paddle subscription ID.
      *
      * @param  string  $subscriptionId
      * @return \Laravel\Paddle\Subscription|null

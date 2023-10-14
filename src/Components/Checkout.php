@@ -51,6 +51,10 @@ class Checkout extends Component
             $options['customer'] = ['id' => $customer->paddle_id];
         }
 
+        if ($custom = $this->checkout->getCustom()) {
+            $options['customData'] = $custom;
+        }
+
         return $options;
     }
 }

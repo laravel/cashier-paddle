@@ -11,19 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subscriptions', function (Blueprint $table) {
+        Schema::create('subscription_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('billable_id');
-            $table->string('billable_type');
-            $table->string('type');
-            $table->string('paddle_id')->unique();
+            $table->foreignId('subscription_id');
+            $table->string('product_id');
+            $table->string('price_id');
             $table->string('status');
-            $table->timestamp('trial_ends_at')->nullable();
-            $table->timestamp('paused_from')->nullable();
-            $table->timestamp('ends_at')->nullable();
+            $table->integer('quantity');
             $table->timestamps();
 
-            $table->index(['billable_id', 'billable_type']);
+            $table->unique(['subscription_id', 'price_id']);
         });
     }
 

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Concerns\Prorates;
 use LogicException;
 
@@ -22,6 +23,8 @@ class Subscription extends Model
     const STATUS_PAUSED = 'paused';
     const STATUS_DELETED = 'deleted';
 
+    const DEFAULT_TYPE = 'default';
+
     /**
      * The attributes that are not mass assignable.
      *
@@ -30,14 +33,19 @@ class Subscription extends Model
     protected $guarded = [];
 
     /**
+     * The relations to eager load on every query.
+     *
+     * @var array
+     */
+    protected $with = ['items'];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
     protected $casts = [
         'paddle_id' => 'integer',
-        'paddle_plan' => 'integer',
-        'quantity' => 'integer',
         'trial_ends_at' => 'datetime',
         'paused_from' => 'datetime',
         'ends_at' => 'datetime',
@@ -58,6 +66,16 @@ class Subscription extends Model
     public function billable()
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get the subscription items related to the subscription.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function items()
+    {
+        return $this->hasMany(Cashier::$subscriptionItemModel);
     }
 
     /**

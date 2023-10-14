@@ -184,7 +184,7 @@ class WebhooksTest extends FeatureTestCase
             'passthrough' => json_encode([
                 'billable_id' => $user->id,
                 'billable_type' => $user->getMorphClass(),
-                'subscription_name' => 'main',
+                'subscription_type' => 'main',
             ]),
             'quantity' => 1,
             'status' => Subscription::STATUS_ACTIVE,
@@ -229,7 +229,7 @@ class WebhooksTest extends FeatureTestCase
             'passthrough' => json_encode([
                 'billable_id' => $user->id,
                 'billable_type' => $user->getMorphClass(),
-                'subscription_name' => 'main',
+                'subscription_type' => 'main',
             ]),
             'quantity' => 1,
             'status' => Subscription::STATUS_ACTIVE,
@@ -272,7 +272,7 @@ class WebhooksTest extends FeatureTestCase
                 'passthrough' => json_encode([
                     'billable_id' => $user->id,
                     'billable_type' => $user->getMorphClass(),
-                    'subscription_name' => 'main',
+                    'subscription_type' => 'main',
                 ]),
                 'quantity' => 1,
                 'status' => Subscription::STATUS_ACTIVE,
