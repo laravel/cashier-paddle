@@ -5,7 +5,6 @@ namespace Laravel\Paddle;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Exceptions\PaddleException;
-use Laravel\Paddle\SubscriptionItem;
 use Money\Currencies\ISOCurrencies;
 use Money\Currency;
 use Money\Formatter\IntlMoneyFormatter;

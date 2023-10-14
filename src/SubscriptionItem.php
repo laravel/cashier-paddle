@@ -5,7 +5,6 @@ namespace Laravel\Paddle;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Laravel\Paddle\Cashier;
 
 /**
  * @property \Laravel\Paddle\Subscription|null $subscription

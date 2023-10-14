@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Concerns\Prorates;
 use LogicException;
 
