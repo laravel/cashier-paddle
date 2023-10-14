@@ -1,10 +1,11 @@
 @php($vendor = ['vendor' => (int) config('cashier.vendor_id')])
 
 <script src="https://cdn.paddle.com/paddle/paddle.js"></script>
-<script type="text/javascript">
-    @if (config('cashier.sandbox'))
+@if (config('cashier.sandbox'))
+    <script type="text/javascript">
         Paddle.Environment.set('sandbox');
-    @endif
-
+    </script>
+@endif
+<script type="text/javascript">
     Paddle.Setup(@json($vendor));
 </script>
