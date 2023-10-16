@@ -27,7 +27,7 @@ class ModifiersTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 3423423,
             'paddle_plan' => 12345,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
         ]);
 
@@ -73,7 +73,7 @@ class ModifiersTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 3423423,
             'paddle_plan' => 12345,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
         ]);
 
@@ -114,7 +114,7 @@ class ModifiersTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 3423423,
             'paddle_plan' => 12345,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
         ]);
 

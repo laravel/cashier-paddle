@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Laravel\Paddle\Events\PaymentSucceeded;
-use Laravel\Paddle\Events\SubscriptionCancelled;
+use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionPaymentFailed;
 use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
@@ -55,7 +55,7 @@ class CashierFake
             PaymentSucceeded::class,
             SubscriptionCreated::class,
             SubscriptionUpdated::class,
-            SubscriptionCancelled::class,
+            SubscriptionCanceled::class,
             SubscriptionPaymentFailed::class,
             SubscriptionPaymentSucceeded::class,
         ], Arr::wrap($events)));
@@ -206,13 +206,13 @@ class CashierFake
     }
 
     /**
-     * Assert if the SubscriptionCancelled event was dispatched based on a truth-test callback.
+     * Assert if the SubscriptionCanceled event was dispatched based on a truth-test callback.
      *
      * @param  callable|int|null  $callback
      * @return void
      */
-    public static function assertSubscriptionCancelled($callback = null)
+    public static function assertSubscriptionCanceled($callback = null)
     {
-        Event::assertDispatched(SubscriptionCancelled::class, $callback);
+        Event::assertDispatched(SubscriptionCanceled::class, $callback);
     }
 }

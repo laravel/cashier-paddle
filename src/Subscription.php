@@ -20,7 +20,7 @@ class Subscription extends Model
     const STATUS_TRIALING = 'trialing';
     const STATUS_PAST_DUE = 'past_due';
     const STATUS_PAUSED = 'paused';
-    const STATUS_DELETED = 'deleted';
+    const STATUS_CANCELED = 'canceled';
 
     const DEFAULT_TYPE = 'default';
 
@@ -88,14 +88,49 @@ class Subscription extends Model
     }
 
     /**
-     * Determine if the subscription has a specific plan.
+     * Determine if the subscription has multiple prices.
      *
-     * @param  int  $plan
      * @return bool
      */
-    public function hasPlan($plan)
+    public function hasMultiplePrices()
     {
-        return $this->paddle_plan == $plan;
+        return $this->items->count() > 1;
+    }
+
+    /**
+     * Determine if the subscription has a single price.
+     *
+     * @return bool
+     */
+    public function hasSinglePrice()
+    {
+        return ! $this->hasMultiplePrices();
+    }
+
+    /**
+     * Determine if the subscription has a specific product.
+     *
+     * @param  string  $product
+     * @return bool
+     */
+    public function hasProduct($product)
+    {
+        return $this->items->contains(function (SubscriptionItem $item) use ($product) {
+            return $item->product_id === $product;
+        });
+    }
+
+    /**
+     * Determine if the subscription has a specific price.
+     *
+     * @param  string  $price
+     * @return bool
+     */
+    public function hasPrice($price)
+    {
+        return $this->items->contains(function (SubscriptionItem $item) use ($price) {
+            return $item->price_id === $price;
+        });
     }
 
     /**
@@ -116,8 +151,8 @@ class Subscription extends Model
     public function active()
     {
         return (is_null($this->ends_at) || $this->onGracePeriod() || $this->onPausedGracePeriod()) &&
-            (! Cashier::$deactivatePastDue || $this->paddle_status !== self::STATUS_PAST_DUE) &&
-            $this->paddle_status !== self::STATUS_PAUSED;
+            (! Cashier::$deactivatePastDue || $this->status !== self::STATUS_PAST_DUE) &&
+            $this->status !== self::STATUS_PAUSED;
     }
 
     /**
@@ -136,10 +171,10 @@ class Subscription extends Model
                 ->orWhere(function ($query) {
                     $query->onPausedGracePeriod();
                 });
-        })->where('paddle_status', '!=', self::STATUS_PAUSED);
+        })->where('status', '!=', self::STATUS_PAUSED);
 
         if (Cashier::$deactivatePastDue) {
-            $query->where('paddle_status', '!=', self::STATUS_PAST_DUE);
+            $query->where('status', '!=', self::STATUS_PAST_DUE);
         }
     }
 
@@ -150,7 +185,7 @@ class Subscription extends Model
      */
     public function pastDue()
     {
-        return $this->paddle_status === self::STATUS_PAST_DUE;
+        return $this->status === self::STATUS_PAST_DUE;
     }
 
     /**
@@ -161,7 +196,7 @@ class Subscription extends Model
      */
     public function scopePastDue($query)
     {
-        $query->where('paddle_status', self::STATUS_PAST_DUE);
+        $query->where('status', self::STATUS_PAST_DUE);
     }
 
     /**
@@ -171,7 +206,7 @@ class Subscription extends Model
      */
     public function recurring()
     {
-        return ! $this->onTrial() && ! $this->paused() && ! $this->onPausedGracePeriod() && ! $this->cancelled();
+        return ! $this->onTrial() && ! $this->paused() && ! $this->onPausedGracePeriod() && ! $this->canceled();
     }
 
     /**
@@ -182,7 +217,7 @@ class Subscription extends Model
      */
     public function scopeRecurring($query)
     {
-        $query->notOnTrial()->notCancelled();
+        $query->notOnTrial()->notCanceled();
     }
 
     /**
@@ -192,7 +227,7 @@ class Subscription extends Model
      */
     public function paused()
     {
-        return $this->paddle_status === self::STATUS_PAUSED;
+        return $this->status === self::STATUS_PAUSED;
     }
 
     /**
@@ -203,7 +238,7 @@ class Subscription extends Model
      */
     public function scopePaused($query)
     {
-        $query->where('paddle_status', self::STATUS_PAUSED);
+        $query->where('status', self::STATUS_PAUSED);
     }
 
     /**
@@ -214,7 +249,7 @@ class Subscription extends Model
      */
     public function scopeNotPaused($query)
     {
-        $query->where('paddle_status', '!=', self::STATUS_PAUSED);
+        $query->where('status', '!=', self::STATUS_PAUSED);
     }
 
     /**
@@ -254,52 +289,31 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function cancelled()
+    public function canceled()
     {
-        return ! is_null($this->ends_at);
+        return $this->status === self::STATUS_CANCELED;
     }
 
     /**
-     * Filter query by cancelled.
+     * Filter query by canceled.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeCancelled($query)
+    public function scopeCanceled($query)
     {
-        $query->whereNotNull('ends_at');
+        $query->where('status', self::STATUS_CANCELED);
     }
 
     /**
-     * Filter query by not cancelled.
+     * Filter query by not canceled.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeNotCancelled($query)
+    public function scopeNotCanceled($query)
     {
-        $query->whereNull('ends_at');
-    }
-
-    /**
-     * Determine if the subscription has ended and the grace period has expired.
-     *
-     * @return bool
-     */
-    public function ended()
-    {
-        return $this->cancelled() && ! $this->onGracePeriod();
-    }
-
-    /**
-     * Filter query by ended.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeEnded($query)
-    {
-        $query->cancelled()->notOnGracePeriod();
+        $query->where('status', '!=', self::STATUS_CANCELED);
     }
 
     /**
@@ -309,7 +323,7 @@ class Subscription extends Model
      */
     public function onTrial()
     {
-        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+        return $this->status === self::STATUS_TRIALING;
     }
 
     /**
@@ -320,7 +334,7 @@ class Subscription extends Model
      */
     public function scopeOnTrial($query)
     {
-        $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '>', Carbon::now());
+        $query->where('status', self::STATUS_TRIALING);
     }
 
     /**
@@ -352,7 +366,7 @@ class Subscription extends Model
      */
     public function scopeNotOnTrial($query)
     {
-        $query->whereNull('trial_ends_at')->orWhere('trial_ends_at', '<=', Carbon::now());
+        $query->where('status', '!=', self::STATUS_TRIALING);
     }
 
     /**
@@ -533,7 +547,7 @@ class Subscription extends Model
         $info = $this->paddleInfo();
 
         $this->forceFill([
-            'paddle_status' => $info['state'],
+            'status' => $info['state'],
             'paused_from' => Carbon::createFromFormat('Y-m-d H:i:s', $info['paused_from'], 'UTC'),
         ])->save();
 
@@ -554,7 +568,7 @@ class Subscription extends Model
         ]);
 
         $this->forceFill([
-            'paddle_status' => self::STATUS_ACTIVE,
+            'status' => self::STATUS_ACTIVE,
             'ends_at' => null,
             'paused_from' => null,
         ])->save();
@@ -682,7 +696,7 @@ class Subscription extends Model
         Cashier::post('/subscription/users_cancel', $payload);
 
         $this->forceFill([
-            'paddle_status' => self::STATUS_DELETED,
+            'status' => self::STATUS_CANCELED,
             'ends_at' => $endsAt,
         ])->save();
 
@@ -813,8 +827,8 @@ class Subscription extends Model
             throw new LogicException("Cannot $action for paused subscriptions.");
         }
 
-        if ($this->cancelled() || $this->onGracePeriod()) {
-            throw new LogicException("Cannot $action for cancelled subscriptions.");
+        if ($this->canceled() || $this->onGracePeriod()) {
+            throw new LogicException("Cannot $action for canceled subscriptions.");
         }
 
         if ($this->pastDue()) {

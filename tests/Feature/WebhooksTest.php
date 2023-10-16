@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Events\PaymentSucceeded;
-use Laravel\Paddle\Events\SubscriptionCancelled;
+use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionUpdated;
@@ -125,7 +125,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
         ]);
 
@@ -203,7 +203,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 'bar',
             'paddle_plan' => 1234,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
             'trial_ends_at' => null,
         ]);
@@ -248,7 +248,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 'bar',
             'paddle_plan' => 1234,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
             'trial_ends_at' => null,
         ]);
@@ -292,7 +292,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 'bar',
             'paddle_plan' => 1234,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
             'trial_ends_at' => null,
         ]);
@@ -312,7 +312,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
         ]);
 
@@ -332,7 +332,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 1234,
-            'paddle_status' => Subscription::STATUS_PAUSED,
+            'status' => Subscription::STATUS_PAUSED,
             'quantity' => 3,
             'paused_from' => $date,
         ]);
@@ -342,7 +342,7 @@ class WebhooksTest extends FeatureTestCase
         });
     }
 
-    public function test_it_can_handle_a_subscription_cancelled_event()
+    public function test_it_can_handle_a_subscription_canceled_event()
     {
         Cashier::fake();
 
@@ -352,13 +352,13 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
         ]);
 
         $this->postJson('paddle/webhook', [
-            'alert_name' => 'subscription_cancelled',
-            'status' => Subscription::STATUS_DELETED,
+            'alert_name' => 'subscription_canceled',
+            'status' => Subscription::STATUS_CANCELED,
             'cancellation_effective_date' => ($date = now('UTC')->addDays(5)->startOfDay())->format('Y-m-d'),
             'subscription_id' => 244,
         ])->assertOk();
@@ -370,11 +370,11 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 244,
             'paddle_plan' => 2323,
-            'paddle_status' => Subscription::STATUS_DELETED,
+            'status' => Subscription::STATUS_CANCELED,
             'ends_at' => $date,
         ]);
 
-        Cashier::assertSubscriptionCancelled(function (SubscriptionCancelled $event) {
+        Cashier::assertSubscriptionCanceled(function (SubscriptionCanceled $event) {
             return $event->subscription->paddle_plan === 2323;
         });
     }
@@ -407,7 +407,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'paddle_id' => 'bar',
             'paddle_plan' => 1234,
-            'paddle_status' => Subscription::STATUS_ACTIVE,
+            'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
             'trial_ends_at' => null,
         ]);

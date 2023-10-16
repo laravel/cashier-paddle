@@ -356,8 +356,8 @@ class Cashier
      * @param  callable|int|null  $callback
      * @return void
      */
-    public static function assertSubscriptionCancelled($callback = null)
+    public static function assertSubscriptionCanceled($callback = null)
     {
-        CashierFake::assertSubscriptionCancelled($callback);
+        CashierFake::assertSubscriptionCanceled($callback);
     }
 }

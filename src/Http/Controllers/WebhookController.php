@@ -8,7 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Events\PaymentSucceeded;
-use Laravel\Paddle\Events\SubscriptionCancelled;
+use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionPaymentFailed;
 use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
@@ -188,7 +188,7 @@ class WebhookController extends Controller
 
         // Status...
         if (isset($payload['status'])) {
-            $subscription->paddle_status = $payload['status'];
+            $subscription->status = $payload['status'];
         }
 
         // Quantity...
@@ -209,12 +209,12 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle subscription cancelled.
+     * Handle subscription canceled.
      *
      * @param  array  $payload
      * @return void
      */
-    protected function handleSubscriptionCancelled(array $payload)
+    protected function handleSubscriptionCanceled(array $payload)
     {
         if (! $subscription = $this->findSubscription($payload['subscription_id'])) {
             return;
@@ -229,14 +229,14 @@ class WebhookController extends Controller
 
         // Status...
         if (isset($payload['status'])) {
-            $subscription->paddle_status = $payload['status'];
+            $subscription->status = $payload['status'];
         }
 
         $subscription->paused_from = null;
 
         $subscription->save();
 
-        SubscriptionCancelled::dispatch($subscription, $payload);
+        SubscriptionCanceled::dispatch($subscription, $payload);
     }
 
     /**

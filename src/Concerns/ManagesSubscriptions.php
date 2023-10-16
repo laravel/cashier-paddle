@@ -35,7 +35,7 @@ trait ManagesSubscriptions
      * @param  int|null  $plan
      * @return bool
      */
-    public function onTrial($type = 'default', $plan = null)
+    public function onTrial($type = 'default', $price = null)
     {
         if (func_num_args() === 0 && $this->onGenericTrial()) {
             return true;
@@ -47,17 +47,17 @@ trait ManagesSubscriptions
             return false;
         }
 
-        return $plan ? $subscription->hasPlan($plan) : true;
+        return $price ? $subscription->hasPrice($price) : true;
     }
 
     /**
      * Determine if the Billable model's trial has ended.
      *
      * @param  string  $type
-     * @param  int|null  $plan
+     * @param  int|null  $price
      * @return bool
      */
-    public function hasExpiredTrial($type = 'default', $plan = null)
+    public function hasExpiredTrial($type = 'default', $price = null)
     {
         if (func_num_args() === 0 && $this->hasExpiredGenericTrial()) {
             return true;
@@ -69,7 +69,7 @@ trait ManagesSubscriptions
             return false;
         }
 
-        return $plan ? $subscription->hasPlan($plan) : true;
+        return $price ? $subscription->hasPrice($price) : true;
     }
 
     /**
@@ -120,54 +120,94 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the Billable model has a given subscription.
+     * Determine if the customer has a given subscription.
      *
-     * @param  string  $type
-     * @param  int|null  $plan
+     * @param  string  $name
+     * @param  string|null  $price
      * @return bool
      */
-    public function subscribed($type = 'default', $plan = null)
+    public function subscribed($name = 'default', $price = null)
     {
-        $subscription = $this->subscription($type);
+        $subscription = $this->subscription($name);
 
         if (! $subscription || ! $subscription->valid()) {
             return false;
         }
 
-        return $plan ? $subscription->hasPlan($plan) : true;
+        return $price ? $subscription->hasPrice($price) : true;
     }
 
     /**
-     * Determine if the Billable model is actively subscribed to one of the given plans.
+     * Determine if the customer is actively subscribed to one of the given products.
      *
-     * @param  int  $plan
-     * @param  string  $type
+     * @param  string|string[]  $products
+     * @param  string  $name
      * @return bool
      */
-    public function subscribedToPlan($plan, $type = 'default')
+    public function subscribedToProduct($products, $name = 'default')
     {
-        $subscription = $this->subscription($type);
+        $subscription = $this->subscription($name);
 
         if (! $subscription || ! $subscription->valid()) {
             return false;
         }
 
-        return $subscription->hasPlan($plan);
+        foreach ((array) $products as $product) {
+            if ($subscription->hasProduct($product)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-     * Determine if the entity has a valid subscription on the given plan.
+     * Determine if the customer is actively subscribed to one of the given prices.
      *
-     * @param  int  $plan
+     * @param  string|string[]  $prices
+     * @param  string  $name
      * @return bool
      */
-    public function onPlan($plan)
+    public function subscribedToPrice($prices, $name = 'default')
     {
-        return ! is_null($this->subscriptions()
-            ->where('paddle_plan', $plan)
-            ->get()
-            ->first(function (Subscription $subscription) {
-                return $subscription->valid();
-            }));
+        $subscription = $this->subscription($name);
+
+        if (! $subscription || ! $subscription->valid()) {
+            return false;
+        }
+
+        foreach ((array) $prices as $price) {
+            if ($subscription->hasPrice($price)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the customer has a valid subscription on the given product.
+     *
+     * @param  string  $product
+     * @return bool
+     */
+    public function onProduct($product)
+    {
+        return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($product) {
+            return $subscription->valid() && $subscription->hasProduct($product);
+        }));
+    }
+
+    /**
+     * Determine if the customer has a valid subscription on the given price.
+     *
+     * @param  string  $price
+     * @return bool
+     */
+    public function onPrice($price)
+    {
+        return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($price) {
+            return $subscription->valid() && $subscription->hasPrice($price);
+        }));
     }
 }

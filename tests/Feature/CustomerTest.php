@@ -21,7 +21,7 @@ class CustomerTest extends FeatureTestCase
 
         $this->assertFalse($user->onTrial());
         $this->assertFalse($user->onGenericTrial());
-        $this->assertFalse($user->onPlan(123));
+        $this->assertFalse($user->onPrice(123));
         $this->assertFalse($user->subscribed());
         $this->assertFalse($user->subscribedToPlan(123));
         $this->assertEmpty($user->subscriptions);
