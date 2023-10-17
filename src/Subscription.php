@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 use Laravel\Paddle\Concerns\Prorates;
 use LogicException;
 
@@ -44,18 +45,10 @@ class Subscription extends Model
      * @var array
      */
     protected $casts = [
-        'paddle_id' => 'integer',
         'trial_ends_at' => 'datetime',
         'paused_from' => 'datetime',
         'ends_at' => 'datetime',
     ];
-
-    /**
-     * The cached Paddle info for the subscription.
-     *
-     * @var array
-     */
-    protected $paddleInfo;
 
     /**
      * Get the billable model related to the subscription.
@@ -421,8 +414,6 @@ class Subscription extends Model
             'charge_name' => $name,
         ]);
 
-        $this->paddleInfo = null;
-
         return Cashier::post("/subscription/{$this->paddle_id}/charge", $payload)['response'];
     }
 
@@ -489,32 +480,69 @@ class Subscription extends Model
             'quantity' => $quantity,
         ])->save();
 
-        $this->paddleInfo = null;
-
         return $this;
     }
 
     /**
-     * Swap the subscription to a new Paddle plan.
+     * Swap the subscription to new Paddle items.
      *
-     * @param  int  $plan
+     * @param  string|array  $items
      * @param  array  $options
      * @return $this
      */
-    public function swap($plan, array $options = [])
+    public function swap($items, array $options = [])
     {
-        $this->guardAgainstUpdates('swap plans');
+        if (empty($items = (array) $items)) {
+            throw new InvalidArgumentException('Please provide at least one item when swapping.');
+        }
 
-        $this->updatePaddleSubscription(array_merge($options, [
-            'plan_id' => $plan,
-            'prorate' => $this->prorate,
+        $this->guardAgainstUpdates('swap items');
+
+        $items = collect($items)->map(function ($item, $key) {
+            if (is_array($item)) {
+                return $item;
+            }
+
+            if (is_string($key)) {
+                return [
+                    'price_id' => $key,
+                    'quantity' => $item,
+                ];
+            }
+
+            return [
+                'price_id' => $item,
+                'quantity' => 1,
+            ];
+        })->values()->all();
+
+        $response = $this->updatePaddleSubscription(array_merge($options, [
+            'items' => $items,
+            'proration_billing_mode' => $this->prorationBehavior,
         ]));
 
         $this->forceFill([
-            'paddle_plan' => $plan,
+            'status' => $response['status'],
         ])->save();
 
-        $this->paddleInfo = null;
+        $paddlePrices = [];
+
+        foreach ($response['items'] as $item) {
+            $paddlePrices[] = $item['price']['id'];
+
+            $this->items()->updateOrCreate([
+                'price_id' => $item['price']['id'],
+            ], [
+                'product_id' => $item['price']['product_id'],
+                'status' => $item['status'],
+                'quantity' => $item['quantity'],
+            ]);
+        }
+
+        // Delete items that aren't attached to the subscription anymore...
+        $this->items()->whereNotIn('price_id', $paddlePrices)->delete();
+
+        $this->load('items');
 
         return $this;
     }
@@ -540,18 +568,14 @@ class Subscription extends Model
      */
     public function pause()
     {
-        $this->updatePaddleSubscription([
+        $response = $this->updatePaddleSubscription([
             'pause' => true,
         ]);
 
-        $info = $this->paddleInfo();
-
         $this->forceFill([
-            'status' => $info['state'],
+            'status' => $response['status'],
             'paused_from' => Carbon::createFromFormat('Y-m-d H:i:s', $info['paused_from'], 'UTC'),
         ])->save();
-
-        $this->paddleInfo = null;
 
         return $this;
     }
@@ -563,17 +587,15 @@ class Subscription extends Model
      */
     public function unpause()
     {
-        $this->updatePaddleSubscription([
+        $response = $this->updatePaddleSubscription([
             'pause' => false,
         ]);
 
         $this->forceFill([
-            'status' => self::STATUS_ACTIVE,
+            'status' => $response['status'],
             'ends_at' => null,
             'paused_from' => null,
         ])->save();
-
-        $this->paddleInfo = null;
 
         return $this;
     }
@@ -586,25 +608,7 @@ class Subscription extends Model
      */
     public function updatePaddleSubscription(array $options)
     {
-        $payload = $this->billable->paddleOptions(array_merge([
-            'subscription_id' => $this->paddle_id,
-        ], $options));
-
-        $response = Cashier::post('/subscription/users/update', $payload)['response'];
-
-        $this->paddleInfo = null;
-
-        return $response;
-    }
-
-    /**
-     * Get the Paddle update url.
-     *
-     * @return string
-     */
-    public function updateUrl()
-    {
-        return $this->paddleInfo()['update_url'];
+        return Cashier::api('PATCH', "subscriptions/{$this->paddle_id}", $options)['data'];
     }
 
     /**
@@ -700,113 +704,7 @@ class Subscription extends Model
             'ends_at' => $endsAt,
         ])->save();
 
-        $this->paddleInfo = null;
-
         return $this;
-    }
-
-    /**
-     * Get the Paddle cancellation url.
-     *
-     * @return string
-     */
-    public function cancelUrl()
-    {
-        return $this->paddleInfo()['cancel_url'];
-    }
-
-    /**
-     * Get the last payment for the subscription.
-     *
-     * @return \Laravel\Paddle\Payment
-     */
-    public function lastPayment()
-    {
-        $payment = $this->paddleInfo()['last_payment'];
-
-        return new Payment($payment['amount'], $payment['currency'], $payment['date']);
-    }
-
-    /**
-     * Get the next payment for the subscription.
-     *
-     * @return \Laravel\Paddle\Payment|null
-     */
-    public function nextPayment()
-    {
-        if (! isset($this->paddleInfo()['next_payment'])) {
-            return;
-        }
-
-        $payment = $this->paddleInfo()['next_payment'];
-
-        return new Payment($payment['amount'], $payment['currency'], $payment['date']);
-    }
-
-    /**
-     * Get the email address of the customer associated to this subscription.
-     *
-     * @return string
-     */
-    public function paddleEmail()
-    {
-        return (string) $this->paddleInfo()['user_email'];
-    }
-
-    /**
-     * Get the payment method type from the subscription.
-     *
-     * @return string
-     */
-    public function paymentMethod()
-    {
-        return (string) ($this->paddleInfo()['payment_information']['payment_method'] ?? '');
-    }
-
-    /**
-     * Get the card brand from the subscription.
-     *
-     * @return string
-     */
-    public function cardBrand()
-    {
-        return (string) ($this->paddleInfo()['payment_information']['card_type'] ?? '');
-    }
-
-    /**
-     * Get the last four digits from the subscription if it's a credit card.
-     *
-     * @return string
-     */
-    public function cardLastFour()
-    {
-        return (string) ($this->paddleInfo()['payment_information']['last_four_digits'] ?? '');
-    }
-
-    /**
-     * Get the card expiration date.
-     *
-     * @return string
-     */
-    public function cardExpirationDate()
-    {
-        return (string) ($this->paddleInfo()['payment_information']['expiry_date'] ?? '');
-    }
-
-    /**
-     * Get raw information about the subscription from Paddle.
-     *
-     * @return array
-     */
-    public function paddleInfo()
-    {
-        if ($this->paddleInfo) {
-            return $this->paddleInfo;
-        }
-
-        return $this->paddleInfo = Cashier::post('/subscription/users', array_merge([
-            'subscription_id' => $this->paddle_id,
-        ], $this->billable->paddleOptions()))['response'][0];
     }
 
     /**

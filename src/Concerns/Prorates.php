@@ -2,48 +2,87 @@
 
 namespace Laravel\Paddle\Concerns;
 
+/**
+ * @link https://developer.paddle.com/concepts/subscriptions/proration
+ */
 trait Prorates
 {
     /**
-     * Indicates if the plan change should be prorated.
+     * Indicates if the pricing changes should be prorated.
      *
      * @var bool
      */
-    protected $prorate = true;
+    protected $prorationBehavior = 'prorated_immediately';
 
     /**
-     * Indicate that the plan change should not be prorated.
+     * The buyer is billed the prorated amount now.
+     *
+     * @return $this
+     */
+    public function prorateImmediately()
+    {
+        $this->prorationBehavior = 'prorated_immediately';
+
+        return $this;
+    }
+
+    /**
+     * The buyer is billed the full amount now.
      *
      * @return $this
      */
     public function noProrate()
     {
-        $this->prorate = false;
+        $this->prorationBehavior = 'full_immediately';
 
         return $this;
     }
 
     /**
-     * Indicate that the plan change should be prorated.
+     * The buyer is billed the prorated amount on their next renewal.
      *
      * @return $this
      */
-    public function prorate()
+    public function prorateNextPeriod()
     {
-        $this->prorate = true;
+        $this->prorationBehavior = 'prorated_next_billing_period';
 
         return $this;
     }
 
     /**
-     * Set the prorating behavior for the plan change.
+     * The buyer is billed for the full amount on their next renewal.
      *
-     * @param  bool  $prorate
      * @return $this
      */
-    public function setProration($prorate = true)
+    public function noProrateNextPeriod()
     {
-        $this->prorate = $prorate;
+        $this->prorationBehavior = 'full_next_billing_period';
+
+        return $this;
+    }
+
+    /**
+     * The buyer is not billed for the prorated amount or the full amount.
+     *
+     * @return $this
+     */
+    public function doNotBill()
+    {
+        $this->prorationBehavior = 'do_not_bill';
+
+        return $this;
+    }
+
+    /**
+     * Set the prorating behavior.
+     *
+     * @param  string  $prorationBehavior
+     * @return $this
+     */
+    public function setProrationBehavior($prorationBehavior)
+    {
+        $this->prorationBehavior = $prorationBehavior;
 
         return $this;
     }
