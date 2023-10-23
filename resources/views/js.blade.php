@@ -6,10 +6,13 @@ $seller = array_filter([
 ?>
 
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
-<script type="text/javascript">
-    @if (config('cashier.sandbox'))
-        Paddle.Environment.set('sandbox');
-    @endif
 
+@if (config('cashier.sandbox'))
+    <script type="text/javascript">
+        Paddle.Environment.set('sandbox');
+    </script>
+@endif
+
+<script type="text/javascript">
     Paddle.Setup(@json($seller));
 </script>
