@@ -12,7 +12,7 @@ trait Prorates
      *
      * @var bool
      */
-    protected $prorationBehavior = 'prorated_immediately';
+    protected $prorationBehavior = 'prorated_next_billing_period';
 
     /**
      * The buyer is billed the prorated amount now.

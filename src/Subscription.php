@@ -438,9 +438,17 @@ class Subscription extends Model
      */
     public function incrementAndInvoice($count = 1)
     {
-        $this->updateQuantity($this->quantity + $count, [
-            'bill_immediately' => true,
-        ]);
+        if ($this->prorationBehavior === 'do_not_bill') {
+            throw new LogicException('You cannot combine swapAndInvoice and doNotBill.');
+        }
+
+        if ($this->prorationBehavior === 'prorated_next_billing_period') {
+            $this->prorateImmediately();
+        } elseif ($this->prorationBehavior === 'full_next_billing_period') {
+            $this->noProrate();
+        }
+
+        $this->updateQuantity($this->quantity + $count);
 
         return $this;
     }
@@ -550,15 +558,23 @@ class Subscription extends Model
     /**
      * Swap the subscription to a new Paddle plan, and invoice immediately.
      *
-     * @param  int  $plan
+     * @param  string|array  $items
      * @param  array  $options
      * @return $this
      */
-    public function swapAndInvoice($plan, array $options = [])
+    public function swapAndInvoice($items, array $options = [])
     {
-        return $this->swap($plan, array_merge($options, [
-            'bill_immediately' => true,
-        ]));
+        if ($this->prorationBehavior === 'do_not_bill') {
+            throw new LogicException('You cannot combine swapAndInvoice and doNotBill.');
+        }
+
+        if ($this->prorationBehavior === 'prorated_next_billing_period') {
+            $this->prorateImmediately();
+        } elseif ($this->prorationBehavior === 'full_next_billing_period') {
+            $this->noProrate();
+        }
+
+        return $this->swap($items, $options);
     }
 
     /**
