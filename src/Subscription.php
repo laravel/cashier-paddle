@@ -627,6 +627,26 @@ class Subscription extends Model
     }
 
     /**
+     * Get the Paddle payment method update url.
+     *
+     * @return string
+     */
+    public function paymentMethodUpdateUrl()
+    {
+        return Cashier::api('GET', "subscription/{$this->paddle_id}")['data']['management_urls']['update_payment_method'];
+    }
+
+    /**
+     * Redirect the user to the Paddle payment method update url.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirectToUpdatePaymentMethod()
+    {
+        return redirect($this->paymentMethodUpdateUrl());
+    }
+
+    /**
      * Pause the subscription.
      *
      * @return $this

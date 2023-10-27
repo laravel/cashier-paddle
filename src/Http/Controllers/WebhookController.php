@@ -187,7 +187,7 @@ class WebhookController extends Controller
 
         // @todo Paused...
         if (isset($payload['paused_from'])) {
-            $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:s', $payload['paused_from'], 'UTC');
+            $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:s', $data['paused_at'], 'UTC');
         } else {
             $subscription->paused_from = null;
         }
