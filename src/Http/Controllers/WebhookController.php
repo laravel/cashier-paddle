@@ -154,7 +154,7 @@ class WebhookController extends Controller
             'type' => $data['custom_data']['subscription_type'] ?? Subscription::DEFAULT_TYPE,
             'paddle_id' => $data['id'],
             'status' => $data['status'],
-            'trial_ends_at' => null,
+            'trial_ends_at' => null, // @todo
         ]);
 
         foreach ($data['items'] as $item) {
@@ -177,26 +177,15 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionUpdated(array $payload)
     {
-        if (! $subscription = $this->findSubscription($payload['subscription_id'])) {
+        $data = $payload['data'];
+
+        if (! $subscription = $this->findSubscription($data['id'])) {
             return;
         }
 
-        // Plan...
-        if (isset($payload['subscription_plan_id'])) {
-            $subscription->paddle_plan = $payload['subscription_plan_id'];
-        }
+        $subscription->status = $data['status'];
 
-        // Status...
-        if (isset($payload['status'])) {
-            $subscription->status = $payload['status'];
-        }
-
-        // Quantity...
-        if (isset($payload['new_quantity'])) {
-            $subscription->quantity = $payload['new_quantity'];
-        }
-
-        // Paused...
+        // @todo Paused...
         if (isset($payload['paused_from'])) {
             $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:s', $payload['paused_from'], 'UTC');
         } else {
@@ -204,6 +193,23 @@ class WebhookController extends Controller
         }
 
         $subscription->save();
+
+        $prices = [];
+
+        foreach ($data['items'] as $item) {
+            $prices[] = $item['price']['id'];
+
+            $subscription->items()->updateOrCreate([
+                'price_id' => $item['price']['id'],
+            ], [
+                'product_id' => $item['price']['product_id'],
+                'status' => $item['status'],
+                'quantity' => $item['quantity'] ?? 1,
+            ]);
+        }
+
+        // Delete items that aren't attached to the subscription anymore...
+        $subscription->items()->whereNotIn('price_id', $prices)->delete();
 
         SubscriptionUpdated::dispatch($subscription, $payload);
     }
