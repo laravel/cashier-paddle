@@ -89,8 +89,9 @@ class Subscription extends Model
      * @return \Laravel\Paddle\SubscriptionItem
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \InvalidArgumentException
      */
-    protected function firstItemOrFail($price = null)
+    protected function singleItemOrFail($price = null)
     {
         if ($this->items()->count() > 1 && is_null($price)) {
             throw new InvalidArgumentException(
@@ -480,7 +481,7 @@ class Subscription extends Model
      */
     public function incrementQuantity($count = 1, $price = null)
     {
-        $item = $this->firstItemOrFail($price);
+        $item = $this->singleItemOrFail($price);
 
         return $this->updateQuantity($item->quantity + $count, $item);
     }
@@ -494,7 +495,7 @@ class Subscription extends Model
      */
     public function incrementAndInvoice($count = 1, $price = null)
     {
-        $item = $this->firstItemOrFail($price);
+        $item = $this->singleItemOrFail($price);
 
         $this->setProrateAndInvoice('incrementAndInvoice');
 
@@ -510,7 +511,7 @@ class Subscription extends Model
      */
     public function decrementQuantity($count = 1, $price = null)
     {
-        $item = $this->firstItemOrFail($price);
+        $item = $this->singleItemOrFail($price);
 
         return $this->updateQuantity(max(1, $item->quantity - $count));
     }
@@ -530,7 +531,7 @@ class Subscription extends Model
             throw new LogicException('Quantities of zero are not allowed.');
         }
 
-        $itemToUpdate = $price instanceof SubscriptionItem ? $price : $this->firstItemOrFail($price);
+        $itemToUpdate = $price instanceof SubscriptionItem ? $price : $this->singleItemOrFail($price);
 
         $items = $this->items()->get(['quantity', 'price_id'])->pluck(['quantity', 'price_id'])->toArray();
 
