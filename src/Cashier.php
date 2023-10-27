@@ -154,6 +154,33 @@ class Cashier
     }
 
     /**
+     * Normalize the given items to a Paddle accepted format.
+     *
+     * @param  string|array  $items
+     * @return array
+     */
+    public static function normalizeItems($items, string $priceKey = 'price_id'): array
+    {
+        return collect($items)->map(function ($item, $key) use ($priceKey) {
+            if (is_array($item)) {
+                return $item;
+            }
+
+            if (is_string($key)) {
+                return [
+                    $priceKey => $key,
+                    'quantity' => $item,
+                ];
+            }
+
+            return [
+                'price_id' => $item,
+                'quantity' => 1,
+            ];
+        })->values()->all();
+    }
+
+    /**
      * Set the custom currency formatter.
      *
      * @param  callable  $callback

@@ -4,7 +4,6 @@ namespace Laravel\Paddle;
 
 use Carbon\Carbon;
 use DateTimeInterface;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 use Laravel\Paddle\Concerns\Prorates;
@@ -68,6 +67,38 @@ class Subscription extends Model
     public function items()
     {
         return $this->hasMany(Cashier::$subscriptionItemModel);
+    }
+
+    /**
+     * Get the subscription item for the given price.
+     *
+     * @param  string  $price
+     * @return \Laravel\Paddle\SubscriptionItem
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findItemOrFail($price)
+    {
+        return $this->items()->where('price_id', $price)->firstOrFail();
+    }
+
+    /**
+     * Retrieve a specific item by price or the single item on a subscription.
+     *
+     * @param  string|null  $price
+     * @return \Laravel\Paddle\SubscriptionItem
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    protected function firstItemOrFail($price = null)
+    {
+        if ($this->items()->count() > 1 && is_null($price)) {
+            throw new InvalidArgumentException(
+                'Please provide a price when retrieving an item of a subscription with multiple prices.'
+            );
+        }
+
+        return $price ? $this->findItemOrFail($price) : $this->items()->firstOrFail();
     }
 
     /**
@@ -395,98 +426,134 @@ class Subscription extends Model
     }
 
     /**
-     * Perform a "one off" charge on top of the subscription for the given amount.
+     * Bill for one-time charges on top of the subscription.
      *
-     * @param  float  $amount
-     * @param  string  $name
-     * @return array
+     * @param  string|array  $items
+     * @param  bool  $chargeNow
+     * @return $this
      *
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
-    public function charge($amount, $name)
+    public function charge($items, $chargeNow = false)
     {
-        if (strlen($name) > 50) {
-            throw new Exception('Charge name has a maximum length of 50 characters.');
+        if (empty($items = (array) $items)) {
+            throw new InvalidArgumentException('Please provide at least one item when charging one-time.');
         }
 
-        $payload = $this->billable->paddleOptions([
-            'amount' => $amount,
-            'charge_name' => $name,
-        ]);
+        $this->guardAgainstUpdates('charging one-time');
 
-        return Cashier::post("/subscription/{$this->paddle_id}/charge", $payload)['response'];
+        $response = Cashier::api('POST', "subscription/{$this->paddle_id}/charge", [
+            'effective_from' => $chargeNow ? 'immediately' : 'next_billing_period',
+            'items' => Cashier::normalizeItems($items),
+        ])['data'];
+
+        $this->forceFill([
+            'status' => $response['status'],
+        ])->save();
+
+        return $this;
     }
 
     /**
-     * Increment the quantity of the subscription.
+     * Bill for one-time charges on top of the subscription, and invoice immediately.
+     *
+     * @param  string|array  $items
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function chargeAndInvoice($items)
+    {
+        $this->setProrateAndInvoice('chargeAndInvoice');
+
+        return $this->charge($items, true);
+    }
+
+    /**
+     * Increment the quantity of a subscription item.
      *
      * @param  int  $count
+     * @param  string|null  $price
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function incrementQuantity($count = 1)
+    public function incrementQuantity($count = 1, $price = null)
     {
-        $this->updateQuantity($this->quantity + $count);
+        $item = $this->firstItemOrFail($price);
 
-        return $this;
+        return $this->updateQuantity($item->quantity + $count, $item);
     }
 
     /**
      * Increment the quantity of the subscription, and invoice immediately.
      *
      * @param  int  $count
+     * @param  string|null  $price
      * @return $this
      */
-    public function incrementAndInvoice($count = 1)
+    public function incrementAndInvoice($count = 1, $price = null)
     {
-        if ($this->prorationBehavior === 'do_not_bill') {
-            throw new LogicException('You cannot combine swapAndInvoice and doNotBill.');
-        }
+        $item = $this->firstItemOrFail($price);
 
-        if ($this->prorationBehavior === 'prorated_next_billing_period') {
-            $this->prorateImmediately();
-        } elseif ($this->prorationBehavior === 'full_next_billing_period') {
-            $this->noProrate();
-        }
+        $this->setProrateAndInvoice('incrementAndInvoice');
 
-        $this->updateQuantity($this->quantity + $count);
-
-        return $this;
+        return $this->updateQuantity($item->quantity + $count, $item);
     }
 
     /**
-     * Decrement the quantity of the subscription.
+     * Decrement the quantity of a subscription item.
      *
      * @param  int  $count
+     * @param  string|null  $price
      * @return $this
      */
-    public function decrementQuantity($count = 1)
+    public function decrementQuantity($count = 1, $price = null)
     {
-        return $this->updateQuantity(max(1, $this->quantity - $count));
+        $item = $this->firstItemOrFail($price);
+
+        return $this->updateQuantity(max(1, $item->quantity - $count));
     }
 
     /**
      * Update the quantity of the subscription.
      *
      * @param  int  $quantity
-     * @param  array  $options
+     * @param  \Laravel\Paddle\SubscriptionItem|string|null  $price
      * @return $this
      */
-    public function updateQuantity($quantity, array $options = [])
+    public function updateQuantity($quantity, $price = null)
     {
         $this->guardAgainstUpdates('update quantities');
 
         if ($quantity < 1) {
-            throw new LogicException('Paddle does not allow subscriptions to have a quantity of zero.');
+            throw new LogicException('Quantities of zero are not allowed.');
         }
 
-        $this->updatePaddleSubscription(array_merge($options, [
-            'quantity' => $quantity,
-            'prorate' => $this->prorate,
-        ]));
+        $itemToUpdate = $price instanceof SubscriptionItem ? $price : $this->firstItemOrFail($price);
+
+        $items = $this->items()->get(['quantity', 'price_id'])->pluck(['quantity', 'price_id'])->toArray();
+
+        foreach ($items as $key => $item) {
+            if ($item['price_id'] === $itemToUpdate->price_id) {
+                $items[$key]['quantity'] = $quantity;
+            }
+        }
+
+        $response = $this->updatePaddleSubscription([
+            'items' => $items,
+            'proration_billing_mode' => $this->prorationBehavior,
+        ]);
 
         $this->forceFill([
+            'status' => $response['status'],
+        ])->save();
+
+        $itemToUpdate->forceFill([
             'quantity' => $quantity,
         ])->save();
+
+        $this->load('items');
 
         return $this;
     }
@@ -497,6 +564,8 @@ class Subscription extends Model
      * @param  string|array  $items
      * @param  array  $options
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function swap($items, array $options = [])
     {
@@ -506,23 +575,7 @@ class Subscription extends Model
 
         $this->guardAgainstUpdates('swap items');
 
-        $items = collect($items)->map(function ($item, $key) {
-            if (is_array($item)) {
-                return $item;
-            }
-
-            if (is_string($key)) {
-                return [
-                    'price_id' => $key,
-                    'quantity' => $item,
-                ];
-            }
-
-            return [
-                'price_id' => $item,
-                'quantity' => 1,
-            ];
-        })->values()->all();
+        $items = Cashier::normalizeItems($items);
 
         $response = $this->updatePaddleSubscription(array_merge($options, [
             'items' => $items,
@@ -533,24 +586,7 @@ class Subscription extends Model
             'status' => $response['status'],
         ])->save();
 
-        $paddlePrices = [];
-
-        foreach ($response['items'] as $item) {
-            $paddlePrices[] = $item['price']['id'];
-
-            $this->items()->updateOrCreate([
-                'price_id' => $item['price']['id'],
-            ], [
-                'product_id' => $item['price']['product_id'],
-                'status' => $item['status'],
-                'quantity' => $item['quantity'],
-            ]);
-        }
-
-        // Delete items that aren't attached to the subscription anymore...
-        $this->items()->whereNotIn('price_id', $paddlePrices)->delete();
-
-        $this->load('items');
+        $this->syncSubscriptionItems($response['items']);
 
         return $this;
     }
@@ -564,15 +600,7 @@ class Subscription extends Model
      */
     public function swapAndInvoice($items, array $options = [])
     {
-        if ($this->prorationBehavior === 'do_not_bill') {
-            throw new LogicException('You cannot combine swapAndInvoice and doNotBill.');
-        }
-
-        if ($this->prorationBehavior === 'prorated_next_billing_period') {
-            $this->prorateImmediately();
-        } elseif ($this->prorationBehavior === 'full_next_billing_period') {
-            $this->noProrate();
-        }
+        $this->setProrateAndInvoice('swapAndInvoice');
 
         return $this->swap($items, $options);
     }
@@ -731,7 +759,7 @@ class Subscription extends Model
      *
      * @throws \LogicException
      */
-    public function guardAgainstUpdates($action): void
+    protected function guardAgainstUpdates($action): void
     {
         if ($this->onTrial()) {
             throw new LogicException("Cannot $action while on trial.");
@@ -747,6 +775,27 @@ class Subscription extends Model
 
         if ($this->pastDue()) {
             throw new LogicException("Cannot $action for past due subscriptions.");
+        }
+    }
+
+    /**
+     * Dynamically set the proration behavior when invoicing immediately.
+     *
+     * @param  string  $method
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    protected function setProrateAndInvoice($method): void
+    {
+        if ($this->prorationBehavior === 'do_not_bill') {
+            throw new LogicException("You cannot combine {$method} and doNotBill.");
+        }
+
+        if ($this->prorationBehavior === 'prorated_next_billing_period') {
+            $this->prorateImmediately();
+        } elseif ($this->prorationBehavior === 'full_next_billing_period') {
+            $this->noProrate();
         }
     }
 }

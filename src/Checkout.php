@@ -17,23 +17,7 @@ class Checkout
         protected array $items = [],
         protected array $custom = []
     ) {
-        $this->items = collect($items)->map(function ($item, $key) {
-            if (is_array($item)) {
-                return $item;
-            }
-
-            if (is_string($key)) {
-                return [
-                    'priceId' => $key,
-                    'quantity' => $item,
-                ];
-            }
-
-            return [
-                'priceId' => $item,
-                'quantity' => 1,
-            ];
-        })->values()->all();
+        $this->items = Cashier::normalizeItems($items, 'priceId');
     }
 
     /**
