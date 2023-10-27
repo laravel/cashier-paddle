@@ -607,6 +607,26 @@ class Subscription extends Model
     }
 
     /**
+     * Change the billing cycle anchor.
+     *
+     * @param  \DateTimeInterface|int  $date
+     * @return $this
+     */
+    public function anchorBillingCycleOn($date)
+    {
+        if (is_int($date)) {
+            $date = Carbon::createFromTimestamp($date);
+        }
+
+        $this->updatePaddleSubscription([
+            'next_billed_at' => $date->format(DateTimeInterface::RFC3339),
+            'proration_billing_mode' => $this->prorationBehavior,
+        ]);
+
+        return $this;
+    }
+
+    /**
      * Pause the subscription.
      *
      * @return $this
