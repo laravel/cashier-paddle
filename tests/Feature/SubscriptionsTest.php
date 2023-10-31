@@ -184,7 +184,7 @@ class SubscriptionsTest extends FeatureTestCase
             'paddle_plan' => 2323,
             'status' => Subscription::STATUS_ACTIVE,
             'quantity' => 1,
-            'paused_from' => Carbon::tomorrow(),
+            'paused_at' => Carbon::tomorrow(),
         ]);
 
         $this->assertTrue($subscription->valid());

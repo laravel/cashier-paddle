@@ -185,11 +185,10 @@ class WebhookController extends Controller
 
         $subscription->status = $data['status'];
 
-        // @todo Paused...
-        if (isset($payload['paused_from'])) {
-            $subscription->paused_from = Carbon::createFromFormat('Y-m-d H:i:s', $data['paused_at'], 'UTC');
+        if (isset($payload['paused_at'])) {
+            $subscription->paused_at = Carbon::parse($data['paused_at'], 'UTC');
         } else {
-            $subscription->paused_from = null;
+            $subscription->paused_at = null;
         }
 
         $subscription->save();
@@ -238,7 +237,7 @@ class WebhookController extends Controller
             $subscription->status = $payload['status'];
         }
 
-        $subscription->paused_from = null;
+        $subscription->paused_at = null;
 
         $subscription->save();
 

@@ -45,7 +45,7 @@ class Subscription extends Model
      */
     protected $casts = [
         'trial_ends_at' => 'datetime',
-        'paused_from' => 'datetime',
+        'paused_at' => 'datetime',
         'ends_at' => 'datetime',
     ];
 
@@ -172,6 +172,7 @@ class Subscription extends Model
      * Determine if the subscription is active.
      *
      * @return bool
+     * @todo review logic, rely more on status
      */
     public function active()
     {
@@ -284,7 +285,7 @@ class Subscription extends Model
      */
     public function onPausedGracePeriod()
     {
-        return $this->paused_from && $this->paused_from->isFuture();
+        return $this->paused_at && $this->paused_at->isFuture();
     }
 
     /**
@@ -295,7 +296,7 @@ class Subscription extends Model
      */
     public function scopeOnPausedGracePeriod($query)
     {
-        $query->whereNotNull('paused_from')->where('paused_from', '>', Carbon::now());
+        $query->whereNotNull('paused_at')->where('paused_at', '>', Carbon::now());
     }
 
     /**
@@ -306,7 +307,7 @@ class Subscription extends Model
      */
     public function scopeNotOnPausedGracePeriod($query)
     {
-        $query->whereNull('paused_from')->orWhere('paused_from', '<=', Carbon::now());
+        $query->whereNull('paused_at')->orWhere('paused_at', '<=', Carbon::now());
     }
 
     /**
@@ -443,7 +444,7 @@ class Subscription extends Model
 
         $this->guardAgainstUpdates('charging one-time');
 
-        $response = Cashier::api('POST', "subscription/{$this->paddle_id}/charge", [
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/charge", [
             'effective_from' => $chargeNow ? 'immediately' : 'next_billing_period',
             'items' => Cashier::normalizeItems($items),
         ])['data'];
@@ -609,17 +610,13 @@ class Subscription extends Model
     /**
      * Change the billing cycle anchor.
      *
-     * @param  \DateTimeInterface|int  $date
+     * @param  \DateTimeInterface|string|null  $date
      * @return $this
      */
     public function anchorBillingCycleOn($date)
     {
-        if (is_int($date)) {
-            $date = Carbon::createFromTimestamp($date);
-        }
-
         $this->updatePaddleSubscription([
-            'next_billed_at' => $date->format(DateTimeInterface::RFC3339),
+            'next_billed_at' => Carbon::parse($date)->format(DateTimeInterface::RFC3339),
             'proration_billing_mode' => $this->prorationBehavior,
         ]);
 
@@ -633,7 +630,7 @@ class Subscription extends Model
      */
     public function paymentMethodUpdateUrl()
     {
-        return Cashier::api('GET', "subscription/{$this->paddle_id}")['data']['management_urls']['update_payment_method'];
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data']['management_urls']['update_payment_method'];
     }
 
     /**
@@ -649,20 +646,55 @@ class Subscription extends Model
     /**
      * Pause the subscription.
      *
+     * @param  bool  $pauseNow
+     * @param  \DateTimeInterface|string|null  $until
      * @return $this
      */
-    public function pause()
+    public function pause(bool $pauseNow = false, $until = null)
     {
-        $response = $this->updatePaddleSubscription([
-            'pause' => true,
-        ]);
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/pause", [
+            'effective_from' => $pauseNow ? 'immediately' : 'next_billing_period',
+            'resume_at' => $until ? Carbon::parse($until)->format(DateTimeInterface::RFC3339) : null,
+        ])['data'];
 
         $this->forceFill([
             'status' => $response['status'],
-            'paused_from' => Carbon::createFromFormat('Y-m-d H:i:s', $info['paused_from'], 'UTC'),
+            'paused_at' => Carbon::parse($response['paused_at'], 'UTC'),
         ])->save();
 
         return $this;
+    }
+
+    /**
+     * Pause the subscription until a certain date.
+     *
+     * @param  \DateTimeInterface|string  $until
+     * @return $this
+     */
+    public function pauseUntil($until)
+    {
+        return $this->pause(false, $until);
+    }
+
+    /**
+     * Pause the subscription immediately.
+     *
+     * @return $this
+     */
+    public function pauseNow()
+    {
+        return $this->pause(true);
+    }
+
+    /**
+     * Pause the subscription immediately and until a certain date.
+     *
+     * @param  \DateTimeInterface|string  $until
+     * @return $this
+     */
+    public function pauseNowUntil($until)
+    {
+        return $this->pause(true, $until);
     }
 
     /**
@@ -670,16 +702,14 @@ class Subscription extends Model
      *
      * @return $this
      */
-    public function unpause()
+    public function resume()
     {
-        $response = $this->updatePaddleSubscription([
-            'pause' => false,
-        ]);
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/resume")['data'];
 
         $this->forceFill([
             'status' => $response['status'],
             'ends_at' => null,
-            'paused_from' => null,
+            'paused_at' => null,
         ])->save();
 
         return $this;
@@ -748,8 +778,8 @@ class Subscription extends Model
         }
 
         if ($this->onPausedGracePeriod() || $this->paused()) {
-            $endsAt = $this->paused_from->isFuture()
-                ? $this->paused_from
+            $endsAt = $this->paused_at->isFuture()
+                ? $this->paused_at
                 : Carbon::now();
         } else {
             $endsAt = $this->onTrial()

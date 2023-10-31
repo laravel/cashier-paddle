@@ -320,7 +320,7 @@ class WebhooksTest extends FeatureTestCase
             'alert_name' => 'subscription_updated',
             'new_quantity' => 3,
             'status' => Subscription::STATUS_PAUSED,
-            'paused_from' => ($date = now('UTC')->addDays(5))->format('Y-m-d H:i:s'),
+            'paused_at' => ($date = now('UTC')->addDays(5))->format('Y-m-d H:i:s'),
             'subscription_id' => 244,
             'subscription_plan_id' => 1234,
         ])->assertOk();
@@ -334,7 +334,7 @@ class WebhooksTest extends FeatureTestCase
             'paddle_plan' => 1234,
             'status' => Subscription::STATUS_PAUSED,
             'quantity' => 3,
-            'paused_from' => $date,
+            'paused_at' => $date,
         ]);
 
         Cashier::assertSubscriptionUpdated(function (SubscriptionUpdated $event) {

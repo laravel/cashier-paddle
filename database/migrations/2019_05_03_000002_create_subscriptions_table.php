@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('paddle_id')->unique();
             $table->string('status');
             $table->timestamp('trial_ends_at')->nullable();
-            $table->timestamp('paused_from')->nullable();
+            $table->timestamp('paused_at')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();
 
