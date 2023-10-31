@@ -172,6 +172,7 @@ class Subscription extends Model
      * Determine if the subscription is active.
      *
      * @return bool
+     *
      * @todo review logic, rely more on status
      */
     public function active()
