@@ -645,6 +645,26 @@ class Subscription extends Model
     }
 
     /**
+     * Get the Paddle cancel url.
+     *
+     * @return string
+     */
+    public function cancelUrl()
+    {
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data']['management_urls']['cancel'];
+    }
+
+    /**
+     * Redirect the user to the Paddle cancel url.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirectToCancel()
+    {
+        return redirect($this->paymentMethodUpdateUrl());
+    }
+
+    /**
      * Pause the subscription.
      *
      * @param  bool  $pauseNow
