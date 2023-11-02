@@ -165,21 +165,86 @@ class Subscription extends Model
      */
     public function valid()
     {
-        return $this->active() || $this->onTrial() || $this->onPausedGracePeriod() || $this->onGracePeriod();
+        return $this->onTrial() || $this->active() || (! Cashier::$deactivatePastDue && $this->pastDue());
+    }
+
+    /**
+     * Filter query by valid.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeValid($query)
+    {
+        $query->where('status', self::STATUS_TRIALING)
+            ->orWhere('status', self::STATUS_ACTIVE);
+
+        if (! Cashier::$deactivatePastDue) {
+            $query->orWhere('status', self::STATUS_PAST_DUE);
+        }
+    }
+
+    /**
+     * Determine if the subscription is within its trial period.
+     *
+     * @return bool
+     */
+    public function onTrial()
+    {
+        return $this->status === self::STATUS_TRIALING;
+    }
+
+    /**
+     * Filter query by on trial.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeOnTrial($query)
+    {
+        $query->where('status', self::STATUS_TRIALING);
+    }
+
+    /**
+     * Determine if the subscription's trial has expired.
+     *
+     * @return bool
+     */
+    public function hasExpiredTrial()
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isPast();
+    }
+
+    /**
+     * Filter query by expired trial.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeExpiredTrial($query)
+    {
+        $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '<', Carbon::now());
+    }
+
+    /**
+     * Filter query by not on trial.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeNotOnTrial($query)
+    {
+        $query->where('status', '!=', self::STATUS_TRIALING);
     }
 
     /**
      * Determine if the subscription is active.
      *
      * @return bool
-     *
-     * @todo review logic, rely more on status
      */
     public function active()
     {
-        return (is_null($this->ends_at) || $this->onGracePeriod() || $this->onPausedGracePeriod()) &&
-            (! Cashier::$deactivatePastDue || $this->status !== self::STATUS_PAST_DUE) &&
-            $this->status !== self::STATUS_PAUSED;
+        return $this->status === self::STATUS_ACTIVE;
     }
 
     /**
@@ -190,19 +255,7 @@ class Subscription extends Model
      */
     public function scopeActive($query)
     {
-        $query->where(function ($query) {
-            $query->whereNull('ends_at')
-                ->orWhere(function ($query) {
-                    $query->onGracePeriod();
-                })
-                ->orWhere(function ($query) {
-                    $query->onPausedGracePeriod();
-                });
-        })->where('status', '!=', self::STATUS_PAUSED);
-
-        if (Cashier::$deactivatePastDue) {
-            $query->where('status', '!=', self::STATUS_PAST_DUE);
-        }
+        $query->where('status', '=', self::STATUS_ACTIVE);
     }
 
     /**
@@ -224,27 +277,6 @@ class Subscription extends Model
     public function scopePastDue($query)
     {
         $query->where('status', self::STATUS_PAST_DUE);
-    }
-
-    /**
-     * Determine if the subscription is recurring and not on trial.
-     *
-     * @return bool
-     */
-    public function recurring()
-    {
-        return ! $this->onTrial() && ! $this->paused() && ! $this->onPausedGracePeriod() && ! $this->canceled();
-    }
-
-    /**
-     * Filter query by recurring.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeRecurring($query)
-    {
-        $query->notOnTrial()->notCanceled();
     }
 
     /**
@@ -341,59 +373,6 @@ class Subscription extends Model
     public function scopeNotCanceled($query)
     {
         $query->where('status', '!=', self::STATUS_CANCELED);
-    }
-
-    /**
-     * Determine if the subscription is within its trial period.
-     *
-     * @return bool
-     */
-    public function onTrial()
-    {
-        return $this->status === self::STATUS_TRIALING;
-    }
-
-    /**
-     * Filter query by on trial.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeOnTrial($query)
-    {
-        $query->where('status', self::STATUS_TRIALING);
-    }
-
-    /**
-     * Determine if the subscription's trial has expired.
-     *
-     * @return bool
-     */
-    public function hasExpiredTrial()
-    {
-        return $this->trial_ends_at && $this->trial_ends_at->isPast();
-    }
-
-    /**
-     * Filter query by expired trial.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeExpiredTrial($query)
-    {
-        $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '<', Carbon::now());
-    }
-
-    /**
-     * Filter query by not on trial.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeNotOnTrial($query)
-    {
-        $query->where('status', '!=', self::STATUS_TRIALING);
     }
 
     /**
