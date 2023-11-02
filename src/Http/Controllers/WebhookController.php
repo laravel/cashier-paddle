@@ -155,7 +155,9 @@ class WebhookController extends Controller
             'type' => $data['custom_data']['subscription_type'] ?? Subscription::DEFAULT_TYPE,
             'paddle_id' => $data['id'],
             'status' => $data['status'],
-            'trial_ends_at' => null, // @todo
+            'trial_ends_at' => $data['status'] === Subscription::STATUS_TRIALING
+                ? Carbon::parse($data['next_billed_at'], 'UTC')
+                : null,
         ]);
 
         foreach ($data['items'] as $item) {
@@ -185,6 +187,12 @@ class WebhookController extends Controller
         }
 
         $subscription->status = $data['status'];
+
+        if ($data['status'] === Subscription::STATUS_TRIALING) {
+            $subscription->trial_ends_at = Carbon::parse($data['next_billed_at'], 'UTC');
+        } else {
+            $subscription->trial_ends_at = null;
+        }
 
         if (isset($data['paused_at'])) {
             $subscription->paused_at = Carbon::parse($data['paused_at'], 'UTC');

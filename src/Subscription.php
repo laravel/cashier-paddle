@@ -541,6 +541,48 @@ class Subscription extends Model
     }
 
     /**
+     * Extend the trial period of the subscription.
+     *
+     * @param  \DateTimeInterface|string  $until
+     * @return $this
+     */
+    public function extendTrial($until)
+    {
+        $response = $this->updatePaddleSubscription([
+            'next_billed_at' => Carbon::parse($until)->format(DateTimeInterface::RFC3339),
+            'proration_billing_mode' => 'do_not_bill',
+        ]);
+
+        $this->forceFill([
+            'status' => $response['status'],
+            'trial_ends_at' => Carbon::parse($response['next_billed_at'], 'UTC'),
+        ])->save();
+
+        $this->syncSubscriptionItems($response['items']);
+
+        return $this;
+    }
+
+    /**
+     * Force the trial to end immediately and activate the subscription.
+     *
+     * @return $this
+     */
+    public function activate()
+    {
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/activate")['data'];
+
+        $this->forceFill([
+            'status' => $response['status'],
+            'trial_ends_at' => null,
+        ])->save();
+
+        $this->syncSubscriptionItems($response['items']);
+
+        return $this;
+    }
+
+    /**
      * Swap the subscription to new Paddle items.
      *
      * @param  string|array  $items
@@ -662,6 +704,8 @@ class Subscription extends Model
             'paused_at' => Carbon::parse($response['paused_at'], 'UTC'),
         ])->save();
 
+        $this->syncSubscriptionItems($response['items']);
+
         return $this;
     }
 
@@ -711,6 +755,8 @@ class Subscription extends Model
             'ends_at' => null,
             'paused_at' => null,
         ])->save();
+
+        $this->syncSubscriptionItems($response['items']);
 
         return $this;
     }
