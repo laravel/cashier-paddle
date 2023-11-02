@@ -10,6 +10,7 @@ use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Events\PaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
+use Laravel\Paddle\Events\SubscriptionPaused;
 use Laravel\Paddle\Events\SubscriptionPaymentFailed;
 use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionUpdated;
@@ -185,10 +186,16 @@ class WebhookController extends Controller
 
         $subscription->status = $data['status'];
 
-        if (isset($payload['paused_at'])) {
+        if (isset($data['paused_at'])) {
             $subscription->paused_at = Carbon::parse($data['paused_at'], 'UTC');
         } else {
             $subscription->paused_at = null;
+        }
+
+        if (isset($data['canceled_at'])) {
+            $subscription->ends_at = Carbon::parse($data['canceled_at'], 'UTC');
+        } else {
+            $subscription->ends_at = null;
         }
 
         $subscription->save();
@@ -214,6 +221,33 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle subscription paused.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    protected function handleSubscriptionPaused(array $payload)
+    {
+        $data = $payload['data'];
+
+        if (! $subscription = $this->findSubscription($data['id'])) {
+            return;
+        }
+
+        // Status...
+        $subscription->status = $data['status'];
+
+        // Cancellation date...
+        $subscription->paused_at = Carbon::parse($data['paused_at'], 'UTC');
+
+        $subscription->ends_at = null;
+
+        $subscription->save();
+
+        SubscriptionPaused::dispatch($subscription, $payload);
+    }
+
+    /**
      * Handle subscription canceled.
      *
      * @param  array  $payload
@@ -221,21 +255,17 @@ class WebhookController extends Controller
      */
     protected function handleSubscriptionCanceled(array $payload)
     {
-        if (! $subscription = $this->findSubscription($payload['subscription_id'])) {
+        $data = $payload['data'];
+
+        if (! $subscription = $this->findSubscription($data['id'])) {
             return;
         }
 
-        // Cancellation date...
-        if (is_null($subscription->ends_at)) {
-            $subscription->ends_at = $subscription->onTrial()
-                ? $subscription->trial_ends_at
-                : Carbon::createFromFormat('Y-m-d', $payload['cancellation_effective_date'], 'UTC')->startOfDay();
-        }
-
         // Status...
-        if (isset($payload['status'])) {
-            $subscription->status = $payload['status'];
-        }
+        $subscription->status = $data['status'];
+
+        // Cancellation date...
+        $subscription->ends_at = Carbon::parse($data['canceled_at'], 'UTC');
 
         $subscription->paused_at = null;
 

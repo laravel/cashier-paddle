@@ -437,7 +437,7 @@ class Subscription extends Model
      *
      * @throws \InvalidArgumentException
      */
-    public function charge($items, $chargeNow = false)
+    public function charge($items, bool $chargeNow = false)
     {
         if (empty($items = (array) $items)) {
             throw new InvalidArgumentException('Please provide at least one item when charging one-time.');
@@ -770,25 +770,22 @@ class Subscription extends Model
     /**
      * Cancel the subscription at the end of the current billing period.
      *
+     * @param  bool  $cancelNow
      * @return $this
      */
-    public function cancel()
+    public function cancel(bool $cancelNow = false)
     {
-        if ($this->onGracePeriod()) {
-            return $this;
-        }
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/cancel", [
+            'effective_from' => $cancelNow ? 'immediately' : 'next_billing_period',
+        ])['data'];
 
-        if ($this->onPausedGracePeriod() || $this->paused()) {
-            $endsAt = $this->paused_at->isFuture()
-                ? $this->paused_at
-                : Carbon::now();
-        } else {
-            $endsAt = $this->onTrial()
-                ? $this->trial_ends_at
-                : $this->nextPayment()->date();
-        }
+        $this->forceFill([
+            'status' => $response['status'],
+            'ends_at' => Carbon::parse($response['scheduled_change']['effective_at'], 'UTC'),
+            'trial_ends_at' => $cancelNow ? null : $this->trial_ends_at,
+        ])->save();
 
-        return $this->cancelAt($endsAt);
+        return $this;
     }
 
     /**
@@ -798,26 +795,21 @@ class Subscription extends Model
      */
     public function cancelNow()
     {
-        return $this->cancelAt(Carbon::now());
+        return $this->cancel(true);
     }
 
     /**
-     * Cancel the subscription at a specific moment in time.
+     * Stop the subscription from beign canceled at the end of the current billing period.
      *
-     * @param  \DateTimeInterface  $endsAt
      * @return $this
      */
-    public function cancelAt(DateTimeInterface $endsAt)
+    public function stopCancel()
     {
-        $payload = $this->billable->paddleOptions([
-            'subscription_id' => $this->paddle_id,
-        ]);
-
-        Cashier::post('/subscription/users_cancel', $payload);
+        $response = $this->updatePaddleSubscription(['scheduled_change' => null]);
 
         $this->forceFill([
-            'status' => self::STATUS_CANCELED,
-            'ends_at' => $endsAt,
+            'status' => $response['status'],
+            'ends_at' => null,
         ])->save();
 
         return $this;
