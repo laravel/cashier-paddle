@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Paddle\Concerns\ManagesAmounts;
 use Money\Currency;
 
-class Receipt extends Model
+class Transaction extends Model
 {
     use ManagesAmounts;
 

@@ -13,6 +13,9 @@ use Laravel\Paddle\Events\SubscriptionPaymentFailed;
 use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionUpdated;
 
+/**
+ * @todo
+ */
 class CashierFake
 {
     /**

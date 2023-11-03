@@ -7,13 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use Laravel\Paddle\Cashier;
-use Laravel\Paddle\Events\PaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionPaused;
-use Laravel\Paddle\Events\SubscriptionPaymentFailed;
-use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionUpdated;
+use Laravel\Paddle\Events\TransactionCompleted;
 use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
@@ -60,77 +58,34 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle one-time payment succeeded.
+     * Handle transaction completed.
      *
      * @param  array  $payload
      * @return void
      */
-    protected function handlePaymentSucceeded(array $payload)
+    protected function handleTransactionCompleted(array $payload)
     {
-        if ($this->receiptExists($payload['order_id'])) {
+        $data = $payload['data'];
+
+        if ($this->transactionExists($data['id'])) {
             return;
         }
 
-        $customer = $this->findOrCreateCustomer($payload['passthrough']);
-
-        $receipt = $customer->receipts()->create([
-            'checkout_id' => $payload['checkout_id'],
-            'order_id' => $payload['order_id'],
-            'amount' => $payload['sale_gross'],
-            'tax' => $payload['payment_tax'],
-            'currency' => $payload['currency'],
-            'quantity' => (int) $payload['quantity'],
-            'receipt_url' => $payload['receipt_url'],
-            'paid_at' => Carbon::createFromFormat('Y-m-d H:i:s', $payload['event_time'], 'UTC'),
-        ]);
-
-        PaymentSucceeded::dispatch($customer, $receipt, $payload);
-    }
-
-    /**
-     * Handle subscription payment succeeded.
-     *
-     * @param  array  $payload
-     * @return void
-     */
-    protected function handleSubscriptionPaymentSucceeded(array $payload)
-    {
-        if ($this->receiptExists($payload['order_id'])) {
+        if (! $billable = $this->findBillable($data['customer_id'])) {
             return;
         }
 
-        if ($subscription = $this->findSubscription($payload['subscription_id'])) {
-            $billable = $subscription->billable;
-        } else {
-            $billable = $this->findOrCreateCustomer($payload['passthrough']);
-        }
-
-        $receipt = $billable->receipts()->create([
-            'paddle_subscription_id' => $payload['subscription_id'],
-            'checkout_id' => $payload['checkout_id'],
-            'order_id' => $payload['order_id'],
-            'amount' => $payload['sale_gross'],
-            'tax' => $payload['payment_tax'],
-            'currency' => $payload['currency'],
-            'quantity' => (int) $payload['quantity'],
-            'receipt_url' => $payload['receipt_url'],
-            'paid_at' => Carbon::createFromFormat('Y-m-d H:i:s', $payload['event_time'], 'UTC'),
+        $transaction = $billable->transactions()->create([
+            'transaction_id' => $data['id'],
+            'paddle_subscription_id' => $data['subscription_id'],
+            'status' => $data['status'],
+            'total' => $data['details']['totals']['total'],
+            'tax' => $data['details']['totals']['tax'],
+            'currency' => $data['details']['totals']['currency_code'],
+            'billed_at' => Carbon::parse($data['billed_at'], 'UTC'),
         ]);
 
-        SubscriptionPaymentSucceeded::dispatch($billable, $receipt, $payload);
-    }
-
-    /**
-     * Handle subscription payment failed.
-     *
-     * @param  array  $payload
-     * @return void
-     */
-    protected function handleSubscriptionPaymentFailed(array $payload)
-    {
-        if ($subscription = $this->findSubscription($payload['subscription_id'])) {
-            SubscriptionPaymentFailed::dispatch($subscription->billable, $payload);
-        }
+        TransactionCompleted::dispatch($billable, $transaction, $payload);
     }
 
     /**
@@ -147,11 +102,11 @@ class WebhookController extends Controller
             return;
         }
 
-        if (! $customer = $this->findCustomer($data['customer_id'])) {
+        if (! $billable = $this->findBillable($data['customer_id'])) {
             return;
         }
 
-        $subscription = $customer->subscriptions()->create([
+        $subscription = $billable->subscriptions()->create([
             'type' => $data['custom_data']['subscription_type'] ?? Subscription::DEFAULT_TYPE,
             'paddle_id' => $data['id'],
             'status' => $data['status'],
@@ -169,7 +124,7 @@ class WebhookController extends Controller
             ]);
         }
 
-        SubscriptionCreated::dispatch($customer, $subscription, $payload);
+        SubscriptionCreated::dispatch($billable, $subscription, $payload);
     }
 
     /**
@@ -292,7 +247,7 @@ class WebhookController extends Controller
      * @param  string  $paddleId
      * @return \Laravel\Paddle\Billable|null
      */
-    protected function findCustomer($customerId)
+    protected function findBillable($customerId)
     {
         return Cashier::findBillable($customerId);
     }
@@ -320,13 +275,13 @@ class WebhookController extends Controller
     }
 
     /**
-     * Determine if a receipt with a given Order ID already exists.
+     * Determine if a transaction with a given ID already exists.
      *
-     * @param  string  $orderId
+     * @param  string  $transactionId
      * @return bool
      */
-    protected function receiptExists(string $orderId)
+    protected function transactionExists(string $transactionId)
     {
-        return Cashier::$receiptModel::where('order_id', $orderId)->count() > 0;
+        return Cashier::$transactionModel::where('transaction_id', $transactionId)->count() > 0;
     }
 }

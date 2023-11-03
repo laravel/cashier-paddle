@@ -65,11 +65,11 @@ class Cashier
     public static $subscriptionItemModel = SubscriptionItem::class;
 
     /**
-     * The receipt model class name.
+     * The transaction model class name.
      *
      * @var string
      */
-    public static $receiptModel = Receipt::class;
+    public static $transactionModel = Transaction::class;
 
     /**
      * Get prices for a set of product ids.
@@ -291,14 +291,14 @@ class Cashier
     }
 
     /**
-     * Set the receipt model class name.
+     * Set the transaction model class name.
      *
-     * @param  string  $receiptModel
+     * @param  string  $transactionModel
      * @return void
      */
-    public static function useReceiptModel($receiptModel)
+    public static function useTransactionModel($transactionModel)
     {
-        static::$receiptModel = $receiptModel;
+        static::$transactionModel = $transactionModel;
     }
 
     /**

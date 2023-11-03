@@ -103,13 +103,13 @@ class Subscription extends Model
     }
 
     /**
-     * Get all of the receipts for the Billable model.
+     * Get all of the transactions for the Billable model.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function receipts()
+    public function transactions()
     {
-        return $this->hasMany(Cashier::$receiptModel, 'paddle_subscription_id', 'paddle_id')->orderByDesc('created_at');
+        return $this->hasMany(Cashier::$transactionModel, 'paddle_subscription_id', 'paddle_id')->orderByDesc('created_at');
     }
 
     /**

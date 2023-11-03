@@ -5,8 +5,9 @@ namespace Laravel\Paddle\Events;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Laravel\Paddle\Transaction;
 
-class SubscriptionPaymentFailed
+class TransactionCompleted
 {
     use Dispatchable, SerializesModels;
 
@@ -16,6 +17,13 @@ class SubscriptionPaymentFailed
      * @var \Illuminate\Database\Eloquent\Model
      */
     public $billable;
+
+    /**
+     * The transaction instance.
+     *
+     * @var \Laravel\Paddle\Transaction
+     */
+    public $transaction;
 
     /**
      * The webhook payload.
@@ -28,12 +36,14 @@ class SubscriptionPaymentFailed
      * Create a new event instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $billable
+     * @param  \Laravel\Paddle\Transaction  $receipt
      * @param  array  $payload
      * @return void
      */
-    public function __construct(Model $billable, array $payload)
+    public function __construct(Model $billable, Transaction $transaction, array $payload)
     {
         $this->billable = $billable;
+        $this->transaction = $transaction;
         $this->payload = $payload;
     }
 }

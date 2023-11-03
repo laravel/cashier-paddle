@@ -11,19 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('receipts', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('billable_id');
             $table->string('billable_type');
-            $table->unsignedBigInteger('paddle_subscription_id')->nullable()->index();
-            $table->string('checkout_id');
-            $table->string('order_id')->unique();
-            $table->string('amount');
+            $table->string('paddle_subscription_id')->nullable()->index();
+            $table->string('transaction_id')->unique();
+            $table->string('status');
+            $table->string('total');
             $table->string('tax');
             $table->string('currency', 3);
-            $table->integer('quantity');
-            $table->string('receipt_url')->unique();
-            $table->timestamp('paid_at');
+            $table->timestamp('billed_at');
             $table->timestamps();
 
             $table->index(['billable_id', 'billable_type']);
@@ -35,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('receipts');
+        Schema::dropIfExists('transactions');
     }
 };
