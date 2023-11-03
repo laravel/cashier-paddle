@@ -196,12 +196,16 @@ class WebhookController extends Controller
 
         if (isset($data['paused_at'])) {
             $subscription->paused_at = Carbon::parse($data['paused_at'], 'UTC');
+        } elseif (isset($data['scheduled_change']) && $data['scheduled_change']['action'] === 'pause') {
+            $subscription->paused_at = Carbon::parse($data['scheduled_change']['effective_at'], 'UTC');
         } else {
             $subscription->paused_at = null;
         }
 
         if (isset($data['canceled_at'])) {
             $subscription->ends_at = Carbon::parse($data['canceled_at'], 'UTC');
+        } elseif (isset($data['scheduled_change']) && $data['scheduled_change']['action'] === 'cancel') {
+            $subscription->ends_at = Carbon::parse($data['scheduled_change']['effective_at'], 'UTC');
         } else {
             $subscription->ends_at = null;
         }
