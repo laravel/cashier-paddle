@@ -422,8 +422,6 @@ class Subscription extends Model
             throw new InvalidArgumentException('Please provide at least one item when charging one-time.');
         }
 
-        $this->guardAgainstUpdates('charging one-time');
-
         $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/charge", [
             'effective_from' => $chargeNow ? 'immediately' : 'next_billing_period',
             'items' => Cashier::normalizeItems($items),
@@ -506,8 +504,6 @@ class Subscription extends Model
      */
     public function updateQuantity($quantity, $price = null)
     {
-        $this->guardAgainstUpdates('update quantities');
-
         if ($quantity < 1) {
             throw new LogicException('Quantities of zero are not allowed.');
         }
@@ -596,8 +592,6 @@ class Subscription extends Model
         if (empty($items = (array) $items)) {
             throw new InvalidArgumentException('Please provide at least one item when swapping.');
         }
-
-        $this->guardAgainstUpdates('swap items');
 
         $items = Cashier::normalizeItems($items);
 
@@ -777,6 +771,8 @@ class Subscription extends Model
      *
      * @param  float  $amount
      * @return \Laravel\Paddle\ModifierBuilder
+     *
+     * @todo
      */
     public function newModifier($amount)
     {
@@ -787,6 +783,8 @@ class Subscription extends Model
      * Get all of the modifiers for this subscription.
      *
      * @return \Illuminate\Support\Collection
+     *
+     * @todo
      */
     public function modifiers()
     {
@@ -804,6 +802,8 @@ class Subscription extends Model
      *
      * @param  int  $id
      * @return \Laravel\Paddle\Modifier|null
+     *
+     * @todo
      */
     public function modifier($id)
     {
@@ -824,9 +824,11 @@ class Subscription extends Model
             'effective_from' => $cancelNow ? 'immediately' : 'next_billing_period',
         ])['data'];
 
+        $endsAt = $cancelNow ? $response['canceled_at'] : $response['scheduled_change']['effective_at'];
+
         $this->forceFill([
             'status' => $response['status'],
-            'ends_at' => Carbon::parse($response['scheduled_change']['effective_at'], 'UTC'),
+            'ends_at' => Carbon::parse($endsAt, 'UTC'),
             'trial_ends_at' => $cancelNow ? null : $this->trial_ends_at,
         ])->save();
 
@@ -858,33 +860,6 @@ class Subscription extends Model
         ])->save();
 
         return $this;
-    }
-
-    /**
-     * Perform a guard check to prevent change for a specific action.
-     *
-     * @param  string  $action
-     * @return void
-     *
-     * @throws \LogicException
-     */
-    protected function guardAgainstUpdates($action): void
-    {
-        if ($this->onTrial()) {
-            throw new LogicException("Cannot $action while on trial.");
-        }
-
-        if ($this->paused() || $this->onPausedGracePeriod()) {
-            throw new LogicException("Cannot $action for paused subscriptions.");
-        }
-
-        if ($this->canceled() || $this->onGracePeriod()) {
-            throw new LogicException("Cannot $action for canceled subscriptions.");
-        }
-
-        if ($this->pastDue()) {
-            throw new LogicException("Cannot $action for past due subscriptions.");
-        }
     }
 
     /**
