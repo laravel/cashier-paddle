@@ -38,9 +38,6 @@ class CashierFake
             $endpoints = array_merge([
                 'payment/refund',
                 'subscription/users',
-                'subscription/modifiers',
-                'subscription/modifiers/create',
-                'subscription/modifiers/delete',
             ], $endpoints)
             as $endpoint => $response
         ) {
