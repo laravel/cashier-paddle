@@ -5,6 +5,7 @@ namespace Laravel\Paddle\Concerns;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Checkout;
 use Laravel\Paddle\Subscription;
+use LogicException;
 
 trait PerformsCharges
 {
@@ -41,24 +42,54 @@ trait PerformsCharges
     }
 
     /**
-     * Refund a given order.
+     * Refund a given transaction and its specific items.
      *
-     * @param  int  $orderId
-     * @param  float|null  $amount
+     * @param  \Laravel\Paddle\Transaction|string  $transactionId
      * @param  string  $reason
-     * @return int
+     * @param  array|string  $items
+     * @return array
      */
-    public function refund($orderId, $amount = null, $reason = '')
+    public function refund($transactionId, string $reason, $items)
     {
-        $payload = array_merge([
-            'order_id' => $orderId,
-            'reason' => $reason,
-        ], $this->paddleOptions());
+        $transaction = $transactionId instanceof Transaction
+            ? $transactionId
+            : $this->transactions()->findOrFail($transactionId);
 
-        if ($amount) {
-            $payload['amount'] = $amount;
+        if ($transaction->status !== 'billed' && $transaction->status !== 'completed') {
+            throw new LogicException('Only "billed" or "completed" transactions can be refunded.');
         }
 
-        return Cashier::post('/payment/refund', $payload)['response']['refund_request_id'];
+        return Cashier::api('POST', 'adjustments', [
+            'action' => 'refund',
+            'transaction_id' => $transaction->paddle_id,
+            'reason' => $reason,
+            'items' => $items,
+        ])['data'];
+    }
+
+    /**
+     * Credit a given transaction and its specific items.
+     *
+     * @param  \Laravel\Paddle\Transaction|string  $transactionId
+     * @param  string  $reason
+     * @param  array|string  $items
+     * @return array
+     */
+    public function credit($transactionId, string $reason, $items)
+    {
+        $transaction = $transactionId instanceof Transaction
+            ? $transactionId
+            : $this->transactions()->findOrFail($transactionId);
+
+        if ($transaction->status !== 'billed') {
+            throw new LogicException('Only "billed" transactions can be credited.');
+        }
+
+        return Cashier::api('POST', 'adjustments', [
+            'action' => 'credit',
+            'transaction_id' => $transaction->paddle_id,
+            'reason' => $reason,
+            'items' => $items,
+        ])['data'];
     }
 }
