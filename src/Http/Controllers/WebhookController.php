@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use Laravel\Paddle\Cashier;
+use Laravel\Paddle\Events\CustomerUpdated;
 use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionPaused;
@@ -56,6 +57,28 @@ class WebhookController extends Controller
         }
 
         return new Response();
+    }
+
+    /**
+     * Handle customer updated.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    protected function handleCustomerUpdated(array $payload)
+    {
+        $data = $payload['data'];
+
+        if (! $customer = $this->findCustomer($data['id'])) {
+            return;
+        }
+
+        $customer = $customer->update([
+            'name' => $data['name'],
+            'email' => $data['email'],
+        ]);
+
+        CustomerUpdated::dispatch($billable, $customer, $payload);
     }
 
     /**
@@ -277,6 +300,17 @@ class WebhookController extends Controller
     protected function findBillable($customerId)
     {
         return Cashier::findBillable($customerId);
+    }
+
+    /**
+     * Find the first customer matching a Paddle customer ID.
+     *
+     * @param  string  $customerId
+     * @return \Laravel\Paddle\Customer|null
+     */
+    protected function findCustomer(string $customerId)
+    {
+        return Cashier::$customerModel::firstWhere('paddle_id', $customerId);
     }
 
     /**
