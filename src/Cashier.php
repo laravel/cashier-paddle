@@ -72,22 +72,20 @@ class Cashier
     public static $transactionModel = Transaction::class;
 
     /**
-     * Get prices for a set of product ids.
+     * Preview prices for a set items.
      *
-     * @param  array|int  $products
+     * @param  array|string  $items
      * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
-    public static function productPrices($products, array $options = [])
+    public static function previewPrices($items, array $options = [])
     {
-        $payload = array_merge($options, [
-            'product_ids' => implode(',', (array) $products),
-        ]);
+        $items = static::api('GET', 'pricing-preview', array_merge([
+            'items' => static::normalizeItems($items),
+        ], $options))['data']['details']['line_items'];
 
-        $response = static::get('/prices', $payload)['response'];
-
-        return collect($response['products'])->map(function (array $product) use ($response) {
-            return new ProductPrice($response['customer_country'], $product);
+        return collect($items)->map(function (array $item) {
+            return new PricePreview($item);
         });
     }
 

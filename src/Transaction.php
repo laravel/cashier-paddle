@@ -3,13 +3,13 @@
 namespace Laravel\Paddle;
 
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Paddle\Concerns\ManagesAmounts;
+use Laravel\Paddle\Concerns\FortmatsAmounts;
 use LogicException;
 use Money\Currency;
 
 class Transaction extends Model
 {
-    use ManagesAmounts;
+    use FortmatsAmounts;
 
     /**
      * The attributes that are not mass assignable.

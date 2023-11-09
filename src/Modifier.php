@@ -2,12 +2,12 @@
 
 namespace Laravel\Paddle;
 
-use Laravel\Paddle\Concerns\ManagesAmounts;
+use Laravel\Paddle\Concerns\FortmatsAmounts;
 use Money\Currency;
 
 class Modifier
 {
-    use ManagesAmounts;
+    use FortmatsAmounts;
 
     /**
      * The Subscription model the modifier belongs to.

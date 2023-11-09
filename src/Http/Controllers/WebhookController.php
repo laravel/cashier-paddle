@@ -78,7 +78,6 @@ class WebhookController extends Controller
         $transaction = $billable->transactions()->create([
             'paddle_id' => $data['id'],
             'paddle_subscription_id' => $data['subscription_id'],
-            'invoice_id' => $data['invoice_id'],
             'invoice_number' => $data['invoice_number'],
             'status' => $data['status'],
             'total' => $data['details']['totals']['total'],

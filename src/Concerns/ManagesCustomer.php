@@ -64,19 +64,23 @@ trait ManagesCustomer
     }
 
     /**
-     * Get prices for a set of product ids for this billable model.
+     * Get price previews for a set of price ids for this billable model.
      *
-     * @param  array|int  $products
+     * @param  array|string  $items
      * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
-    public function productPrices($products, array $options = [])
+    public function previewPrices($items, array $options = [])
     {
         $options = array_merge([
             'customer_country' => $this->paddleCountry(),
         ], $options);
 
-        return Cashier::productPrices($products, $options);
+        if ($customer = $this->customer) {
+            $options['customer'] = $customer->paddle_id;
+        }
+
+        return Cashier::previewPrices($items, $options);
     }
 
     /**
