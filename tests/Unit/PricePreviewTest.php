@@ -26,7 +26,7 @@ class PricePreviewTest extends TestCase
             'billing_cycle' => [
                 'interval' => 'monthly',
                 'frequency' => 1,
-            ]
+            ],
         ],
     ];
 
