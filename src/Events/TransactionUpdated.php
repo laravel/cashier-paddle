@@ -7,7 +7,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Laravel\Paddle\Transaction;
 
-class TransactionCompleted
+class TransactionUpdated
 {
     use Dispatchable, SerializesModels;
 

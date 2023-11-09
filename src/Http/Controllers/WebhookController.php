@@ -12,6 +12,7 @@ use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionPaused;
 use Laravel\Paddle\Events\SubscriptionUpdated;
 use Laravel\Paddle\Events\TransactionCompleted;
+use Laravel\Paddle\Events\TransactionUpdated;
 use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
@@ -87,6 +88,31 @@ class WebhookController extends Controller
         ]);
 
         TransactionCompleted::dispatch($billable, $transaction, $payload);
+    }
+
+    /**
+     * Handle transaction updated.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    protected function handleTransactionUpdated(array $payload)
+    {
+        $data = $payload['data'];
+
+        if (! $transaction = $this->findTransaction($data['id'])) {
+            return;
+        }
+
+        $transaction = $transaction->update([
+            'invoice_number' => $data['invoice_number'],
+            'status' => $data['status'],
+            'total' => $data['details']['totals']['total'],
+            'tax' => $data['details']['totals']['tax'],
+            'billed_at' => Carbon::parse($data['billed_at'], 'UTC'),
+        ]);
+
+        TransactionUpdated::dispatch($billable, $transaction, $payload);
     }
 
     /**
@@ -273,6 +299,17 @@ class WebhookController extends Controller
     protected function subscriptionExists(string $subscriptionId)
     {
         return Cashier::$subscriptionModel::where('paddle_id', $subscriptionId)->exists();
+    }
+
+    /**
+     * Find the first transaction matching a Paddle transaction ID.
+     *
+     * @param  string  $subscriptionId
+     * @return \Laravel\Paddle\Transaction|null
+     */
+    protected function findTransaction(string $transactionId)
+    {
+        return Cashier::$transactionModel::firstWhere('paddle_id', $transactionId);
     }
 
     /**

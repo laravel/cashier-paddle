@@ -28,7 +28,7 @@ class Transaction extends Model
     ];
 
     /**
-     * Get the billable model related to the receipt.
+     * Get the billable model related to the transaction.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
@@ -38,7 +38,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the subscription related to the receipt.
+     * Get the subscription related to the transaction.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -68,7 +68,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the used currency for the receipt.
+     * Get the used currency for the transaction.
      *
      * @return \Money\Currency
      */
