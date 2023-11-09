@@ -4,6 +4,7 @@ namespace Laravel\Paddle;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Paddle\Concerns\ManagesAmounts;
+use LogicException;
 use Money\Currency;
 
 class Transaction extends Model
@@ -23,8 +24,7 @@ class Transaction extends Model
      * @var array
      */
     protected $casts = [
-        'quantity' => 'integer',
-        'paid_at' => 'datetime',
+        'billed_at' => 'datetime',
     ];
 
     /**
@@ -52,9 +52,9 @@ class Transaction extends Model
      *
      * @return string
      */
-    public function amount()
+    public function total()
     {
-        return $this->formatDecimalAmount($this->amount);
+        return $this->formatAmount($this->total);
     }
 
     /**
@@ -64,7 +64,7 @@ class Transaction extends Model
      */
     public function tax()
     {
-        return $this->formatDecimalAmount($this->tax);
+        return $this->formatAmount($this->tax);
     }
 
     /**
@@ -75,5 +75,29 @@ class Transaction extends Model
     public function currency(): Currency
     {
         return new Currency($this->currency);
+    }
+
+    /**
+     * Get the URL to download the invoice.
+     *
+     * @return string|null
+     */
+    public function invoicePdf()
+    {
+        return Cashier::api('GET', "transactions/{$this->paddle_id}/invoice")['data']['url'] ?? null;
+    }
+
+    /**
+     * Get the URL to download the invoice.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirectToInvoicePdf()
+    {
+        if ($url = $this->invoicePdf()) {
+            return redirect($url);
+        }
+
+        throw new LogicException('The transaction does not have an invoice PDF.');
     }
 }

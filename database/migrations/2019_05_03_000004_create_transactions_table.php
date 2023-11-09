@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('billable_id');
             $table->string('billable_type');
+            $table->string('paddle_id')->unique();
             $table->string('paddle_subscription_id')->nullable()->index();
-            $table->string('transaction_id')->unique();
+            $table->string('invoice_id')->nullable();
+            $table->string('invoice_number')->nullable();
             $table->string('status');
             $table->string('total');
             $table->string('tax');

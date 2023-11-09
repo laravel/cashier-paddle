@@ -76,8 +76,10 @@ class WebhookController extends Controller
         }
 
         $transaction = $billable->transactions()->create([
-            'transaction_id' => $data['id'],
+            'paddle_id' => $data['id'],
             'paddle_subscription_id' => $data['subscription_id'],
+            'invoice_id' => $data['invoice_id'],
+            'invoice_number' => $data['invoice_number'],
             'status' => $data['status'],
             'total' => $data['details']['totals']['total'],
             'tax' => $data['details']['totals']['tax'],
@@ -282,6 +284,6 @@ class WebhookController extends Controller
      */
     protected function transactionExists(string $transactionId)
     {
-        return Cashier::$transactionModel::where('transaction_id', $transactionId)->count() > 0;
+        return Cashier::$transactionModel::where('paddle_id', $transactionId)->count() > 0;
     }
 }
