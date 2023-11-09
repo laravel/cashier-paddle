@@ -20,5 +20,6 @@
     </testsuites>
     <php>
         <env name="DB_CONNECTION" value="testing"/>
+        <env name="PADDLE_AUTH_CODE" value="fake"/>
     </php>
 </phpunit>

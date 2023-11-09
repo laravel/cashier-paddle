@@ -74,7 +74,7 @@ class Price
      */
     public function currency(): Currency
     {
-        return new Currency($this->item['unit_price']['currency_code']);
+        return new Currency($this->price['unit_price']['currency_code']);
     }
 
     /**

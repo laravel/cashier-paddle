@@ -15,9 +15,9 @@ return [
 
     'seller_id' => env('PADDLE_SELLER_ID'),
 
-    'retain_key' => env('PADDLE_RETAIN_KEY'),
-
     'auth_code' => env('PADDLE_AUTH_CODE'),
+
+    'retain_key' => env('PADDLE_RETAIN_KEY'),
 
     'webhook_secret' => env('PADDLE_WEBHOOK_SECRET'),
 

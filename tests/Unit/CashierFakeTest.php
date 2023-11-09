@@ -14,7 +14,10 @@ class CashierFakeTest extends FeatureTestCase
     public function test_a_user_may_overwrite_its_api_responses()
     {
         Cashier::fake([
-            $endpoint = 'payment/refund' => $expected = ['success' => true, 'response' => ['faked' => 'response']],
+            $endpoint = 'products' => $expected = [
+                'data' => [['id' => 1, 'name' => 'Test Product']],
+                'meta' => ['request_id' => 'xxx'],
+            ],
         ]);
 
         $this->assertEquals(
@@ -26,12 +29,12 @@ class CashierFakeTest extends FeatureTestCase
     public function test_a_user_may_use_the_response_method_to_mock_an_endpoint()
     {
         Cashier::fake()->response(
-            $endpoint = 'payment/refund',
-            $expected = ['custom' => 'response']
+            $endpoint = 'products',
+            $expected = [['id' => 1, 'name' => 'Test Product']],
         );
 
         $this->assertEquals(
-            ['success' => true, 'response' => $expected],
+            ['data' => $expected],
             Http::get(CashierFake::getFormattedApiUrl($endpoint))->json()
         );
     }

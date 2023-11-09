@@ -81,8 +81,8 @@ trait PerformsCharges
             ? $transactionId
             : $this->transactions()->findOrFail($transactionId);
 
-        if ($transaction->status !== 'billed') {
-            throw new LogicException('Only "billed" transactions can be credited.');
+        if ($transaction->status !== 'billed' && $transaction->status !== 'completed') {
+            throw new LogicException('Only "billed" or "completed" transactions can be credited.');
         }
 
         return Cashier::api('POST', 'adjustments', [

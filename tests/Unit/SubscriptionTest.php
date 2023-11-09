@@ -12,12 +12,14 @@ class SubscriptionTest extends TestCase
     {
         $subscription = new Subscription();
         $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->status = 'trialing';
         $subscription->trial_ends_at = now()->addDay();
 
         $this->assertTrue($subscription->onTrial());
 
         $subscription = new Subscription();
         $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->status = 'active';
         $subscription->trial_ends_at = now()->subDay();
 
         $this->assertFalse($subscription->onTrial());
@@ -27,12 +29,14 @@ class SubscriptionTest extends TestCase
     {
         $subscription = new Subscription();
         $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->status = 'active';
         $subscription->trial_ends_at = now()->subDay();
 
         $this->assertTrue($subscription->hasExpiredTrial());
 
         $subscription = new Subscription();
         $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->status = 'trialing';
         $subscription->trial_ends_at = now()->addDay();
 
         $this->assertFalse($subscription->hasExpiredTrial());
