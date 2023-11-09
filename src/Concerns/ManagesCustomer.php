@@ -72,10 +72,6 @@ trait ManagesCustomer
      */
     public function previewPrices($items, array $options = [])
     {
-        $options = array_merge([
-            'customer_country' => $this->paddleCountry(),
-        ], $options);
-
         if ($customer = $this->customer) {
             $options['customer'] = $customer->paddle_id;
         }
