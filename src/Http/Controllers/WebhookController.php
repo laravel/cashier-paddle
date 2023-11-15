@@ -78,7 +78,7 @@ class WebhookController extends Controller
             'email' => $data['email'],
         ]);
 
-        CustomerUpdated::dispatch($billable, $customer, $payload);
+        CustomerUpdated::dispatch($customer->billable, $customer, $payload);
     }
 
     /**
@@ -106,7 +106,7 @@ class WebhookController extends Controller
             'status' => $data['status'],
             'total' => $data['details']['totals']['total'],
             'tax' => $data['details']['totals']['tax'],
-            'currency' => $data['details']['totals']['currency_code'],
+            'currency' => $data['currency_code'],
             'billed_at' => Carbon::parse($data['billed_at'], 'UTC'),
         ]);
 
@@ -135,7 +135,7 @@ class WebhookController extends Controller
             'billed_at' => Carbon::parse($data['billed_at'], 'UTC'),
         ]);
 
-        TransactionUpdated::dispatch($billable, $transaction, $payload);
+        TransactionUpdated::dispatch($transaction->billable, $transaction, $payload);
     }
 
     /**

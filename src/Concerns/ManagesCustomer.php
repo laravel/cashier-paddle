@@ -48,7 +48,10 @@ trait ManagesCustomer
         $customer->paddle_id = $response['id'];
         $customer->name = $response['name'];
         $customer->email = $response['email'];
+        $customer->trial_ends_at = $options['trial_ends_at'] ?? null;
         $customer->save();
+
+        $this->refresh();
 
         return $customer;
     }
@@ -73,7 +76,7 @@ trait ManagesCustomer
     public function previewPrices($items, array $options = [])
     {
         if ($customer = $this->customer) {
-            $options['customer'] = $customer->paddle_id;
+            $options['customer_id'] = $customer->paddle_id;
         }
 
         return Cashier::previewPrices($items, $options);

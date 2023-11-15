@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Str;
+use Laravel\Paddle\Cashier;
 use Laravel\Paddle\CashierServiceProvider;
 use Orchestra\Testbench\TestCase;
 use Tests\Fixtures\User;
@@ -20,6 +22,16 @@ abstract class FeatureTestCase extends TestCase
     protected function createBillable($description = 'taylor', array $options = []): User
     {
         $user = $this->createUser($description);
+
+        Cashier::fake([
+            'customers' => [
+                'data' => [
+                    'id' => 'cus_123456789',
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+            ],
+        ]);
 
         $user->createAsCustomer($options);
 

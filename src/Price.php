@@ -2,13 +2,10 @@
 
 namespace Laravel\Paddle;
 
-use Laravel\Paddle\Concerns\FortmatsAmounts;
 use Money\Currency;
 
 class Price
 {
-    use FortmatsAmounts;
-
     /**
      * The price attributes.
      *
@@ -34,7 +31,7 @@ class Price
      */
     public function amount()
     {
-        return $this->formatAmount($this->rawAmount());
+        return Cashier::formatAmount($this->rawAmount(), $this->currency());
     }
 
     /**

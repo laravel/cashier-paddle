@@ -128,7 +128,7 @@ class CashierFake
      */
     public static function getFormattedApiUrl(string $path): string
     {
-        return Cashier::apiUrl().'/'.Str::start($path, '/');
+        return Cashier::apiUrl().Str::start($path, '/');
     }
 
     /**

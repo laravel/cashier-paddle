@@ -21,5 +21,6 @@
     <php>
         <env name="DB_CONNECTION" value="testing"/>
         <env name="PADDLE_AUTH_CODE" value="fake"/>
+        <env name="PADDLE_SANDBOX" value="true"/>
     </php>
 </phpunit>

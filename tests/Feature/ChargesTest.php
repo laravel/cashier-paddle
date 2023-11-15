@@ -3,37 +3,34 @@
 namespace Tests\Feature;
 
 use Laravel\Paddle\Cashier;
+use Laravel\Paddle\Transaction;
 
 class ChargesTest extends FeatureTestCase
 {
-    public function test_customers_can_retrieve_a_product_charge_link()
-    {
-        if (! getenv('PADDLE_TEST_PRODUCT')) {
-            $this->markTestSkipped('Test product not configured.');
-        }
-
-        $billable = $this->createBillable();
-
-        $url = $billable->chargeProduct(getenv('PADDLE_TEST_PRODUCT'));
-
-        $this->assertStringContainsString('/checkout/custom/', $url);
-    }
-
     public function test_payments_can_be_refunded()
     {
         Cashier::fake([
-            'payment/refund' => [
-                'success' => true,
-                'response' => [
-                    'refund_request_id' => 12345,
+            'adjustments' => [
+                'data' => [
+                    'id' => 12345,
                 ],
             ],
         ]);
 
         $billable = $this->createBillable();
+        $transaction = new Transaction([
+            'id' => 12345,
+            'paddle_id' => 'txn_123456789',
+            'billable_id' => $billable->id,
+            'billable_type' => get_class($billable),
+            'status' => 'completed',
+        ]);
 
-        $response = $billable->refund(4321, 12.50, 'Incorrect order');
+        $response = $billable->refund($transaction, 'Incorrect order', [
+            'itemid_' => 'txnitm_123456789',
+            'type' => 'full',
+        ]);
 
-        $this->assertSame(12345, $response);
+        $this->assertSame(12345, $response['id']);
     }
 }

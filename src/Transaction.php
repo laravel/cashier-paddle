@@ -3,14 +3,11 @@
 namespace Laravel\Paddle;
 
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Paddle\Concerns\FortmatsAmounts;
 use LogicException;
 use Money\Currency;
 
 class Transaction extends Model
 {
-    use FortmatsAmounts;
-
     /**
      * The attributes that are not mass assignable.
      *
@@ -54,7 +51,7 @@ class Transaction extends Model
      */
     public function total()
     {
-        return $this->formatAmount($this->total);
+        return Cashier::formatAmount($this->total, $this->currency());
     }
 
     /**
@@ -64,7 +61,7 @@ class Transaction extends Model
      */
     public function tax()
     {
-        return $this->formatAmount($this->tax);
+        return Cashier::formatAmount($this->tax, $this->currency());
     }
 
     /**

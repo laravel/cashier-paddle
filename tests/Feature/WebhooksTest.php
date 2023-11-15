@@ -3,171 +3,59 @@
 namespace Tests\Feature;
 
 use Laravel\Paddle\Cashier;
-use Laravel\Paddle\Events\PaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
-use Laravel\Paddle\Events\SubscriptionPaymentSucceeded;
 use Laravel\Paddle\Events\SubscriptionUpdated;
+use Laravel\Paddle\Events\TransactionCompleted;
 use Laravel\Paddle\Subscription;
 
 class WebhooksTest extends FeatureTestCase
 {
-    public function test_gracefully_handle_webhook_without_alert_name()
-    {
-        $this->postJson('paddle/webhook', [
-            'event_time' => now()->addDay()->format('Y-m-d H:i:s'),
-        ])->assertOk();
-    }
-
-    public function test_it_can_handle_a_payment_succeeded_event()
-    {
-        Cashier::fake();
-
-        $user = $this->createUser();
-
-        $this->postJson('paddle/webhook', [
-            'alert_name' => 'payment_succeeded',
-            'event_time' => $paidAt = now()->addDay()->format('Y-m-d H:i:s'),
-            'checkout_id' => 12345,
-            'order_id' => 'foo',
-            'email' => $user->paddleEmail(),
-            'sale_gross' => '12.55',
-            'payment_tax' => '4.34',
-            'currency' => 'EUR',
-            'quantity' => 1,
-            'receipt_url' => 'https://example.com/receipt.pdf',
-            'passthrough' => json_encode([
-                'billable_id' => $user->id,
-                'billable_type' => $user->getMorphClass(),
-            ]),
-        ])->assertOk();
-
-        $this->assertDatabaseHas('customers', [
-            'billable_id' => $user->id,
-            'billable_type' => $user->getMorphClass(),
-        ]);
-
-        $this->assertDatabaseHas('receipts', [
-            'billable_id' => $user->id,
-            'billable_type' => $user->getMorphClass(),
-            'paddle_subscription_id' => null,
-            'paid_at' => $paidAt,
-            'checkout_id' => 12345,
-            'order_id' => 'foo',
-            'amount' => '12.55',
-            'tax' => '4.34',
-            'currency' => 'EUR',
-            'quantity' => 1,
-            'receipt_url' => 'https://example.com/receipt.pdf',
-        ]);
-
-        Cashier::assertPaymentSucceeded(function (PaymentSucceeded $event) use ($user) {
-            return $event->billable->id === $user->id && $event->receipt->order_id === 'foo';
-        });
-    }
-
-    public function test_it_can_handle_a_payment_succeeded_event_when_billable_already_exists()
-    {
-        Cashier::fake();
-
-        $user = $this->createBillable('taylor', [
-            'trial_ends_at' => now('UTC')->addDays(5),
-        ]);
-
-        $this->postJson('paddle/webhook', [
-            'alert_name' => 'payment_succeeded',
-            'event_time' => $paidAt = now()->addDay()->format('Y-m-d H:i:s'),
-            'checkout_id' => 12345,
-            'order_id' => 'foo',
-            'email' => $user->paddleEmail(),
-            'sale_gross' => '12.55',
-            'payment_tax' => '4.34',
-            'currency' => 'EUR',
-            'quantity' => 1,
-            'receipt_url' => 'https://example.com/receipt.pdf',
-            'passthrough' => json_encode([
-                'billable_id' => $user->id,
-                'billable_type' => $user->getMorphClass(),
-            ]),
-        ])->assertOk();
-
-        $this->assertDatabaseHas('customers', [
-            'billable_id' => $user->id,
-            'billable_type' => $user->getMorphClass(),
-        ]);
-
-        $this->assertDatabaseHas('receipts', [
-            'billable_id' => $user->id,
-            'billable_type' => $user->getMorphClass(),
-            'paddle_subscription_id' => null,
-            'paid_at' => $paidAt,
-            'checkout_id' => 12345,
-            'order_id' => 'foo',
-            'amount' => '12.55',
-            'tax' => '4.34',
-            'currency' => 'EUR',
-            'quantity' => 1,
-            'receipt_url' => 'https://example.com/receipt.pdf',
-        ]);
-
-        Cashier::assertPaymentSucceeded(function (PaymentSucceeded $event) use ($user) {
-            return $event->billable->id === $user->id && $event->receipt->order_id === 'foo';
-        });
-    }
-
-    public function test_it_can_handle_a_subscription_payment_succeeded_event()
+    public function test_it_can_handle_a_transaction_completed_event()
     {
         Cashier::fake();
 
         $user = $this->createBillable();
 
-        $subscription = $user->subscriptions()->create([
-            'name' => 'main',
-            'paddle_id' => 244,
-            'paddle_plan' => 2323,
-            'status' => Subscription::STATUS_ACTIVE,
-            'quantity' => 1,
-        ]);
-
         $this->postJson('paddle/webhook', [
-            'alert_name' => 'subscription_payment_succeeded',
-            'event_time' => $paidAt = now()->addDay()->format('Y-m-d H:i:s'),
-            'subscription_id' => $subscription->paddle_id,
-            'checkout_id' => 12345,
-            'order_id' => 'foo',
-            'email' => $user->paddleEmail(),
-            'sale_gross' => '12.55',
-            'payment_tax' => '4.34',
-            'currency' => 'EUR',
-            'quantity' => 1,
-            'receipt_url' => 'https://example.com/receipt.pdf',
-            'passthrough' => json_encode([
-                'billable_id' => $user->id,
-                'billable_type' => $user->getMorphClass(),
-            ]),
+            'event_type' => 'transaction_completed',
+            'occurred_at' => $billedAt = now()->addDay()->format('Y-m-d H:i:s'),
+            'data' => [
+                'id' => 'txn_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => 'completed',
+                'subscription_id' => 'sub_123456789',
+                'invoice_number' => 'foo',
+                'currency_code' => 'EUR',
+                'details' => [
+                    'totals' => [
+                        'total' => '1255',
+                        'tax' => '434',
+                    ],
+                ],
+                'billed_at' => $billedAt,
+            ],
         ])->assertOk();
 
         $this->assertDatabaseHas('customers', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
+            'paddle_id' => 'cus_123456789',
         ]);
 
-        $this->assertDatabaseHas('receipts', [
+        $this->assertDatabaseHas('transactions', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
-            'paddle_subscription_id' => $subscription->paddle_id,
-            'paid_at' => $paidAt,
-            'checkout_id' => 12345,
-            'order_id' => 'foo',
-            'amount' => '12.55',
-            'tax' => '4.34',
+            'paddle_subscription_id' => 'sub_123456789',
+            'status' => 'completed',
+            'total' => '1255',
+            'tax' => '434',
             'currency' => 'EUR',
-            'quantity' => 1,
-            'receipt_url' => 'https://example.com/receipt.pdf',
+            'billed_at' => $billedAt,
         ]);
 
-        Cashier::assertSubscriptionPaymentSucceeded(function (SubscriptionPaymentSucceeded $event) use ($user) {
-            return $event->billable->id === $user->id && $event->receipt->order_id === 'foo';
+        Cashier::assertTransactionCompleted(function (TransactionCompleted $event) use ($user) {
+            return $event->billable->id === $user->id && $event->transaction->paddle_id === 'txn_123456789';
         });
     }
 
@@ -175,86 +63,55 @@ class WebhooksTest extends FeatureTestCase
     {
         Cashier::fake();
 
-        $user = $this->createUser();
+        $user = $this->createBillable();
 
         $this->postJson('paddle/webhook', [
-            'alert_name' => 'subscription_created',
-            'user_id' => 'foo',
-            'email' => $user->paddleEmail(),
-            'passthrough' => json_encode([
-                'billable_id' => $user->id,
-                'billable_type' => $user->getMorphClass(),
-                'subscription_type' => 'main',
-            ]),
-            'quantity' => 1,
-            'status' => Subscription::STATUS_ACTIVE,
-            'subscription_id' => 'bar',
-            'subscription_plan_id' => 1234,
+            'event_type' => 'subscription_created',
+            'data' => [
+                'id' => 'sub_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => Subscription::STATUS_ACTIVE,
+                'custom_data' => [
+                    'subscription_type' => 'main',
+                ],
+                'items' => [
+                    [
+                        'price' => [
+                            'id' => 'pri_123456789',
+                            'product_id' => 'pro_123456789',
+                        ],
+                        'status' => 'active',
+                        'quantity' => 1,
+                    ],
+                ],
+            ],
         ])->assertOk();
 
         $this->assertDatabaseHas('customers', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
+            'paddle_id' => 'cus_123456789',
         ]);
 
         $this->assertDatabaseHas('subscriptions', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
-            'name' => 'main',
-            'paddle_id' => 'bar',
-            'paddle_plan' => 1234,
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
             'status' => Subscription::STATUS_ACTIVE,
-            'quantity' => 1,
             'trial_ends_at' => null,
         ]);
 
-        Cashier::assertSubscriptionCreated(function (SubscriptionCreated $event) use ($user) {
-            return $event->billable->id === $user->id && $event->subscription->paddle_plan === 1234;
-        });
-    }
-
-    public function test_it_can_handle_a_subscription_created_event_if_billable_already_exists()
-    {
-        Cashier::fake();
-
-        $user = $this->createUser();
-        $user->customer()->create([
-            'trial_ends_at' => now('UTC')->addDays(5),
-        ]);
-
-        $this->postJson('paddle/webhook', [
-            'alert_name' => 'subscription_created',
-            'user_id' => 'foo',
-            'email' => $user->paddleEmail(),
-            'passthrough' => json_encode([
-                'billable_id' => $user->id,
-                'billable_type' => $user->getMorphClass(),
-                'subscription_type' => 'main',
-            ]),
+        $this->assertDatabaseHas('subscription_items', [
+            'subscription_id' => 1,
+            'product_id' => 'pro_123456789',
+            'price_id' => 'pri_123456789',
+            'status' => 'active',
             'quantity' => 1,
-            'status' => Subscription::STATUS_ACTIVE,
-            'subscription_id' => 'bar',
-            'subscription_plan_id' => 1234,
-        ])->assertOk();
-
-        $this->assertDatabaseHas('customers', [
-            'billable_id' => $user->id,
-            'billable_type' => $user->getMorphClass(),
-        ]);
-
-        $this->assertDatabaseHas('subscriptions', [
-            'billable_id' => $user->id,
-            'billable_type' => $user->getMorphClass(),
-            'name' => 'main',
-            'paddle_id' => 'bar',
-            'paddle_plan' => 1234,
-            'status' => Subscription::STATUS_ACTIVE,
-            'quantity' => 1,
-            'trial_ends_at' => null,
         ]);
 
         Cashier::assertSubscriptionCreated(function (SubscriptionCreated $event) use ($user) {
-            return $event->billable->id === $user->id && $event->subscription->paddle_plan === 1234;
+            return $event->billable->id === $user->id && $event->subscription->paddle_id === 'sub_123456789';
         });
     }
 
@@ -262,43 +119,57 @@ class WebhooksTest extends FeatureTestCase
     {
         Cashier::fake();
 
-        $user = $this->createUser();
+        $user = $this->createBillable();
 
         for ($i = 0; $i < 2; $i++) {
             $this->postJson('paddle/webhook', [
-                'alert_name' => 'subscription_created',
-                'user_id' => 'foo',
-                'email' => $user->paddleEmail(),
-                'passthrough' => json_encode([
-                    'billable_id' => $user->id,
-                    'billable_type' => $user->getMorphClass(),
-                    'subscription_type' => 'main',
-                ]),
-                'quantity' => 1,
-                'status' => Subscription::STATUS_ACTIVE,
-                'subscription_id' => 'bar',
-                'subscription_plan_id' => 1234,
+                'event_type' => 'subscription_created',
+                'data' => [
+                    'id' => 'sub_123456789',
+                    'customer_id' => 'cus_123456789',
+                    'status' => Subscription::STATUS_ACTIVE,
+                    'custom_data' => [
+                        'subscription_type' => 'main',
+                    ],
+                    'items' => [
+                        [
+                            'price' => [
+                                'id' => 'pri_123456789',
+                                'product_id' => 'pro_123456789',
+                            ],
+                            'status' => 'active',
+                            'quantity' => 1,
+                        ],
+                    ],
+                ],
             ])->assertOk();
         }
 
         $this->assertDatabaseHas('customers', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
+            'paddle_id' => 'cus_123456789',
         ]);
 
         $this->assertDatabaseHas('subscriptions', [
             'billable_id' => $user->id,
             'billable_type' => $user->getMorphClass(),
-            'name' => 'main',
-            'paddle_id' => 'bar',
-            'paddle_plan' => 1234,
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
             'status' => Subscription::STATUS_ACTIVE,
-            'quantity' => 1,
             'trial_ends_at' => null,
         ]);
 
+        $this->assertDatabaseHas('subscription_items', [
+            'subscription_id' => 1,
+            'product_id' => 'pro_123456789',
+            'price_id' => 'pri_123456789',
+            'status' => 'active',
+            'quantity' => 1,
+        ]);
+
         Cashier::assertSubscriptionCreated(function (SubscriptionCreated $event) use ($user) {
-            return $event->billable->id === $user->id && $event->subscription->paddle_plan === 1234;
+            return $event->billable->id === $user->id && $event->subscription->paddle_id === 'sub_123456789';
         });
     }
 
@@ -306,39 +177,64 @@ class WebhooksTest extends FeatureTestCase
     {
         Cashier::fake();
 
-        $billable = $this->createBillable('taylor');
+        $user = $this->createBillable('taylor');
 
-        $subscription = $billable->subscriptions()->create([
-            'name' => 'main',
-            'paddle_id' => 244,
-            'paddle_plan' => 2323,
+        $subscription = $user->subscriptions()->create([
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
             'status' => Subscription::STATUS_ACTIVE,
+        ]);
+
+        $subscription->items()->create([
+            'subscription_id' => 1,
+            'product_id' => 'pro_123456789',
+            'price_id' => 'pri_123456789',
+            'status' => 'active',
             'quantity' => 1,
         ]);
 
         $this->postJson('paddle/webhook', [
-            'alert_name' => 'subscription_updated',
-            'new_quantity' => 3,
-            'status' => Subscription::STATUS_PAUSED,
-            'paused_at' => ($date = now('UTC')->addDays(5))->format('Y-m-d H:i:s'),
-            'subscription_id' => 244,
-            'subscription_plan_id' => 1234,
+            'event_type' => 'subscription_updated',
+            'data' => [
+                'id' => 'sub_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => Subscription::STATUS_PAUSED,
+                'paused_at' => ($date = now('UTC')->addDays(5))->format('Y-m-d H:i:s'),
+                'custom_data' => [
+                    'subscription_type' => 'main',
+                ],
+                'items' => [
+                    [
+                        'price' => [
+                            'id' => 'pri_123456789',
+                            'product_id' => 'pro_123456789',
+                        ],
+                        'status' => 'active',
+                        'quantity' => 3,
+                    ],
+                ],
+            ],
         ])->assertOk();
 
         $this->assertDatabaseHas('subscriptions', [
-            'id' => $subscription->id,
-            'billable_id' => $billable->id,
-            'billable_type' => $billable->getMorphClass(),
-            'name' => 'main',
-            'paddle_id' => 244,
-            'paddle_plan' => 1234,
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
             'status' => Subscription::STATUS_PAUSED,
-            'quantity' => 3,
             'paused_at' => $date,
         ]);
 
+        $this->assertDatabaseHas('subscription_items', [
+            'subscription_id' => 1,
+            'product_id' => 'pro_123456789',
+            'price_id' => 'pri_123456789',
+            'status' => 'active',
+            'quantity' => 3,
+        ]);
+
         Cashier::assertSubscriptionUpdated(function (SubscriptionUpdated $event) {
-            return $event->subscription->paddle_plan === 1234;
+            return $event->subscription->paddle_id === 'sub_123456789';
         });
     }
 
@@ -346,70 +242,91 @@ class WebhooksTest extends FeatureTestCase
     {
         Cashier::fake();
 
-        $billable = $this->createBillable('taylor');
+        $user = $this->createBillable('taylor');
 
-        $subscription = $billable->subscriptions()->create([
-            'name' => 'main',
-            'paddle_id' => 244,
-            'paddle_plan' => 2323,
+        $subscription = $user->subscriptions()->create([
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
             'status' => Subscription::STATUS_ACTIVE,
+        ]);
+
+        $subscription->items()->create([
+            'subscription_id' => 1,
+            'product_id' => 'pro_123456789',
+            'price_id' => 'pri_123456789',
+            'status' => 'active',
             'quantity' => 1,
         ]);
 
         $this->postJson('paddle/webhook', [
-            'alert_name' => 'subscription_canceled',
-            'status' => Subscription::STATUS_CANCELED,
-            'cancellation_effective_date' => ($date = now('UTC')->addDays(5)->startOfDay())->format('Y-m-d'),
-            'subscription_id' => 244,
+            'event_type' => 'subscription_canceled',
+            'data' => [
+                'id' => 'sub_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => Subscription::STATUS_CANCELED,
+                'canceled_at' => ($date = now('UTC')->addDays(5))->format('Y-m-d H:i:s'),
+                'custom_data' => [
+                    'subscription_type' => 'main',
+                ],
+                'items' => [
+                    [
+                        'price' => [
+                            'id' => 'pri_123456789',
+                            'product_id' => 'pro_123456789',
+                        ],
+                        'status' => 'active',
+                        'quantity' => 1,
+                    ],
+                ],
+            ],
         ])->assertOk();
 
         $this->assertDatabaseHas('subscriptions', [
-            'id' => $subscription->id,
-            'billable_id' => $billable->id,
-            'billable_type' => $billable->getMorphClass(),
-            'name' => 'main',
-            'paddle_id' => 244,
-            'paddle_plan' => 2323,
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
             'status' => Subscription::STATUS_CANCELED,
             'ends_at' => $date,
         ]);
 
         Cashier::assertSubscriptionCanceled(function (SubscriptionCanceled $event) {
-            return $event->subscription->paddle_plan === 2323;
+            return $event->subscription->paddle_id === 'sub_123456789';
         });
     }
 
-    public function test_manual_created_paylinks_without_passthrough_values_are_ignored()
+    public function test_subscription_created_event_without_a_matching_customer_is_ignored()
     {
         Cashier::fake();
 
-        $user = $this->createUser();
-
         $this->postJson('paddle/webhook', [
-            'alert_name' => 'subscription_created',
-            'user_id' => 'foo',
-            'email' => $user->paddleEmail(),
-            'passthrough' => '',
-            'quantity' => 1,
-            'status' => Subscription::STATUS_ACTIVE,
-            'subscription_id' => 'bar',
-            'subscription_plan_id' => 1234,
+            'event_type' => 'subscription_created',
+            'data' => [
+                'id' => 'sub_123456789',
+                'customer_id' => 'cus_987654321',
+                'status' => Subscription::STATUS_ACTIVE,
+                'custom_data' => [
+                    'subscription_type' => 'main',
+                ],
+                'items' => [
+                    [
+                        'price' => [
+                            'id' => 'pri_123456789',
+                            'product_id' => 'pro_123456789',
+                        ],
+                        'status' => 'active',
+                        'quantity' => 1,
+                    ],
+                ],
+            ],
         ])->assertOk();
 
         $this->assertDatabaseMissing('customers', [
-            'billable_id' => $user->id,
-            'billable_type' => $user->getMorphClass(),
+            'paddle_id' => 'cus_987654321',
         ]);
 
         $this->assertDatabaseMissing('subscriptions', [
-            'billable_id' => $user->id,
-            'billable_type' => $user->getMorphClass(),
-            'name' => 'main',
-            'paddle_id' => 'bar',
-            'paddle_plan' => 1234,
-            'status' => Subscription::STATUS_ACTIVE,
-            'quantity' => 1,
-            'trial_ends_at' => null,
+            'paddle_id' => 'sub_123456789',
         ]);
 
         Cashier::assertSubscriptionNotCreated();

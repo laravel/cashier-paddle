@@ -1,12 +1,13 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\CashierFake;
 use Laravel\Paddle\Exceptions\PaddleException;
+use Laravel\Paddle\Transaction;
 use Tests\Feature\FeatureTestCase;
 
 class CashierFakeTest extends FeatureTestCase
@@ -42,9 +43,18 @@ class CashierFakeTest extends FeatureTestCase
     public function test_a_user_may_use_the_error_method_to_error_an_endpoint()
     {
         $this->expectException(PaddleException::class);
-        Cashier::fake()->error('payment/refund');
+        Cashier::fake()->error('adjustments');
+        $billable = $this->createBillable();
 
-        $this->createBillable()->refund(4321, 12.50, 'Incorrect order');
+        $transaction = new Transaction([
+            'id' => 12345,
+            'paddle_id' => 'txn_123456789',
+            'billable_id' => $billable->id,
+            'billable_type' => get_class($billable),
+            'status' => 'completed',
+        ]);
+
+        $billable->refund($transaction, 12.50, 'Incorrect order');
     }
 
     public function test_a_user_may_append_additional_events_to_mock()

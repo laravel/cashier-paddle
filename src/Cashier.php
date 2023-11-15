@@ -80,7 +80,7 @@ class Cashier
      */
     public static function previewPrices($items, array $options = [])
     {
-        $items = static::api('GET', 'pricing-preview', array_merge([
+        $items = static::api('POST', 'pricing-preview', array_merge([
             'items' => static::normalizeItems($items),
         ], $options))['data']['details']['line_items'];
 
@@ -154,7 +154,8 @@ class Cashier
     /**
      * Normalize the given items to a Paddle accepted format.
      *
-     * @param  string|array  $items
+     * @param  array|string  $items
+     * @param  string  $priceKey
      * @return array
      */
     public static function normalizeItems($items, string $priceKey = 'price_id'): array
@@ -172,7 +173,7 @@ class Cashier
             }
 
             return [
-                'price_id' => $item,
+                $priceKey => $item,
                 'quantity' => 1,
             ];
         })->values()->all();
@@ -315,9 +316,9 @@ class Cashier
      * @param  callable|int|null  $callback
      * @return void
      */
-    public static function assertPaymentSucceeded($callback = null)
+    public static function assertCustomerUpdated($callback = null)
     {
-        CashierFake::assertPaymentSucceeded($callback);
+        CashierFake::assertCustomerUpdated($callback);
     }
 
     /**
@@ -326,9 +327,9 @@ class Cashier
      * @param  callable|int|null  $callback
      * @return void
      */
-    public static function assertSubscriptionPaymentSucceeded($callback = null)
+    public static function assertTransactionCompleted($callback = null)
     {
-        CashierFake::assertSubscriptionPaymentSucceeded($callback);
+        CashierFake::assertTransactionCompleted($callback);
     }
 
     /**
@@ -337,9 +338,9 @@ class Cashier
      * @param  callable|int|null  $callback
      * @return void
      */
-    public static function assertSubscriptionPaymentFailed($callback = null)
+    public static function assertTransactionUpdated($callback = null)
     {
-        CashierFake::assertSubscriptionPaymentFailed($callback);
+        CashierFake::assertTransactionUpdated($callback);
     }
 
     /**
@@ -384,5 +385,16 @@ class Cashier
     public static function assertSubscriptionCanceled($callback = null)
     {
         CashierFake::assertSubscriptionCanceled($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name.
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionPaused($callback = null)
+    {
+        CashierFake::assertSubscriptionPaused($callback);
     }
 }
