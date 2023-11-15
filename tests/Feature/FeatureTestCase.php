@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Support\Str;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\CashierServiceProvider;
 use Orchestra\Testbench\TestCase;

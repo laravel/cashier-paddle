@@ -8,7 +8,6 @@ use Laravel\Paddle\Cashier;
 use Laravel\Paddle\CashierFake;
 use Laravel\Paddle\Exceptions\PaddleException;
 use Laravel\Paddle\Transaction;
-use Tests\Feature\FeatureTestCase;
 
 class CashierFakeTest extends FeatureTestCase
 {

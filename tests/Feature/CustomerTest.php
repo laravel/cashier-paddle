@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests\Feature;
+
 use Laravel\Paddle\Cashier;
 
 class CustomerTest extends FeatureTestCase
