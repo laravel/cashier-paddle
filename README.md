@@ -21,6 +21,9 @@ Laravel Cashier Paddle provides an expressive, fluent interface to [Paddle's](ht
 
 ## Official Documentation
 
+> **Warning**  
+> These docs and Cashier Paddle v1 are for Paddle Classic. If you want to use Paddle's new Paddle Billing product, switch over to [the latest Cashier Paddle version](https://github.com/laravel/cashier-paddle).
+
 While working with Cashier we recommend you also review Paddle's [user guides](https://developer.paddle.com/guides) and [API documentation](https://developer.paddle.com/api-reference).
 
 ### Upgrading Cashier
