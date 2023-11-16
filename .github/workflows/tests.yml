@@ -40,7 +40,7 @@ jobs:
            composer update --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit
         env:
           PADDLE_SELLER_ID: ${{ secrets.PADDLE_SELLER_ID }}
           PADDLE_AUTH_CODE: ${{ secrets.PADDLE_AUTH_CODE }}
