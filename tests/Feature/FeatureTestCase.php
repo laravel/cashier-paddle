@@ -2,21 +2,20 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\CashierServiceProvider;
+<<<<<<< HEAD
+=======
+use Orchestra\Testbench\Attributes\WithMigration;
+>>>>>>> 038d62f ([2.x] Use PHPUnit 10)
+use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Orchestra\Testbench\TestCase;
 use Tests\Fixtures\User;
 
 abstract class FeatureTestCase extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->loadLaravelMigrations();
-
-        $this->artisan('migrate')->run();
-    }
+    use DatabaseMigrations, WithLaravelMigrations;
 
     protected function createBillable($description = 'taylor', array $options = []): User
     {
