@@ -5,10 +5,6 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\CashierServiceProvider;
-<<<<<<< HEAD
-=======
-use Orchestra\Testbench\Attributes\WithMigration;
->>>>>>> 038d62f ([2.x] Use PHPUnit 10)
 use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Orchestra\Testbench\TestCase;
 use Tests\Fixtures\User;
