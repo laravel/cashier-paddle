@@ -11,6 +11,6 @@ Copy the default file using `cp phpunit.xml.dist phpunit.xml` and add the follow
     <env name="PADDLE_SANDBOX" value="true"/>
     <env name="PADDLE_SELLER_ID" value="Your Paddle seller ID"/>
     <env name="PADDLE_AUTH_CODE" value="Your Paddle auth code"/>
-    <env name="PADDLE_TEST_PRODUCT" value="Identifier for a random one off product"/>
+    <env name="PADDLE_TEST_PRICE" value="Identifier for a random one off price"/>
 
 After setting these variables, you can run your tests by executing the `vendor/bin/phpunit` command.
