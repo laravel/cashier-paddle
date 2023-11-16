@@ -58,6 +58,26 @@ class PricePreview implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Get the subtotal amount.
+     *
+     * @return string
+     */
+    public function subtotal()
+    {
+        return $this->item['formatted_totals']['subtotal'];
+    }
+
+    /**
+     * Get the raw subtotal amount.
+     *
+     * @return string
+     */
+    public function rawSubtotal()
+    {
+        return $this->item['totals']['subtotal'];
+    }
+
+    /**
      * Get the tax amount.
      *
      * @return string
