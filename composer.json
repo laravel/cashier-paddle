@@ -37,7 +37,7 @@
     "require-dev": {
         "mockery/mockery": "^1.5.1",
         "orchestra/testbench": "^8.14",
-        "phpstan/phpstan": "1.10.41",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^10.1"
     },
     "suggest": {
