@@ -1,9 +1,15 @@
 <?php
 
 namespace Laravel\Paddle;
+use LogicException;
 
 class Checkout
 {
+    /**
+     * Custom data for the checkout.
+     */
+    protected array $custom = [];
+
     /**
      * The return url which will be triggered upon starting the subscription.
      */
@@ -12,28 +18,40 @@ class Checkout
     /**
      * Create a new checkout instance.
      */
-    public function __construct(
-        protected ?Customer $customer,
-        protected array $items = [],
-        protected array $custom = []
-    ) {
+    public function __construct(protected ?Customer $customer, protected array $items = [])
+    {
         $this->items = Cashier::normalizeItems($items, 'priceId');
     }
 
     /**
      * Create a new checkout instance for a guest.
      */
-    public static function guest(array $items = [], array $custom = []): self
+    public static function guest(array $items = []): self
     {
-        return new static(null, $items, $custom);
+        return new static(null, $items);
     }
 
     /**
      * Create a new checkout instance for an existing customer.
      */
-    public static function customer(Customer $customer, array $items = [], array $custom = []): self
+    public static function customer(Customer $customer, array $items = []): self
     {
-        return new static($customer, $items, $custom);
+        return new static($customer, $items);
+    }
+
+    /**
+     * Add custom data to a checkout.
+     */
+    public function customData(array $custom): self
+    {
+        // Make sure subscription_type doesn't gets unset.
+        if (isset($this->custom['subscription_type']) && isset($custom['subscription_type'])) {
+            throw new LogicException('The subscription_type can not be overwritten.');
+        }
+
+        $this->custom = $custom;
+
+        return $this;
     }
 
     /**

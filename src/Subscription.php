@@ -259,6 +259,27 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription is active and not on any grace period.
+     *
+     * @return bool
+     */
+    public function recurring()
+    {
+        return $this->active() && ! $this->onPausedGracePeriod() && ! $this->onGracePeriod();
+    }
+
+    /**
+     * Filter query by recurring.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeRecurring($query)
+    {
+        $query->active()->notOnPausedGracePeriod()->notOnGracePeriod;
+    }
+
+    /**
      * Determine if the subscription is past due.
      *
      * @return bool
