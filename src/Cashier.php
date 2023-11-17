@@ -92,12 +92,12 @@ class Cashier
     /**
      * Get the customer instance by its Paddle customer ID.
      *
-     * @param  string  $paddleId
+     * @param  string  $customerId
      * @return \Laravel\Paddle\Billable|null
      */
-    public static function findBillable($paddleId)
+    public static function findBillable($customerId)
     {
-        return (new static::$customerModel)->where('paddle_id', $paddleId)->first()?->billable;
+        return (new static::$customerModel)->where('paddle_id', $customerId)->first()?->billable;
     }
 
     /**
