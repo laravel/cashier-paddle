@@ -49,19 +49,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Currency
-    |--------------------------------------------------------------------------
-    |
-    | This is the default currency that will be used when generating charges
-    | from your application. Of course, you are welcome to use any of the
-    | various world currencies that are currently supported via Paddle.
-    |
-    */
-
-    'currency' => env('CASHIER_CURRENCY', 'USD'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Currency Locale
     |--------------------------------------------------------------------------
     |

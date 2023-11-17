@@ -194,18 +194,18 @@ class Cashier
      * Format the given amount into a displayable currency.
      *
      * @param  int  $amount
-     * @param  string|null  $currency
+     * @param  string  $currency
      * @param  string|null  $locale
      * @param  array  $options
      * @return string
      */
-    public static function formatAmount($amount, $currency = null, $locale = null, array $options = [])
+    public static function formatAmount($amount, $currency, $locale = null, array $options = [])
     {
         if (static::$formatCurrencyUsing) {
             return call_user_func(static::$formatCurrencyUsing, $amount, $currency, $locale, $options);
         }
 
-        $money = new Money($amount, new Currency(strtoupper($currency ?? config('cashier.currency'))));
+        $money = new Money($amount, new Currency(strtoupper($currency)));
 
         $locale = $locale ?? config('cashier.currency_locale');
 

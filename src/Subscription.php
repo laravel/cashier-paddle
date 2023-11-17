@@ -838,6 +838,30 @@ class Subscription extends Model
     }
 
     /**
+     * Get the next payment for the subscription.
+     *
+     * @return \Carbon\Carbon|null
+     */
+    public function nextBilledAt()
+    {
+        $paddleSubscription = $this->asPaddleSubscription();
+
+        return $paddleSubscription['next_billed_at']
+            ? Carbon::parse($paddleSubscription['next_billed_at'], 'UTC')
+            : null;
+    }
+
+    /**
+     * Get the subscription as a Paddle subscription response.
+     *
+     * @return array
+     */
+    public function asPaddleSubscription()
+    {
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data'];
+    }
+
+    /**
      * Dynamically set the proration behavior when invoicing immediately.
      *
      * @param  string  $method
