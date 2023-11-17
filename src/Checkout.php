@@ -1,6 +1,7 @@
 <?php
 
 namespace Laravel\Paddle;
+
 use LogicException;
 
 class Checkout
