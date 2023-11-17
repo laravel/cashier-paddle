@@ -854,7 +854,7 @@ class Subscription extends Model
         if ($this->prorationBehavior === 'prorated_next_billing_period') {
             $this->prorateImmediately();
         } elseif ($this->prorationBehavior === 'full_next_billing_period') {
-            $this->noProrate();
+            $this->noProrateImmediately();
         }
     }
 }

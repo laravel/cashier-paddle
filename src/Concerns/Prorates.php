@@ -8,11 +8,35 @@ namespace Laravel\Paddle\Concerns;
 trait Prorates
 {
     /**
-     * Indicates if the pricing changes should be prorated.
+     * Set the proration behavior.
      *
      * @var bool
      */
     protected $prorationBehavior = 'prorated_next_billing_period';
+
+    /**
+     * The buyer is billed the prorated amount on their next renewal.
+     *
+     * @return $this
+     */
+    public function prorate()
+    {
+        $this->prorationBehavior = 'prorated_next_billing_period';
+
+        return $this;
+    }
+
+    /**
+     * The buyer is billed for the full amount on their next renewal.
+     *
+     * @return $this
+     */
+    public function noProrate()
+    {
+        $this->prorationBehavior = 'full_next_billing_period';
+
+        return $this;
+    }
 
     /**
      * The buyer is billed the prorated amount now.
@@ -31,33 +55,9 @@ trait Prorates
      *
      * @return $this
      */
-    public function noProrate()
+    public function noProrateImmediately()
     {
         $this->prorationBehavior = 'full_immediately';
-
-        return $this;
-    }
-
-    /**
-     * The buyer is billed the prorated amount on their next renewal.
-     *
-     * @return $this
-     */
-    public function prorateNextPeriod()
-    {
-        $this->prorationBehavior = 'prorated_next_billing_period';
-
-        return $this;
-    }
-
-    /**
-     * The buyer is billed for the full amount on their next renewal.
-     *
-     * @return $this
-     */
-    public function noProrateNextPeriod()
-    {
-        $this->prorationBehavior = 'full_next_billing_period';
 
         return $this;
     }
