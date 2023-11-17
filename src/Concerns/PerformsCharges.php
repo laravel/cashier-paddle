@@ -35,7 +35,7 @@ trait PerformsCharges
      * @param  array  $custom
      * @return \Laravel\Paddle\Checkout
      */
-    public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE, array $options = [], array $custom = [])
+    public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE, array $custom = [])
     {
         return $this->checkout($prices, 1, array_merge($custom, [
             'subscription_type' => $type,

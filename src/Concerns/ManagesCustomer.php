@@ -26,9 +26,11 @@ trait ManagesCustomer
     /**
      * Create a Paddle customer for the given model.
      *
+     * @return \Laravel\Paddle\Customer
+     *
      * @throws \Laravel\Paddle\Exceptions\CustomerAlreadyCreated
      */
-    public function createAsCustomer(array $options = []): Customer
+    public function createAsCustomer(array $options = [])
     {
         if ($customer = $this->customer) {
             throw CustomerAlreadyCreated::exists($customer);
