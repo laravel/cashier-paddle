@@ -2,11 +2,8 @@
 
 namespace Laravel\Paddle\Concerns;
 
-use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Checkout;
 use Laravel\Paddle\Subscription;
-use Laravel\Paddle\Transaction;
-use LogicException;
 
 trait PerformsCharges
 {
