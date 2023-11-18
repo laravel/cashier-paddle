@@ -276,7 +276,7 @@ class Subscription extends Model
      */
     public function scopeRecurring($query)
     {
-        $query->active()->notOnPausedGracePeriod()->notOnGracePeriod;
+        $query->active()->notOnPausedGracePeriod()->notOnGracePeriod();
     }
 
     /**

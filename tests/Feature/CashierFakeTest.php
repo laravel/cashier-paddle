@@ -42,7 +42,7 @@ class CashierFakeTest extends FeatureTestCase
     public function test_a_user_may_use_the_error_method_to_error_an_endpoint()
     {
         $this->expectException(PaddleException::class);
-        Cashier::fake()->error('adjustments');
+        Cashier::fake()->error('transactions/txn_123456789');
         $billable = $this->createBillable();
 
         $transaction = new Transaction([
@@ -53,7 +53,7 @@ class CashierFakeTest extends FeatureTestCase
             'status' => 'completed',
         ]);
 
-        $billable->refund($transaction, 12.50, 'Incorrect order');
+        $transaction->refund('Incorrect order');
     }
 
     public function test_a_user_may_append_additional_events_to_mock()
