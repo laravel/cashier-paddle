@@ -109,7 +109,8 @@ class Subscription extends Model
      */
     public function transactions()
     {
-        return $this->hasMany(Cashier::$transactionModel, 'paddle_subscription_id', 'paddle_id')->orderByDesc('created_at');
+        return $this->hasMany(Cashier::$transactionModel, 'paddle_subscription_id', 'paddle_id')
+            ->orderByDesc('created_at');
     }
 
     /**

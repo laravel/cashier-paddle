@@ -8,7 +8,7 @@ body:
     attributes:
       label: Cashier Paddle Version
       description: Provide the Cashier Paddle version that you are using.
-      placeholder: 1.6.1
+      placeholder: 2.1.0
     validations:
       required: true
   - type: input
@@ -44,4 +44,3 @@ body:
       description: Provide detailed steps to reproduce your issue. If necessary, please provide a GitHub repository to demonstrate your issue using `laravel new bug-report --github="--public"`.
     validations:
       required: true
-      

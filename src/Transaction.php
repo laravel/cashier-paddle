@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use LogicException;
 use Money\Currency;
 
+/**
+ * @property \Laravel\Paddle\Billable $billable
+ * @property \Laravel\Paddle\Subscription|null $subscription
+ */
 class Transaction extends Model
 {
     /**
@@ -134,7 +138,7 @@ class Transaction extends Model
     public function adjust($type, $reason, $prices = [])
     {
         if ($this->status !== 'billed' && $this->status !== 'completed') {
-            throw new LogicException('Only "billed" or "completed" transactions can be refunded.');
+            throw new LogicException('Only "billed" or "completed" transactions can be adjusted.');
         }
 
         $lineItems = $this->asPaddleTransaction()['details']['line_items'];

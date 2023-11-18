@@ -251,10 +251,8 @@ class WebhookController extends Controller
             return;
         }
 
-        // Status...
         $subscription->status = $data['status'];
 
-        // Cancellation date...
         $subscription->paused_at = Carbon::parse($data['paused_at'], 'UTC');
 
         $subscription->ends_at = null;
@@ -278,10 +276,8 @@ class WebhookController extends Controller
             return;
         }
 
-        // Status...
         $subscription->status = $data['status'];
 
-        // Cancellation date...
         $subscription->ends_at = Carbon::parse($data['canceled_at'], 'UTC');
 
         $subscription->paused_at = null;

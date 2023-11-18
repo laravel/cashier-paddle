@@ -108,6 +108,10 @@ trait ManagesSubscriptions
      */
     public function trialEndsAt($type = 'default')
     {
+        if (is_null($this->customer)) {
+            return null;
+        }
+
         if (func_num_args() === 0 && $this->onGenericTrial()) {
             return $this->customer->trial_ends_at;
         }

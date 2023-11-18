@@ -3,37 +3,18 @@
 namespace Laravel\Paddle\Concerns;
 
 use Laravel\Paddle\Cashier;
-use Laravel\Paddle\Customer;
-use Laravel\Paddle\Exceptions\CustomerAlreadyCreated;
-use Laravel\Paddle\Exceptions\InvalidCustomer;
 
 trait ManagesCustomer
 {
     /**
-     * Determine if the customer has a Paddle customer ID and throw an exception if not.
-     *
-     * @return void
-     *
-     * @throws \Laravel\Paddle\Exceptions\InvalidCustomer
-     */
-    protected function assertCustomerExists()
-    {
-        if (is_null($this->customer)) {
-            throw InvalidCustomer::notYetCreated($this);
-        }
-    }
-
-    /**
      * Create a Paddle customer for the given model.
      *
      * @return \Laravel\Paddle\Customer
-     *
-     * @throws \Laravel\Paddle\Exceptions\CustomerAlreadyCreated
      */
     public function createAsCustomer(array $options = [])
     {
         if ($customer = $this->customer) {
-            throw CustomerAlreadyCreated::exists($customer);
+            return $customer;
         }
 
         if (! array_key_exists('name', $options) && $name = $this->paddleName()) {

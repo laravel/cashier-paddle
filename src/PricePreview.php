@@ -108,7 +108,7 @@ class PricePreview implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the used currency for the price.
+     * Get the used currency for the price preview.
      *
      * @return \Money\Currency
      */

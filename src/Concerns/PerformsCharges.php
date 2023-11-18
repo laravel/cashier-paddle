@@ -16,9 +16,7 @@ trait PerformsCharges
      */
     public function checkout($prices, int $quantity = 1)
     {
-        if (! $customer = $this->customer) {
-            $customer = $this->createAsCustomer();
-        }
+        $customer = $this->createAsCustomer();
 
         return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity]);
     }
