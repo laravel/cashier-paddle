@@ -826,7 +826,7 @@ class Subscription extends Model
      *
      * @return $this
      */
-    public function stopCancel()
+    public function stopCancelation()
     {
         $response = $this->updatePaddleSubscription(['scheduled_change' => null]);
 

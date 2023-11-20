@@ -96,4 +96,29 @@ class Checkout
     {
         return $this->returnTo;
     }
+
+    /**
+     * Converts the checkout to an array compatible with `Paddle.Checkout.open`.
+     */
+    public function options(): array
+    {
+        $options = [
+            'settings' => array_filter([
+                'displayMode' => 'inline',
+                'frameStyle' => 'width: 100%; background-color: transparent; border: none;',
+                'successUrl' => $this->returnTo,
+            ]),
+            'items' => $this->items,
+        ];
+
+        if ($customer = $this->customer) {
+            $options['customer'] = ['id' => $customer->paddle_id];
+        }
+
+        if ($custom = $this->custom) {
+            $options['customData'] = $custom;
+        }
+
+        return $options;
+    }
 }
