@@ -142,11 +142,12 @@ class Transaction extends Model
         }
 
         $lineItems = $this->asPaddleTransaction()['details']['line_items'];
+
         $prices = (array) $prices;
 
         $items = collect($lineItems)
             ->filter(function (array $lineItem) use ($prices) {
-                // If no specific prices were given, we'll refund the entire transaction.
+                // If no specific prices were given, we'll refund the entire transaction...
                 if (empty($prices)) {
                     return true;
                 }
@@ -154,8 +155,7 @@ class Transaction extends Model
                 return in_array($lineItem['price_id'], $prices);
             })
             ->map(function (array $lineItem) use ($prices) {
-                // If a specific amount was given to refund for this price, we'll use that.
-                // Otherwise, we'll refund the entire line item.
+                // If a specific amount was given to refund for this price, we'll use that...
                 $amount = isset($prices[$lineItem['price_id']])
                     ? $prices[$lineItem['price_id']]
                     : null;

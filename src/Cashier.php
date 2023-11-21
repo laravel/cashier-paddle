@@ -72,7 +72,7 @@ class Cashier
     public static $transactionModel = Transaction::class;
 
     /**
-     * Preview prices for a set items.
+     * Preview prices for a given set of items.
      *
      * @param  array|string  $items
      * @param  array  $options
@@ -111,16 +111,6 @@ class Cashier
     }
 
     /**
-     * Get the Paddle API url.
-     *
-     * @return string
-     */
-    public static function apiUrl()
-    {
-        return 'https://'.(config('cashier.sandbox') ? 'sandbox-' : '').'api.paddle.com';
-    }
-
-    /**
      * Perform a Paddle API call.
      *
      * @param  string  $method
@@ -149,6 +139,16 @@ class Cashier
         }
 
         return $response;
+    }
+
+    /**
+     * Get the Paddle API url.
+     *
+     * @return string
+     */
+    public static function apiUrl()
+    {
+        return 'https://'.(config('cashier.sandbox') ? 'sandbox-' : '').'api.paddle.com';
     }
 
     /**

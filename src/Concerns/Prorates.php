@@ -8,14 +8,14 @@ namespace Laravel\Paddle\Concerns;
 trait Prorates
 {
     /**
-     * Set the proration behavior.
+     * The current proration behavior.
      *
      * @var bool
      */
     protected $prorationBehavior = 'prorated_next_billing_period';
 
     /**
-     * The buyer is billed the prorated amount on their next renewal.
+     * Indicate that the buyer is billed the prorated amount on their next renewal.
      *
      * @return $this
      */
@@ -27,7 +27,7 @@ trait Prorates
     }
 
     /**
-     * The buyer is billed for the full amount on their next renewal.
+     * Indicate that the buyer is billed for the full amount on their next renewal.
      *
      * @return $this
      */
@@ -39,7 +39,7 @@ trait Prorates
     }
 
     /**
-     * The buyer is billed the prorated amount now.
+     * Indicate that the buyer is billed the prorated amount now.
      *
      * @return $this
      */
@@ -51,11 +51,11 @@ trait Prorates
     }
 
     /**
-     * The buyer is billed the full amount now.
+     * Indicate that the buyer is billed the full amount now.
      *
      * @return $this
      */
-    public function noProrateImmediately()
+    public function immediatelyWithoutProrate()
     {
         $this->prorationBehavior = 'full_immediately';
 
@@ -63,7 +63,7 @@ trait Prorates
     }
 
     /**
-     * The buyer is not billed for the prorated amount or the full amount.
+     * Indicate that the buyer is not billed for the prorated amount or the full amount.
      *
      * @return $this
      */
@@ -75,7 +75,7 @@ trait Prorates
     }
 
     /**
-     * Set the prorating behavior.
+     * Set the proration behavior.
      *
      * @param  string  $prorationBehavior
      * @return $this

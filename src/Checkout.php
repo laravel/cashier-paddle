@@ -7,12 +7,12 @@ use LogicException;
 class Checkout
 {
     /**
-     * Custom data for the checkout.
+     * The custom data for the checkout.
      */
     protected array $custom = [];
 
     /**
-     * The return url which will be triggered upon starting the subscription.
+     * The URL which the customer will be returned to after starting the subscription.
      */
     protected ?string $returnTo = null;
 
@@ -41,7 +41,7 @@ class Checkout
     }
 
     /**
-     * Add custom data to a checkout.
+     * Add custom data to the checkout.
      */
     public function customData(array $custom): self
     {
@@ -56,49 +56,7 @@ class Checkout
     }
 
     /**
-     * The return url to the success page.
-     */
-    public function returnTo(string $returnTo): self
-    {
-        $this->returnTo = $returnTo;
-
-        return $this;
-    }
-
-    /**
-     * Return the items for the checkout.
-     */
-    public function getItems(): array
-    {
-        return $this->items;
-    }
-
-    /**
-     * Return the customer for the checkout.
-     */
-    public function getCustomer(): ?Customer
-    {
-        return $this->customer;
-    }
-
-    /**
-     * Return the custom data for the checkout.
-     */
-    public function getCustom(): array
-    {
-        return $this->custom;
-    }
-
-    /**
-     * Return the return url for the checkout.
-     */
-    public function getReturnUrl(): ?string
-    {
-        return $this->returnTo;
-    }
-
-    /**
-     * Converts the checkout to an array compatible with `Paddle.Checkout.open`.
+     * Convert the checkout to an array compatible with `Paddle.Checkout.open`.
      */
     public function options(): array
     {
@@ -120,5 +78,47 @@ class Checkout
         }
 
         return $options;
+    }
+
+    /**
+     * The URL the customer should be returned to after a successful checkout.
+     */
+    public function returnTo(string $returnTo): self
+    {
+        $this->returnTo = $returnTo;
+
+        return $this;
+    }
+
+    /**
+     * Get the customer for the checkout.
+     */
+    public function getCustomer(): ?Customer
+    {
+        return $this->customer;
+    }
+
+    /**
+     * Get the items for the checkout.
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /**
+     * Get the custom data for the checkout.
+     */
+    public function getCustomData(): array
+    {
+        return $this->custom;
+    }
+
+    /**
+     * Get the URL the customer should be returned to after a successful checkout.
+     */
+    public function getReturnUrl(): ?string
+    {
+        return $this->returnTo;
     }
 }

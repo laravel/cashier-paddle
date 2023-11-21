@@ -662,17 +662,7 @@ class Subscription extends Model
     }
 
     /**
-     * Get the Paddle payment method update url.
-     *
-     * @return string
-     */
-    public function paymentMethodUpdateUrl()
-    {
-        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data']['management_urls']['update_payment_method'];
-    }
-
-    /**
-     * Redirect the user to the Paddle payment method update url.
+     * Redirect the user to the Paddle payment method update URL.
      *
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -682,23 +672,33 @@ class Subscription extends Model
     }
 
     /**
-     * Get the Paddle cancel url.
+     * Get the Paddle payment method update URL.
      *
      * @return string
      */
-    public function cancelUrl()
+    public function paymentMethodUpdateUrl()
     {
-        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data']['management_urls']['cancel'];
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data']['management_urls']['update_payment_method'];
     }
 
     /**
-     * Redirect the user to the Paddle cancel url.
+     * Redirect the user to the Paddle cancel URL.
      *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function redirectToCancel()
     {
         return redirect($this->paymentMethodUpdateUrl());
+    }
+
+    /**
+     * Get the Paddle cancel URL.
+     *
+     * @return string
+     */
+    public function cancelUrl()
+    {
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data']['management_urls']['cancel'];
     }
 
     /**
@@ -822,7 +822,7 @@ class Subscription extends Model
     }
 
     /**
-     * Stop the subscription from beign canceled at the end of the current billing period.
+     * Stop the subscription from being canceled at the end of the current billing period.
      *
      * @return $this
      */
@@ -879,7 +879,7 @@ class Subscription extends Model
         if ($this->prorationBehavior === 'prorated_next_billing_period') {
             $this->prorateImmediately();
         } elseif ($this->prorationBehavior === 'full_next_billing_period') {
-            $this->noProrateImmediately();
+            $this->immediatelyWithoutProrate();
         }
     }
 }

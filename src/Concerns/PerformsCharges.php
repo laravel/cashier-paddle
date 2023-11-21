@@ -8,7 +8,7 @@ use Laravel\Paddle\Subscription;
 trait PerformsCharges
 {
     /**
-     * Get a checkout for a given list of prices.
+     * Get a checkout instance for a given list of prices.
      *
      * @param  string|array  $prices
      * @param  int  $quantity

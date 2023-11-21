@@ -1,7 +1,7 @@
 <?php
 $items = $checkout->getItems();
 $customer = $checkout->getCustomer();
-$custom = $checkout->getCustom();
+$custom = $checkout->getCustomData();
 ?>
 
 <a
