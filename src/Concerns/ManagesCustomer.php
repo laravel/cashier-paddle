@@ -28,6 +28,7 @@ trait ManagesCustomer
         $response = Cashier::api('POST', 'customers', $options)['data'];
 
         $customer = $this->customer()->make();
+
         $customer->paddle_id = $response['id'];
         $customer->name = $response['name'];
         $customer->email = $response['email'];
