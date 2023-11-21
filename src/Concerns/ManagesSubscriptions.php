@@ -32,7 +32,7 @@ trait ManagesSubscriptions
      * Determine if the Billable model is on trial.
      *
      * @param  string  $type
-     * @param  int|null  $plan
+     * @param  int|null  $price
      * @return bool
      */
     public function onTrial($type = 'default', $price = null)
