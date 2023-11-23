@@ -200,7 +200,7 @@ Before displaying the checkout overlay widget, you must generate a checkout sess
         return view('billing', ['checkout' => $checkout]);
     });
 
-Cashier includes a `paddle-button` [Blade component](/docs/{{version}}/blade#components). You may pass the checkout session to this component as a "prop". Then, when this button is clicked, Paddle's checkout widget will be displayed:
+Cashier includes a `paddle-button` [Blade component](https://laravel.com/docs/blade#components). You may pass the checkout session to this component as a "prop". Then, when this button is clicked, Paddle's checkout widget will be displayed:
 
 ```html
 <x-paddle-button :checkout="$checkout" class="px-8 py-4">
@@ -501,7 +501,7 @@ If your application offers multiple subscriptions, you may specify the subscript
         // ...
     }
 
-The `subscribed` method also makes a great candidate for a [route middleware](/docs/{{version}}/middleware), allowing you to filter access to routes and controllers based on the user's subscription status:
+The `subscribed` method also makes a great candidate for a [route middleware](https://laravel.com/docs/middleware), allowing you to filter access to routes and controllers based on the user's subscription status:
 
     <?php
 
@@ -961,12 +961,12 @@ To ensure your application can handle Paddle webhooks, be sure to [configure the
 - Subscription Canceled
 
 > **Warning**  
-> Make sure you protect incoming requests with Cashier's included [webhook signature verification](/docs/{{version}}/cashier-paddle#verifying-webhook-signatures) middleware.
+> Make sure you protect incoming requests with Cashier's included [webhook signature verification](https://laravel.com/docs/cashier-paddle#verifying-webhook-signatures) middleware.
 
 <a name="webhooks-csrf-protection"></a>
 #### Webhooks & CSRF Protection
 
-Since Paddle webhooks need to bypass Laravel's [CSRF protection](/docs/{{version}}/csrf), be sure to list the URI as an exception in your `App\Http\Middleware\VerifyCsrfToken` middleware or list the route outside of the `web` middleware group:
+Since Paddle webhooks need to bypass Laravel's [CSRF protection](https://laravel.com/docs/csrf), be sure to list the URI as an exception in your `App\Http\Middleware\VerifyCsrfToken` middleware or list the route outside of the `web` middleware group:
 
     protected $except = [
         'paddle/*',
@@ -975,7 +975,7 @@ Since Paddle webhooks need to bypass Laravel's [CSRF protection](/docs/{{version
 <a name="webhooks-local-development"></a>
 #### Webhooks & Local Development
 
-For Paddle to be able to send your application webhooks during local development, you will need to expose your application via a site sharing service such as [Ngrok](https://ngrok.com/) or [Expose](https://expose.dev/docs/introduction). If you are developing your application locally using [Laravel Sail](/docs/{{version}}/sail), you may use Sail's [site sharing command](/docs/{{version}}/sail#sharing-your-site).
+For Paddle to be able to send your application webhooks during local development, you will need to expose your application via a site sharing service such as [Ngrok](https://ngrok.com/) or [Expose](https://expose.dev/docs/introduction). If you are developing your application locally using [Laravel Sail](https://laravel.com/docs/sail), you may use Sail's [site sharing command](https://laravel.com/docs/sail#sharing-your-site).
 
 <a name="defining-webhook-event-handlers"></a>
 ### Defining Webhook Event Handlers
@@ -985,7 +985,7 @@ Cashier automatically handles subscription cancelation on failed charges and oth
 - `Laravel\Paddle\Events\WebhookReceived`
 - `Laravel\Paddle\Events\WebhookHandled`
 
-Both events contain the full payload of the Paddle webhook. For example, if you wish to handle the `transaction_billed` webhook, you may register a [listener](/docs/{{version}}/events#defining-listeners) that will handle the event:
+Both events contain the full payload of the Paddle webhook. For example, if you wish to handle the `transaction_billed` webhook, you may register a [listener](https://laravel.com/docs/events#defining-listeners) that will handle the event:
 
     <?php
 
@@ -1186,7 +1186,7 @@ Next payment on {{ $nextBilledAt->toFormattedDateString() }}
 
 While testing, you should manually test your billing flow to make sure your integration works as expected.
 
-For automated tests, including those executed within a CI environment, you may use [Laravel's HTTP Client](/docs/{{version}}/http-client#testing) to fake HTTP calls made to Paddle. Although this does not test the actual responses from Paddle, it does provide a way to test your application without actually calling Paddle's API.
+For automated tests, including those executed within a CI environment, you may use [Laravel's HTTP Client](https://laravel.com/docs/http-client#testing) to fake HTTP calls made to Paddle. Although this does not test the actual responses from Paddle, it does provide a way to test your application without actually calling Paddle's API.
 
 ## Contributing
 
