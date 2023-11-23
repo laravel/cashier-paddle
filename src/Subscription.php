@@ -4,8 +4,8 @@ namespace Laravel\Paddle;
 
 use Carbon\Carbon;
 use DateTimeInterface;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 use Laravel\Paddle\Concerns\Prorates;
 use LogicException;
 
@@ -20,7 +20,9 @@ class Subscription extends Model
     const STATUS_TRIALING = 'trialing';
     const STATUS_PAST_DUE = 'past_due';
     const STATUS_PAUSED = 'paused';
-    const STATUS_DELETED = 'deleted';
+    const STATUS_CANCELED = 'canceled';
+
+    const DEFAULT_TYPE = 'default';
 
     /**
      * The attributes that are not mass assignable.
@@ -30,25 +32,22 @@ class Subscription extends Model
     protected $guarded = [];
 
     /**
+     * The relations to eager load on every query.
+     *
+     * @var array
+     */
+    protected $with = ['items'];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
     protected $casts = [
-        'paddle_id' => 'integer',
-        'paddle_plan' => 'integer',
-        'quantity' => 'integer',
         'trial_ends_at' => 'datetime',
-        'paused_from' => 'datetime',
+        'paused_at' => 'datetime',
         'ends_at' => 'datetime',
     ];
-
-    /**
-     * The cached Paddle info for the subscription.
-     *
-     * @var array
-     */
-    protected $paddleInfo;
 
     /**
      * Get the billable model related to the subscription.
@@ -61,24 +60,103 @@ class Subscription extends Model
     }
 
     /**
-     * Get all of the receipts for the Billable model.
+     * Get the subscription items related to the subscription.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function receipts()
+    public function items()
     {
-        return $this->hasMany(Cashier::$receiptModel, 'paddle_subscription_id', 'paddle_id')->orderByDesc('created_at');
+        return $this->hasMany(Cashier::$subscriptionItemModel);
     }
 
     /**
-     * Determine if the subscription has a specific plan.
+     * Get the subscription item for the given price.
      *
-     * @param  int  $plan
+     * @param  string  $price
+     * @return \Laravel\Paddle\SubscriptionItem
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findItemOrFail($price)
+    {
+        return $this->items()->where('price_id', $price)->firstOrFail();
+    }
+
+    /**
+     * Retrieve a specific item by price or the single item on a subscription.
+     *
+     * @param  string|null  $price
+     * @return \Laravel\Paddle\SubscriptionItem
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \InvalidArgumentException
+     */
+    protected function singleItemOrFail($price = null)
+    {
+        if ($this->items()->count() > 1 && is_null($price)) {
+            throw new InvalidArgumentException(
+                'Please provide a price when retrieving an item of a subscription with multiple prices.'
+            );
+        }
+
+        return $price ? $this->findItemOrFail($price) : $this->items()->firstOrFail();
+    }
+
+    /**
+     * Get all of the transactions for the Billable model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Cashier::$transactionModel, 'paddle_subscription_id', 'paddle_id')
+            ->orderByDesc('created_at');
+    }
+
+    /**
+     * Determine if the subscription has multiple prices.
+     *
      * @return bool
      */
-    public function hasPlan($plan)
+    public function hasMultiplePrices()
     {
-        return $this->paddle_plan == $plan;
+        return $this->items->count() > 1;
+    }
+
+    /**
+     * Determine if the subscription has a single price.
+     *
+     * @return bool
+     */
+    public function hasSinglePrice()
+    {
+        return ! $this->hasMultiplePrices();
+    }
+
+    /**
+     * Determine if the subscription has a specific product.
+     *
+     * @param  string  $product
+     * @return bool
+     */
+    public function hasProduct($product)
+    {
+        return $this->items->contains(function (SubscriptionItem $item) use ($product) {
+            return $item->product_id === $product;
+        });
+    }
+
+    /**
+     * Determine if the subscription has a specific price.
+     *
+     * @param  string  $price
+     * @return bool
+     */
+    public function hasPrice($price)
+    {
+        return $this->items->contains(function (SubscriptionItem $item) use ($price) {
+            return $item->price_id === $price;
+        });
     }
 
     /**
@@ -88,201 +166,23 @@ class Subscription extends Model
      */
     public function valid()
     {
-        return $this->active() || $this->onTrial() || $this->onPausedGracePeriod() || $this->onGracePeriod();
+        return $this->onTrial() || $this->active() || (! Cashier::$deactivatePastDue && $this->pastDue());
     }
 
     /**
-     * Determine if the subscription is active.
-     *
-     * @return bool
-     */
-    public function active()
-    {
-        return (is_null($this->ends_at) || $this->onGracePeriod() || $this->onPausedGracePeriod()) &&
-            (! Cashier::$deactivatePastDue || $this->paddle_status !== self::STATUS_PAST_DUE) &&
-            $this->paddle_status !== self::STATUS_PAUSED;
-    }
-
-    /**
-     * Filter query by active.
+     * Filter query by valid.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeActive($query)
+    public function scopeValid($query)
     {
-        $query->where(function ($query) {
-            $query->whereNull('ends_at')
-                ->orWhere(function ($query) {
-                    $query->onGracePeriod();
-                })
-                ->orWhere(function ($query) {
-                    $query->onPausedGracePeriod();
-                });
-        })->where('paddle_status', '!=', self::STATUS_PAUSED);
+        $query->where('status', self::STATUS_TRIALING)
+            ->orWhere('status', self::STATUS_ACTIVE);
 
-        if (Cashier::$deactivatePastDue) {
-            $query->where('paddle_status', '!=', self::STATUS_PAST_DUE);
+        if (! Cashier::$deactivatePastDue) {
+            $query->orWhere('status', self::STATUS_PAST_DUE);
         }
-    }
-
-    /**
-     * Determine if the subscription is past due.
-     *
-     * @return bool
-     */
-    public function pastDue()
-    {
-        return $this->paddle_status === self::STATUS_PAST_DUE;
-    }
-
-    /**
-     * Filter query by past due.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopePastDue($query)
-    {
-        $query->where('paddle_status', self::STATUS_PAST_DUE);
-    }
-
-    /**
-     * Determine if the subscription is recurring and not on trial.
-     *
-     * @return bool
-     */
-    public function recurring()
-    {
-        return ! $this->onTrial() && ! $this->paused() && ! $this->onPausedGracePeriod() && ! $this->cancelled();
-    }
-
-    /**
-     * Filter query by recurring.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeRecurring($query)
-    {
-        $query->notOnTrial()->notCancelled();
-    }
-
-    /**
-     * Determine if the subscription is paused.
-     *
-     * @return bool
-     */
-    public function paused()
-    {
-        return $this->paddle_status === self::STATUS_PAUSED;
-    }
-
-    /**
-     * Filter query by paused.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopePaused($query)
-    {
-        $query->where('paddle_status', self::STATUS_PAUSED);
-    }
-
-    /**
-     * Filter query by not paused.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeNotPaused($query)
-    {
-        $query->where('paddle_status', '!=', self::STATUS_PAUSED);
-    }
-
-    /**
-     * Determine if the subscription is within its grace period after being paused.
-     *
-     * @return bool
-     */
-    public function onPausedGracePeriod()
-    {
-        return $this->paused_from && $this->paused_from->isFuture();
-    }
-
-    /**
-     * Filter query by on trial grace period.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeOnPausedGracePeriod($query)
-    {
-        $query->whereNotNull('paused_from')->where('paused_from', '>', Carbon::now());
-    }
-
-    /**
-     * Filter query by not on trial grace period.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeNotOnPausedGracePeriod($query)
-    {
-        $query->whereNull('paused_from')->orWhere('paused_from', '<=', Carbon::now());
-    }
-
-    /**
-     * Determine if the subscription is no longer active.
-     *
-     * @return bool
-     */
-    public function cancelled()
-    {
-        return ! is_null($this->ends_at);
-    }
-
-    /**
-     * Filter query by cancelled.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeCancelled($query)
-    {
-        $query->whereNotNull('ends_at');
-    }
-
-    /**
-     * Filter query by not cancelled.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeNotCancelled($query)
-    {
-        $query->whereNull('ends_at');
-    }
-
-    /**
-     * Determine if the subscription has ended and the grace period has expired.
-     *
-     * @return bool
-     */
-    public function ended()
-    {
-        return $this->cancelled() && ! $this->onGracePeriod();
-    }
-
-    /**
-     * Filter query by ended.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     */
-    public function scopeEnded($query)
-    {
-        $query->cancelled()->notOnGracePeriod();
     }
 
     /**
@@ -292,7 +192,7 @@ class Subscription extends Model
      */
     public function onTrial()
     {
-        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+        return $this->status === self::STATUS_TRIALING;
     }
 
     /**
@@ -303,7 +203,7 @@ class Subscription extends Model
      */
     public function scopeOnTrial($query)
     {
-        $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '>', Carbon::now());
+        $query->where('status', self::STATUS_TRIALING);
     }
 
     /**
@@ -335,7 +235,166 @@ class Subscription extends Model
      */
     public function scopeNotOnTrial($query)
     {
-        $query->whereNull('trial_ends_at')->orWhere('trial_ends_at', '<=', Carbon::now());
+        $query->where('status', '!=', self::STATUS_TRIALING);
+    }
+
+    /**
+     * Determine if the subscription is active.
+     *
+     * @return bool
+     */
+    public function active()
+    {
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
+    /**
+     * Filter query by active.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeActive($query)
+    {
+        $query->where('status', '=', self::STATUS_ACTIVE);
+    }
+
+    /**
+     * Determine if the subscription is active and not on any grace period.
+     *
+     * @return bool
+     */
+    public function recurring()
+    {
+        return $this->active() && ! $this->onPausedGracePeriod() && ! $this->onGracePeriod();
+    }
+
+    /**
+     * Filter query by recurring.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeRecurring($query)
+    {
+        $query->active()->notOnPausedGracePeriod()->notOnGracePeriod();
+    }
+
+    /**
+     * Determine if the subscription is past due.
+     *
+     * @return bool
+     */
+    public function pastDue()
+    {
+        return $this->status === self::STATUS_PAST_DUE;
+    }
+
+    /**
+     * Filter query by past due.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopePastDue($query)
+    {
+        $query->where('status', self::STATUS_PAST_DUE);
+    }
+
+    /**
+     * Determine if the subscription is paused.
+     *
+     * @return bool
+     */
+    public function paused()
+    {
+        return $this->status === self::STATUS_PAUSED;
+    }
+
+    /**
+     * Filter query by paused.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopePaused($query)
+    {
+        $query->where('status', self::STATUS_PAUSED);
+    }
+
+    /**
+     * Filter query by not paused.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeNotPaused($query)
+    {
+        $query->where('status', '!=', self::STATUS_PAUSED);
+    }
+
+    /**
+     * Determine if the subscription is within its grace period after being paused.
+     *
+     * @return bool
+     */
+    public function onPausedGracePeriod()
+    {
+        return $this->paused_at && $this->paused_at->isFuture();
+    }
+
+    /**
+     * Filter query by on trial grace period.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeOnPausedGracePeriod($query)
+    {
+        $query->whereNotNull('paused_at')->where('paused_at', '>', Carbon::now());
+    }
+
+    /**
+     * Filter query by not on trial grace period.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeNotOnPausedGracePeriod($query)
+    {
+        $query->whereNull('paused_at')->orWhere('paused_at', '<=', Carbon::now());
+    }
+
+    /**
+     * Determine if the subscription is no longer active.
+     *
+     * @return bool
+     */
+    public function canceled()
+    {
+        return $this->status === self::STATUS_CANCELED;
+    }
+
+    /**
+     * Filter query by canceled.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeCanceled($query)
+    {
+        $query->where('status', self::STATUS_CANCELED);
+    }
+
+    /**
+     * Filter query by not canceled.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeNotCanceled($query)
+    {
+        $query->where('status', '!=', self::STATUS_CANCELED);
     }
 
     /**
@@ -371,119 +430,203 @@ class Subscription extends Model
     }
 
     /**
-     * Perform a "one off" charge on top of the subscription for the given amount.
+     * Bill for one-time charges on top of the subscription.
      *
-     * @param  float  $amount
-     * @param  string  $name
-     * @return array
+     * @param  string|array  $items
+     * @param  bool  $chargeNow
+     * @return $this
      *
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
-    public function charge($amount, $name)
+    public function charge($items, bool $chargeNow = false)
     {
-        if (strlen($name) > 50) {
-            throw new Exception('Charge name has a maximum length of 50 characters.');
+        if (empty($items = (array) $items)) {
+            throw new InvalidArgumentException('Please provide at least one item when charging one-time.');
         }
 
-        $payload = $this->billable->paddleOptions([
-            'amount' => $amount,
-            'charge_name' => $name,
-        ]);
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/charge", [
+            'effective_from' => $chargeNow ? 'immediately' : 'next_billing_period',
+            'items' => Cashier::normalizeItems($items),
+        ])['data'];
 
-        $this->paddleInfo = null;
+        $this->forceFill([
+            'status' => $response['status'],
+        ])->save();
 
-        return Cashier::post("/subscription/{$this->paddle_id}/charge", $payload)['response'];
+        return $this;
     }
 
     /**
-     * Increment the quantity of the subscription.
+     * Bill for one-time charges on top of the subscription, and invoice immediately.
+     *
+     * @param  string|array  $items
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function chargeAndInvoice($items)
+    {
+        $this->setProrateAndInvoice('chargeAndInvoice');
+
+        return $this->charge($items, true);
+    }
+
+    /**
+     * Increment the quantity of a subscription item.
      *
      * @param  int  $count
+     * @param  string|null  $price
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function incrementQuantity($count = 1)
+    public function incrementQuantity($count = 1, $price = null)
     {
-        $this->updateQuantity($this->quantity + $count);
+        $item = $this->singleItemOrFail($price);
 
-        return $this;
+        return $this->updateQuantity($item->quantity + $count, $item);
     }
 
     /**
      * Increment the quantity of the subscription, and invoice immediately.
      *
      * @param  int  $count
+     * @param  string|null  $price
      * @return $this
      */
-    public function incrementAndInvoice($count = 1)
+    public function incrementAndInvoice($count = 1, $price = null)
     {
-        $this->updateQuantity($this->quantity + $count, [
-            'bill_immediately' => true,
-        ]);
+        $item = $this->singleItemOrFail($price);
 
-        return $this;
+        $this->setProrateAndInvoice('incrementAndInvoice');
+
+        return $this->updateQuantity($item->quantity + $count, $item);
     }
 
     /**
-     * Decrement the quantity of the subscription.
+     * Decrement the quantity of a subscription item.
      *
      * @param  int  $count
+     * @param  string|null  $price
      * @return $this
      */
-    public function decrementQuantity($count = 1)
+    public function decrementQuantity($count = 1, $price = null)
     {
-        return $this->updateQuantity(max(1, $this->quantity - $count));
+        $item = $this->singleItemOrFail($price);
+
+        return $this->updateQuantity(max(1, $item->quantity - $count));
     }
 
     /**
      * Update the quantity of the subscription.
      *
      * @param  int  $quantity
-     * @param  array  $options
+     * @param  \Laravel\Paddle\SubscriptionItem|string|null  $price
      * @return $this
      */
-    public function updateQuantity($quantity, array $options = [])
+    public function updateQuantity($quantity, $price = null)
     {
-        $this->guardAgainstUpdates('update quantities');
-
         if ($quantity < 1) {
-            throw new LogicException('Paddle does not allow subscriptions to have a quantity of zero.');
+            throw new LogicException('Quantities of zero are not allowed.');
         }
 
-        $this->updatePaddleSubscription(array_merge($options, [
-            'quantity' => $quantity,
-            'prorate' => $this->prorate,
-        ]));
+        $itemToUpdate = $price instanceof SubscriptionItem ? $price : $this->singleItemOrFail($price);
+
+        $items = $this->items()->get(['quantity', 'price_id'])->pluck(['quantity', 'price_id'])->toArray();
+
+        foreach ($items as $key => $item) {
+            if ($item['price_id'] === $itemToUpdate->price_id) {
+                $items[$key]['quantity'] = $quantity;
+            }
+        }
+
+        $response = $this->updatePaddleSubscription([
+            'items' => $items,
+            'proration_billing_mode' => $this->prorationBehavior,
+        ]);
 
         $this->forceFill([
+            'status' => $response['status'],
+        ])->save();
+
+        $itemToUpdate->forceFill([
             'quantity' => $quantity,
         ])->save();
 
-        $this->paddleInfo = null;
+        $this->load('items');
 
         return $this;
     }
 
     /**
-     * Swap the subscription to a new Paddle plan.
+     * Extend the trial period of the subscription.
      *
-     * @param  int  $plan
-     * @param  array  $options
+     * @param  \DateTimeInterface|string  $until
      * @return $this
      */
-    public function swap($plan, array $options = [])
+    public function extendTrial($until)
     {
-        $this->guardAgainstUpdates('swap plans');
+        $response = $this->updatePaddleSubscription([
+            'next_billed_at' => Carbon::parse($until)->format(DateTimeInterface::RFC3339),
+            'proration_billing_mode' => 'do_not_bill',
+        ]);
 
-        $this->updatePaddleSubscription(array_merge($options, [
-            'plan_id' => $plan,
-            'prorate' => $this->prorate,
+        $this->forceFill([
+            'status' => $response['status'],
+            'trial_ends_at' => Carbon::parse($response['next_billed_at'], 'UTC'),
+        ])->save();
+
+        $this->syncSubscriptionItems($response['items']);
+
+        return $this;
+    }
+
+    /**
+     * Force the trial to end immediately and activate the subscription.
+     *
+     * @return $this
+     */
+    public function activate()
+    {
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/activate")['data'];
+
+        $this->forceFill([
+            'status' => $response['status'],
+            'trial_ends_at' => null,
+        ])->save();
+
+        $this->syncSubscriptionItems($response['items']);
+
+        return $this;
+    }
+
+    /**
+     * Swap the subscription to new Paddle items.
+     *
+     * @param  string|array  $items
+     * @param  array  $options
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function swap($items, array $options = [])
+    {
+        if (empty($items = (array) $items)) {
+            throw new InvalidArgumentException('Please provide at least one item when swapping.');
+        }
+
+        $items = Cashier::normalizeItems($items);
+
+        $response = $this->updatePaddleSubscription(array_merge($options, [
+            'items' => $items,
+            'proration_billing_mode' => $this->prorationBehavior,
         ]));
 
         $this->forceFill([
-            'paddle_plan' => $plan,
+            'status' => $response['status'],
         ])->save();
 
-        $this->paddleInfo = null;
+        $this->syncSubscriptionItems($response['items']);
 
         return $this;
     }
@@ -491,38 +634,127 @@ class Subscription extends Model
     /**
      * Swap the subscription to a new Paddle plan, and invoice immediately.
      *
-     * @param  int  $plan
+     * @param  string|array  $items
      * @param  array  $options
      * @return $this
      */
-    public function swapAndInvoice($plan, array $options = [])
+    public function swapAndInvoice($items, array $options = [])
     {
-        return $this->swap($plan, array_merge($options, [
-            'bill_immediately' => true,
-        ]));
+        $this->setProrateAndInvoice('swapAndInvoice');
+
+        return $this->swap($items, $options);
+    }
+
+    /**
+     * Change the billing cycle anchor.
+     *
+     * @param  \DateTimeInterface|string|null  $date
+     * @return $this
+     */
+    public function anchorBillingCycleOn($date)
+    {
+        $this->updatePaddleSubscription([
+            'next_billed_at' => Carbon::parse($date)->format(DateTimeInterface::RFC3339),
+            'proration_billing_mode' => $this->prorationBehavior,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Redirect the user to the Paddle payment method update URL.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirectToUpdatePaymentMethod()
+    {
+        return redirect($this->paymentMethodUpdateUrl());
+    }
+
+    /**
+     * Get the Paddle payment method update URL.
+     *
+     * @return string
+     */
+    public function paymentMethodUpdateUrl()
+    {
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data']['management_urls']['update_payment_method'];
+    }
+
+    /**
+     * Redirect the user to the Paddle cancel URL.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirectToCancel()
+    {
+        return redirect($this->cancelUrl());
+    }
+
+    /**
+     * Get the Paddle cancel URL.
+     *
+     * @return string
+     */
+    public function cancelUrl()
+    {
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data']['management_urls']['cancel'];
     }
 
     /**
      * Pause the subscription.
      *
+     * @param  bool  $pauseNow
+     * @param  \DateTimeInterface|string|null  $until
      * @return $this
      */
-    public function pause()
+    public function pause(bool $pauseNow = false, $until = null)
     {
-        $this->updatePaddleSubscription([
-            'pause' => true,
-        ]);
-
-        $info = $this->paddleInfo();
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/pause", [
+            'effective_from' => $pauseNow ? 'immediately' : 'next_billing_period',
+            'resume_at' => $until ? Carbon::parse($until)->format(DateTimeInterface::RFC3339) : null,
+        ])['data'];
 
         $this->forceFill([
-            'paddle_status' => $info['state'],
-            'paused_from' => Carbon::createFromFormat('Y-m-d H:i:s', $info['paused_from'], 'UTC'),
+            'status' => $response['status'],
+            'paused_at' => Carbon::parse($response['paused_at'], 'UTC'),
         ])->save();
 
-        $this->paddleInfo = null;
+        $this->syncSubscriptionItems($response['items']);
 
         return $this;
+    }
+
+    /**
+     * Pause the subscription until a certain date.
+     *
+     * @param  \DateTimeInterface|string  $until
+     * @return $this
+     */
+    public function pauseUntil($until)
+    {
+        return $this->pause(false, $until);
+    }
+
+    /**
+     * Pause the subscription immediately.
+     *
+     * @return $this
+     */
+    public function pauseNow()
+    {
+        return $this->pause(true);
+    }
+
+    /**
+     * Pause the subscription immediately and until a certain date.
+     *
+     * @param  \DateTimeInterface|string  $until
+     * @return $this
+     */
+    public function pauseNowUntil($until)
+    {
+        return $this->pause(true, $until);
     }
 
     /**
@@ -530,19 +762,17 @@ class Subscription extends Model
      *
      * @return $this
      */
-    public function unpause()
+    public function resume()
     {
-        $this->updatePaddleSubscription([
-            'pause' => false,
-        ]);
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/resume")['data'];
 
         $this->forceFill([
-            'paddle_status' => self::STATUS_ACTIVE,
+            'status' => $response['status'],
             'ends_at' => null,
-            'paused_from' => null,
+            'paused_at' => null,
         ])->save();
 
-        $this->paddleInfo = null;
+        $this->syncSubscriptionItems($response['items']);
 
         return $this;
     }
@@ -555,89 +785,30 @@ class Subscription extends Model
      */
     public function updatePaddleSubscription(array $options)
     {
-        $payload = $this->billable->paddleOptions(array_merge([
-            'subscription_id' => $this->paddle_id,
-        ], $options));
-
-        $response = Cashier::post('/subscription/users/update', $payload)['response'];
-
-        $this->paddleInfo = null;
-
-        return $response;
-    }
-
-    /**
-     * Get the Paddle update url.
-     *
-     * @return string
-     */
-    public function updateUrl()
-    {
-        return $this->paddleInfo()['update_url'];
-    }
-
-    /**
-     * Begin creating a new modifier.
-     *
-     * @param  float  $amount
-     * @return \Laravel\Paddle\ModifierBuilder
-     */
-    public function newModifier($amount)
-    {
-        return new ModifierBuilder($this, $amount);
-    }
-
-    /**
-     * Get all of the modifiers for this subscription.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function modifiers()
-    {
-        $result = Cashier::post('/subscription/modifiers', array_merge([
-            'subscription_id' => $this->paddle_id,
-        ], $this->billable->paddleOptions()));
-
-        return collect($result['response'])->map(function (array $modifier) {
-            return new Modifier($this, $modifier);
-        });
-    }
-
-    /**
-     * Get a modifier instance by ID.
-     *
-     * @param  int  $id
-     * @return \Laravel\Paddle\Modifier|null
-     */
-    public function modifier($id)
-    {
-        return $this->modifiers()->first(function (Modifier $modifier) use ($id) {
-            return $modifier->id() === $id;
-        });
+        return Cashier::api('PATCH', "subscriptions/{$this->paddle_id}", $options)['data'];
     }
 
     /**
      * Cancel the subscription at the end of the current billing period.
      *
+     * @param  bool  $cancelNow
      * @return $this
      */
-    public function cancel()
+    public function cancel(bool $cancelNow = false)
     {
-        if ($this->onGracePeriod()) {
-            return $this;
-        }
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/cancel", [
+            'effective_from' => $cancelNow ? 'immediately' : 'next_billing_period',
+        ])['data'];
 
-        if ($this->onPausedGracePeriod() || $this->paused()) {
-            $endsAt = $this->paused_from->isFuture()
-                ? $this->paused_from
-                : Carbon::now();
-        } else {
-            $endsAt = $this->onTrial()
-                ? $this->trial_ends_at
-                : $this->nextPayment()->date();
-        }
+        $endsAt = $cancelNow ? $response['canceled_at'] : $response['scheduled_change']['effective_at'];
 
-        return $this->cancelAt($endsAt);
+        $this->forceFill([
+            'status' => $response['status'],
+            'ends_at' => Carbon::parse($endsAt, 'UTC'),
+            'trial_ends_at' => $cancelNow ? null : $this->trial_ends_at,
+        ])->save();
+
+        return $this;
     }
 
     /**
@@ -647,161 +818,68 @@ class Subscription extends Model
      */
     public function cancelNow()
     {
-        return $this->cancelAt(Carbon::now());
+        return $this->cancel(true);
     }
 
     /**
-     * Cancel the subscription at a specific moment in time.
+     * Stop the subscription from being canceled at the end of the current billing period.
      *
-     * @param  \DateTimeInterface  $endsAt
      * @return $this
      */
-    public function cancelAt(DateTimeInterface $endsAt)
+    public function stopCancelation()
     {
-        $payload = $this->billable->paddleOptions([
-            'subscription_id' => $this->paddle_id,
-        ]);
-
-        Cashier::post('/subscription/users_cancel', $payload);
+        $response = $this->updatePaddleSubscription(['scheduled_change' => null]);
 
         $this->forceFill([
-            'paddle_status' => self::STATUS_DELETED,
-            'ends_at' => $endsAt,
+            'status' => $response['status'],
+            'ends_at' => null,
         ])->save();
-
-        $this->paddleInfo = null;
 
         return $this;
     }
 
     /**
-     * Get the Paddle cancellation url.
-     *
-     * @return string
-     */
-    public function cancelUrl()
-    {
-        return $this->paddleInfo()['cancel_url'];
-    }
-
-    /**
-     * Get the last payment for the subscription.
-     *
-     * @return \Laravel\Paddle\Payment
-     */
-    public function lastPayment()
-    {
-        $payment = $this->paddleInfo()['last_payment'];
-
-        return new Payment($payment['amount'], $payment['currency'], $payment['date']);
-    }
-
-    /**
      * Get the next payment for the subscription.
      *
-     * @return \Laravel\Paddle\Payment|null
+     * @return \Carbon\Carbon|null
      */
-    public function nextPayment()
+    public function nextBilledAt()
     {
-        if (! isset($this->paddleInfo()['next_payment'])) {
-            return;
-        }
+        $paddleSubscription = $this->asPaddleSubscription();
 
-        $payment = $this->paddleInfo()['next_payment'];
-
-        return new Payment($payment['amount'], $payment['currency'], $payment['date']);
+        return $paddleSubscription['next_billed_at']
+            ? Carbon::parse($paddleSubscription['next_billed_at'], 'UTC')
+            : null;
     }
 
     /**
-     * Get the email address of the customer associated to this subscription.
-     *
-     * @return string
-     */
-    public function paddleEmail()
-    {
-        return (string) $this->paddleInfo()['user_email'];
-    }
-
-    /**
-     * Get the payment method type from the subscription.
-     *
-     * @return string
-     */
-    public function paymentMethod()
-    {
-        return (string) ($this->paddleInfo()['payment_information']['payment_method'] ?? '');
-    }
-
-    /**
-     * Get the card brand from the subscription.
-     *
-     * @return string
-     */
-    public function cardBrand()
-    {
-        return (string) ($this->paddleInfo()['payment_information']['card_type'] ?? '');
-    }
-
-    /**
-     * Get the last four digits from the subscription if it's a credit card.
-     *
-     * @return string
-     */
-    public function cardLastFour()
-    {
-        return (string) ($this->paddleInfo()['payment_information']['last_four_digits'] ?? '');
-    }
-
-    /**
-     * Get the card expiration date.
-     *
-     * @return string
-     */
-    public function cardExpirationDate()
-    {
-        return (string) ($this->paddleInfo()['payment_information']['expiry_date'] ?? '');
-    }
-
-    /**
-     * Get raw information about the subscription from Paddle.
+     * Get the subscription as a Paddle subscription response.
      *
      * @return array
      */
-    public function paddleInfo()
+    public function asPaddleSubscription()
     {
-        if ($this->paddleInfo) {
-            return $this->paddleInfo;
-        }
-
-        return $this->paddleInfo = Cashier::post('/subscription/users', array_merge([
-            'subscription_id' => $this->paddle_id,
-        ], $this->billable->paddleOptions()))['response'][0];
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data'];
     }
 
     /**
-     * Perform a guard check to prevent change for a specific action.
+     * Dynamically set the proration behavior when invoicing immediately.
      *
-     * @param  string  $action
+     * @param  string  $method
      * @return void
      *
      * @throws \LogicException
      */
-    public function guardAgainstUpdates($action): void
+    protected function setProrateAndInvoice($method): void
     {
-        if ($this->onTrial()) {
-            throw new LogicException("Cannot $action while on trial.");
+        if ($this->prorationBehavior === 'do_not_bill') {
+            throw new LogicException("You cannot combine {$method} and doNotBill.");
         }
 
-        if ($this->paused() || $this->onPausedGracePeriod()) {
-            throw new LogicException("Cannot $action for paused subscriptions.");
-        }
-
-        if ($this->cancelled() || $this->onGracePeriod()) {
-            throw new LogicException("Cannot $action for cancelled subscriptions.");
-        }
-
-        if ($this->pastDue()) {
-            throw new LogicException("Cannot $action for past due subscriptions.");
+        if ($this->prorationBehavior === 'prorated_next_billing_period') {
+            $this->prorateImmediately();
+        } elseif ($this->prorationBehavior === 'full_next_billing_period') {
+            $this->immediatelyWithoutProrate();
         }
     }
 }

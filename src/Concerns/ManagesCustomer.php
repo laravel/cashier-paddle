@@ -7,14 +7,37 @@ use Laravel\Paddle\Cashier;
 trait ManagesCustomer
 {
     /**
-     * Create a customer record for the billable model.
+     * Create a Paddle customer for the given model.
      *
-     * @param  array  $attributes
      * @return \Laravel\Paddle\Customer
      */
-    public function createAsCustomer(array $attributes = [])
+    public function createAsCustomer(array $options = [])
     {
-        return $this->customer()->create($attributes);
+        if ($customer = $this->customer) {
+            return $customer;
+        }
+
+        if (! array_key_exists('name', $options) && $name = $this->paddleName()) {
+            $options['name'] = $name;
+        }
+
+        if (! array_key_exists('email', $options) && $email = $this->paddleEmail()) {
+            $options['email'] = $email;
+        }
+
+        $response = Cashier::api('POST', 'customers', $options)['data'];
+
+        $customer = $this->customer()->make();
+
+        $customer->paddle_id = $response['id'];
+        $customer->name = $response['name'];
+        $customer->email = $response['email'];
+        $customer->trial_ends_at = $options['trial_ends_at'] ?? null;
+        $customer->save();
+
+        $this->refresh();
+
+        return $customer;
     }
 
     /**
@@ -28,19 +51,29 @@ trait ManagesCustomer
     }
 
     /**
-     * Get prices for a set of product ids for this billable model.
+     * Get price previews for a set of price ids for this billable model.
      *
-     * @param  array|int  $products
+     * @param  array|string  $items
      * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
-    public function productPrices($products, array $options = [])
+    public function previewPrices($items, array $options = [])
     {
-        $options = array_merge([
-            'customer_country' => $this->paddleCountry(),
-        ], $options);
+        if ($customer = $this->customer) {
+            $options['customer_id'] = $customer->paddle_id;
+        }
 
-        return Cashier::productPrices($products, $options);
+        return Cashier::previewPrices($items, $options);
+    }
+
+    /**
+     * Get the billable model's name to associate with Paddle.
+     *
+     * @return string|null
+     */
+    public function paddleName()
+    {
+        return $this->name;
     }
 
     /**
@@ -51,33 +84,5 @@ trait ManagesCustomer
     public function paddleEmail()
     {
         return $this->email;
-    }
-
-    /**
-     * Get the billable model's country to associate with Paddle.
-     *
-     * This needs to be a 2 letter code. See the link below for supported countries.
-     *
-     * @return string|null
-     *
-     * @link https://developer.paddle.com/reference/platform-parameters/supported-countries
-     */
-    public function paddleCountry()
-    {
-        //
-    }
-
-    /**
-     * Get the billable model's postcode to associate with Paddle.
-     *
-     * See the link below for countries which require this.
-     *
-     * @return string|null
-     *
-     * @link https://developer.paddle.com/reference/platform-parameters/supported-countries#countries-requiring-postcode
-     */
-    public function paddlePostcode()
-    {
-        //
     }
 }

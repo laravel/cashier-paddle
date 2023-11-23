@@ -5,9 +5,9 @@ namespace Laravel\Paddle\Events;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Laravel\Paddle\Receipt;
+use Laravel\Paddle\Customer;
 
-class PaymentSucceeded
+class CustomerUpdated
 {
     use Dispatchable, SerializesModels;
 
@@ -19,11 +19,11 @@ class PaymentSucceeded
     public $billable;
 
     /**
-     * The receipt instance.
+     * The customer instance.
      *
-     * @var \Laravel\Paddle\Receipt
+     * @var \Laravel\Paddle\Customer
      */
-    public $receipt;
+    public $customer;
 
     /**
      * The webhook payload.
@@ -36,14 +36,14 @@ class PaymentSucceeded
      * Create a new event instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $billable
-     * @param  \Laravel\Paddle\Receipt  $receipt
+     * @param  \Laravel\Paddle\Customer  $customer
      * @param  array  $payload
      * @return void
      */
-    public function __construct(Model $billable, Receipt $receipt, array $payload)
+    public function __construct(Model $billable, Customer $customer, array $payload)
     {
         $this->billable = $billable;
-        $this->receipt = $receipt;
+        $this->customer = $customer;
         $this->payload = $payload;
     }
 }

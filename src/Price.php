@@ -2,13 +2,10 @@
 
 namespace Laravel\Paddle;
 
-use Laravel\Paddle\Concerns\ManagesAmounts;
 use Money\Currency;
 
 class Price
 {
-    use ManagesAmounts;
-
     /**
      * The price attributes.
      *
@@ -17,93 +14,54 @@ class Price
     protected $price;
 
     /**
-     * The price's currency.
-     *
-     * @var \Money\Currency
-     */
-    protected $currency;
-
-    /**
      * Create a new Price instance.
      *
      * @param  array  $price
-     * @param  \Money\Currency  $currency
      * @return void
      */
-    public function __construct(array $price, Currency $currency)
+    public function __construct(array $price)
     {
         $this->price = $price;
-        $this->currency = $currency;
     }
 
     /**
-     * Get the gross amount.
+     * Get the amount.
      *
      * @return string
      */
-    public function gross()
+    public function amount()
     {
-        return $this->formatDecimalAmount($this->rawGross());
+        return Cashier::formatAmount($this->rawAmount(), $this->currency());
     }
 
     /**
-     * Get the raw gross amount.
+     * Get the raw amount.
      *
      * @return string
      */
-    public function rawGross()
+    public function rawAmount()
     {
-        return $this->price['gross'];
+        return $this->price['unit_price']['amount'];
     }
 
     /**
-     * Get the net amount.
+     * Get the interval for the price.
      *
-     * @return string
+     * @return string|null
      */
-    public function net()
+    public function interval()
     {
-        return $this->formatDecimalAmount($this->rawNet());
+        return $this->price['billing_cycle']['interval'] ?? null;
     }
 
     /**
-     * Get the raw net amount.
+     * Get the frequency for the price.
      *
-     * @return string
+     * @return int|null
      */
-    public function rawNet()
+    public function frequency()
     {
-        return $this->price['net'];
-    }
-
-    /**
-     * Get the net amount.
-     *
-     * @return string
-     */
-    public function tax()
-    {
-        return $this->formatDecimalAmount($this->rawTax());
-    }
-
-    /**
-     * Determine if the price has tax.
-     *
-     * @return bool
-     */
-    public function hasTax()
-    {
-        return $this->rawTax() > 0;
-    }
-
-    /**
-     * Get the raw tax amount.
-     *
-     * @return string
-     */
-    public function rawTax()
-    {
-        return $this->price['tax'];
+        return $this->price['billing_cycle']['frequency'] ?? null;
     }
 
     /**
@@ -113,7 +71,7 @@ class Price
      */
     public function currency(): Currency
     {
-        return $this->currency;
+        return new Currency($this->price['unit_price']['currency_code']);
     }
 
     /**

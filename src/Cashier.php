@@ -2,6 +2,7 @@
 
 namespace Laravel\Paddle;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Exceptions\PaddleException;
 use Money\Currencies\ISOCurrencies;
@@ -12,6 +13,8 @@ use NumberFormatter;
 
 class Cashier
 {
+    const VERSION = '2.0.0-dev';
+
     /**
      * The custom currency formatter.
      *
@@ -55,30 +58,46 @@ class Cashier
     public static $subscriptionModel = Subscription::class;
 
     /**
-     * The receipt model class name.
+     * The subscription item model class name.
      *
      * @var string
      */
-    public static $receiptModel = Receipt::class;
+    public static $subscriptionItemModel = SubscriptionItem::class;
 
     /**
-     * Get prices for a set of product ids.
+     * The transaction model class name.
      *
-     * @param  array|int  $products
+     * @var string
+     */
+    public static $transactionModel = Transaction::class;
+
+    /**
+     * Preview prices for a given set of items.
+     *
+     * @param  array|string  $items
      * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
-    public static function productPrices($products, array $options = [])
+    public static function previewPrices($items, array $options = [])
     {
-        $payload = array_merge($options, [
-            'product_ids' => implode(',', (array) $products),
-        ]);
+        $items = static::api('POST', 'pricing-preview', array_merge([
+            'items' => static::normalizeItems($items),
+        ], $options))['data']['details']['line_items'];
 
-        $response = static::get('/prices', $payload)['response'];
-
-        return collect($response['products'])->map(function (array $product) use ($response) {
-            return new ProductPrice($response['customer_country'], $product);
+        return collect($items)->map(function (array $item) {
+            return new PricePreview($item);
         });
+    }
+
+    /**
+     * Get the customer instance by its Paddle customer ID.
+     *
+     * @param  string  $customerId
+     * @return \Laravel\Paddle\Billable|null
+     */
+    public static function findBillable($customerId)
+    {
+        return (new static::$customerModel)->where('paddle_id', $customerId)->first()?->billable;
     }
 
     /**
@@ -92,54 +111,6 @@ class Cashier
     }
 
     /**
-     * Get the Paddle vendors API url.
-     *
-     * @return string
-     */
-    public static function vendorsUrl()
-    {
-        return 'https://'.(config('cashier.sandbox') ? 'sandbox-' : '').'vendors.paddle.com';
-    }
-
-    /**
-     * Get the Paddle checkout API url.
-     *
-     * @return string
-     */
-    public static function checkoutUrl()
-    {
-        return 'https://'.(config('cashier.sandbox') ? 'sandbox-' : '').'checkout.paddle.com';
-    }
-
-    /**
-     * Perform a GET Paddle API call.
-     *
-     * @param  string  $uri
-     * @param  array  $payload
-     * @return \Illuminate\Http\Client\Response
-     *
-     * @throws \Laravel\Paddle\Exceptions\PaddleException
-     */
-    public static function get($uri, array $payload = [])
-    {
-        return static::makeApiCall('get', static::checkoutUrl().'/api/2.0'.$uri, $payload);
-    }
-
-    /**
-     * Perform a POST Paddle API call.
-     *
-     * @param  string  $uri
-     * @param  array  $payload
-     * @return \Illuminate\Http\Client\Response
-     *
-     * @throws \Laravel\Paddle\Exceptions\PaddleException
-     */
-    public static function post($uri, array $payload = [])
-    {
-        return static::makeApiCall('post', static::vendorsUrl().'/api/2.0'.$uri, $payload);
-    }
-
-    /**
      * Perform a Paddle API call.
      *
      * @param  string  $method
@@ -149,29 +120,63 @@ class Cashier
      *
      * @throws \Laravel\Paddle\Exceptions\PaddleException
      */
-    protected static function makeApiCall($method, $uri, array $payload = [])
+    public static function api($method, $uri, array $payload = [])
     {
-        $response = Http::$method($uri, $payload);
+        if (empty($apiKey = config('cashier.auth_code'))) {
+            throw new Exception('Paddle API key not set.');
+        }
 
-        if ($response['success'] === false) {
-            throw new PaddleException($response['error']['message'], $response['error']['code']);
+        $host = static::apiUrl();
+
+        /** @var \Illuminate\Http\Client\Response $response */
+        $response = Http::withToken($apiKey)
+            ->withUserAgent('Laravel\Paddle/'.static::VERSION)
+            ->withHeaders(['Paddle-Version' => 1])
+            ->$method("{$host}/{$uri}", $payload);
+
+        if (isset($response['error'])) {
+            throw new PaddleException($response['error']['detail']);
         }
 
         return $response;
     }
 
     /**
-     * Get the default Paddle API options.
+     * Get the Paddle API url.
      *
-     * @param  array  $options
+     * @return string
+     */
+    public static function apiUrl()
+    {
+        return 'https://'.(config('cashier.sandbox') ? 'sandbox-' : '').'api.paddle.com';
+    }
+
+    /**
+     * Normalize the given items to a Paddle accepted format.
+     *
+     * @param  array|string  $items
+     * @param  string  $priceKey
      * @return array
      */
-    public static function paddleOptions(array $options = [])
+    public static function normalizeItems($items, string $priceKey = 'price_id'): array
     {
-        return array_merge([
-            'vendor_id' => (int) config('cashier.vendor_id'),
-            'vendor_auth_code' => config('cashier.vendor_auth_code'),
-        ], $options);
+        return collect($items)->map(function ($item, $key) use ($priceKey) {
+            if (is_array($item)) {
+                return $item;
+            }
+
+            if (is_string($key)) {
+                return [
+                    $priceKey => $key,
+                    'quantity' => $item,
+                ];
+            }
+
+            return [
+                $priceKey => $item,
+                'quantity' => 1,
+            ];
+        })->values()->all();
     }
 
     /**
@@ -189,18 +194,18 @@ class Cashier
      * Format the given amount into a displayable currency.
      *
      * @param  int  $amount
-     * @param  string|null  $currency
+     * @param  string  $currency
      * @param  string|null  $locale
      * @param  array  $options
      * @return string
      */
-    public static function formatAmount($amount, $currency = null, $locale = null, array $options = [])
+    public static function formatAmount($amount, $currency, $locale = null, array $options = [])
     {
         if (static::$formatCurrencyUsing) {
             return call_user_func(static::$formatCurrencyUsing, $amount, $currency, $locale, $options);
         }
 
-        $money = new Money($amount, new Currency(strtoupper($currency ?? config('cashier.currency'))));
+        $money = new Money($amount, new Currency(strtoupper($currency)));
 
         $locale = $locale ?? config('cashier.currency_locale');
 
@@ -285,14 +290,14 @@ class Cashier
     }
 
     /**
-     * Set the receipt model class name.
+     * Set the transaction model class name.
      *
-     * @param  string  $receiptModel
+     * @param  string  $transactionModel
      * @return void
      */
-    public static function useReceiptModel($receiptModel)
+    public static function useTransactionModel($transactionModel)
     {
-        static::$receiptModel = $receiptModel;
+        static::$transactionModel = $transactionModel;
     }
 
     /**
@@ -311,9 +316,9 @@ class Cashier
      * @param  callable|int|null  $callback
      * @return void
      */
-    public static function assertPaymentSucceeded($callback = null)
+    public static function assertCustomerUpdated($callback = null)
     {
-        CashierFake::assertPaymentSucceeded($callback);
+        CashierFake::assertCustomerUpdated($callback);
     }
 
     /**
@@ -322,9 +327,9 @@ class Cashier
      * @param  callable|int|null  $callback
      * @return void
      */
-    public static function assertSubscriptionPaymentSucceeded($callback = null)
+    public static function assertTransactionCompleted($callback = null)
     {
-        CashierFake::assertSubscriptionPaymentSucceeded($callback);
+        CashierFake::assertTransactionCompleted($callback);
     }
 
     /**
@@ -333,9 +338,9 @@ class Cashier
      * @param  callable|int|null  $callback
      * @return void
      */
-    public static function assertSubscriptionPaymentFailed($callback = null)
+    public static function assertTransactionUpdated($callback = null)
     {
-        CashierFake::assertSubscriptionPaymentFailed($callback);
+        CashierFake::assertTransactionUpdated($callback);
     }
 
     /**
@@ -377,8 +382,19 @@ class Cashier
      * @param  callable|int|null  $callback
      * @return void
      */
-    public static function assertSubscriptionCancelled($callback = null)
+    public static function assertSubscriptionCanceled($callback = null)
     {
-        CashierFake::assertSubscriptionCancelled($callback);
+        CashierFake::assertSubscriptionCanceled($callback);
+    }
+
+    /**
+     * Pass-thru to the CashierFake method of the same name.
+     *
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public static function assertSubscriptionPaused($callback = null)
+    {
+        CashierFake::assertSubscriptionPaused($callback);
     }
 }

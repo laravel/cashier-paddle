@@ -3,19 +3,19 @@
 namespace Tests\Feature;
 
 use Laravel\Paddle\Cashier;
-use Laravel\Paddle\ProductPrice;
+use Laravel\Paddle\PricePreview;
 
 class PricesTest extends FeatureTestCase
 {
     public function test_it_can_fetch_the_prices_of_products()
     {
-        if (! getenv('PADDLE_TEST_PRODUCT')) {
-            $this->markTestSkipped('Test product not configured.');
+        if (! getenv('PADDLE_TEST_PRICE')) {
+            $this->markTestSkipped('Test price not configured.');
         }
 
-        $prices = Cashier::productPrices([getenv('PADDLE_TEST_PRODUCT')]);
+        $prices = Cashier::previewPrices([getenv('PADDLE_TEST_PRICE')]);
 
         $this->assertNotEmpty($prices);
-        $this->assertContainsOnlyInstancesOf(ProductPrice::class, $prices->all());
+        $this->assertContainsOnlyInstancesOf(PricePreview::class, $prices->all());
     }
 }

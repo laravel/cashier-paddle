@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('billable_id');
             $table->string('billable_type');
+            $table->string('paddle_id')->unique();
+            $table->string('name');
+            $table->string('email');
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamps();
 

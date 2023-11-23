@@ -15,13 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('billable_id');
             $table->string('billable_type');
-            $table->string('name');
-            $table->integer('paddle_id')->unique();
-            $table->string('paddle_status');
-            $table->integer('paddle_plan');
-            $table->integer('quantity');
+            $table->string('type');
+            $table->string('paddle_id')->unique();
+            $table->string('status');
             $table->timestamp('trial_ends_at')->nullable();
-            $table->timestamp('paused_from')->nullable();
+            $table->timestamp('paused_at')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();
 

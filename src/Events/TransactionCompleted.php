@@ -5,9 +5,9 @@ namespace Laravel\Paddle\Events;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Laravel\Paddle\Receipt;
+use Laravel\Paddle\Transaction;
 
-class SubscriptionPaymentSucceeded
+class TransactionCompleted
 {
     use Dispatchable, SerializesModels;
 
@@ -19,11 +19,11 @@ class SubscriptionPaymentSucceeded
     public $billable;
 
     /**
-     * The receipt instance.
+     * The transaction instance.
      *
-     * @var \Laravel\Paddle\Receipt
+     * @var \Laravel\Paddle\Transaction
      */
-    public $receipt;
+    public $transaction;
 
     /**
      * The webhook payload.
@@ -36,24 +36,14 @@ class SubscriptionPaymentSucceeded
      * Create a new event instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $billable
-     * @param  \Laravel\Paddle\Receipt  $receipt
+     * @param  \Laravel\Paddle\Transaction  $transaction
      * @param  array  $payload
      * @return void
      */
-    public function __construct(Model $billable, Receipt $receipt, array $payload)
+    public function __construct(Model $billable, Transaction $transaction, array $payload)
     {
         $this->billable = $billable;
-        $this->receipt = $receipt;
+        $this->transaction = $transaction;
         $this->payload = $payload;
-    }
-
-    /**
-     * Indicates whether it is the customer’s first payment for this subscription.
-     *
-     * @return bool
-     */
-    public function isInitialPayment()
-    {
-        return ((int) $this->payload['initial_payment']) === 1;
     }
 }

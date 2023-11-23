@@ -6,7 +6,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Laravel\Paddle\Subscription;
 
-class SubscriptionCancelled
+class SubscriptionPaused
 {
     use Dispatchable, SerializesModels;
 

@@ -2,9 +2,4 @@
 
 ## Upgrading To 2.0 From 1.x
 
-### Minimum Versions
-
-The following required dependency versions have been updated:
-
-- The minimum PHP version is now v8.0
-- The minimum Laravel version is now v9.0
+Unfortunately there is no official upgrade path from Paddle to migrate from Paddle Classic to Paddle Billing. Therefore, if you use Paddle Classic, you should continue to use Cashier Paddle 1.x. New projects on Paddle which use Paddle Billing should use Cashier Paddle 2.x.

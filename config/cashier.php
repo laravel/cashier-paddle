@@ -7,17 +7,19 @@ return [
     | Paddle Keys
     |--------------------------------------------------------------------------
     |
-    | The Paddle vendor ID and auth code will allow your application to call
+    | The Paddle seller ID and auth code will allow your application to call
     | the Paddle API. The "public" key is typically used when interacting
     | with Paddle.js while the "secret" key accesses private endpoints.
     |
     */
 
-    'vendor_id' => env('PADDLE_VENDOR_ID'),
+    'seller_id' => env('PADDLE_SELLER_ID'),
 
-    'vendor_auth_code' => env('PADDLE_VENDOR_AUTH_CODE'),
+    'auth_code' => env('PADDLE_AUTH_CODE'),
 
-    'public_key' => env('PADDLE_PUBLIC_KEY'),
+    'retain_key' => env('PADDLE_RETAIN_KEY'),
+
+    'webhook_secret' => env('PADDLE_WEBHOOK_SECRET'),
 
     /*
     |--------------------------------------------------------------------------
@@ -47,19 +49,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Currency
-    |--------------------------------------------------------------------------
-    |
-    | This is the default currency that will be used when generating charges
-    | from your application. Of course, you are welcome to use any of the
-    | various world currencies that are currently supported via Paddle.
-    |
-    */
-
-    'currency' => env('CASHIER_CURRENCY', 'USD'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Currency Locale
     |--------------------------------------------------------------------------
     |
@@ -77,8 +66,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option allows you to toggle between the Paddle live environment
-    | and its sandboxed environment. This feature is only available for
-    | a select group of vendors and not a publicly available feature.
+    | and its sandboxed environment.
     |
     */
 
