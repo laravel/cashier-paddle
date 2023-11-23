@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.9.1...master)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.9.2...master)
+
+## [v1.9.2](https://github.com/laravel/cashier-paddle/compare/v1.9.1...v1.9.2) - 2023-10-17
+
+- Fix Livewire support by [@ralphjsmit](https://github.com/ralphjsmit) in https://github.com/laravel/cashier-paddle/pull/199
 
 ## [v1.9.1](https://github.com/laravel/cashier-paddle/compare/v1.9.0...v1.9.1) - 2023-08-24
 
