@@ -186,7 +186,7 @@ Paddle lacks an extensive CRUD API to perform subscription state changes. Theref
         return view('billing', ['payLink' => $payLink]);
     });
 
-Cashier includes a `paddle-button` [Blade component](https://laravel.com/docs//blade#components). We may pass the pay link URL to this component as a "prop". When this button is clicked, Paddle's checkout widget will be displayed:
+Cashier includes a `paddle-button` [Blade component](https://laravel.com/docs/blade#components). We may pass the pay link URL to this component as a "prop". When this button is clicked, Paddle's checkout widget will be displayed:
 
 ```html
 <x-paddle-button :url="$payLink" class="px-8 py-4">
