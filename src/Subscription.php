@@ -688,7 +688,7 @@ class Subscription extends Model
      */
     public function redirectToCancel()
     {
-        return redirect($this->paymentMethodUpdateUrl());
+        return redirect($this->cancelUrl());
     }
 
     /**
