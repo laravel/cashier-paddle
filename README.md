@@ -186,7 +186,7 @@ Paddle lacks an extensive CRUD API to perform subscription state changes. Theref
         return view('billing', ['payLink' => $payLink]);
     });
 
-Cashier includes a `paddle-button` [Blade component](/docs/{{version}}/blade#components). We may pass the pay link URL to this component as a "prop". When this button is clicked, Paddle's checkout widget will be displayed:
+Cashier includes a `paddle-button` [Blade component](https://laravel.com/docs//blade#components). We may pass the pay link URL to this component as a "prop". When this button is clicked, Paddle's checkout widget will be displayed:
 
 ```html
 <x-paddle-button :url="$payLink" class="px-8 py-4">
@@ -447,7 +447,7 @@ To create a subscription, first retrieve an instance of your billable model from
 
 The first argument passed to the `newSubscription` method should be the internal name of the subscription. If your application only offers a single subscription, you might call this `default` or `primary`. This subscription name is only for internal application usage and is not meant to be shown to users. In addition, it should not contain spaces and it should never be changed after creating the subscription. The second argument given to the `newSubscription` method is the specific plan the user is subscribing to. This value should correspond to the plan's identifier in Paddle. The `returnTo` method accepts a URL that your user will be redirected to after they successfully complete the checkout.
 
-The `create` method will create a pay link which you can use to generate a payment button. The payment button can be generated using the `paddle-button` [Blade component](/docs/{{version}}/blade#components) that is included with Cashier Paddle:
+The `create` method will create a pay link which you can use to generate a payment button. The payment button can be generated using the `paddle-button` [Blade component](https://laravel.com/docs/blade#components) that is included with Cashier Paddle:
 
 ```blade
 <x-paddle-button :url="$payLink" class="px-8 py-4">
@@ -496,7 +496,7 @@ Once a user is subscribed to your application, you may check their subscription 
         // ...
     }
 
-The `subscribed` method also makes a great candidate for a [route middleware](/docs/{{version}}/middleware), allowing you to filter access to routes and controllers based on the user's subscription status:
+The `subscribed` method also makes a great candidate for a [route middleware](https://laravel.com/docs/middleware), allowing you to filter access to routes and controllers based on the user's subscription status:
 
     <?php
 
@@ -908,11 +908,11 @@ To ensure your application can handle Paddle webhooks, be sure to [configure the
 - Subscription Payment Succeeded
 
 > **Warning**  
-> Make sure you protect incoming requests with Cashier's included [webhook signature verification](/docs/{{version}}/cashier-paddle#verifying-webhook-signatures) middleware.
+> Make sure you protect incoming requests with Cashier's included [webhook signature verification](#verifying-webhook-signatures) middleware.
 
 ##### Webhooks & CSRF Protection
 
-Since Paddle webhooks need to bypass Laravel's [CSRF protection](/docs/{{version}}/csrf), be sure to list the URI as an exception in your `App\Http\Middleware\VerifyCsrfToken` middleware or list the route outside of the `web` middleware group:
+Since Paddle webhooks need to bypass Laravel's [CSRF protection](https://laravel.com/docs/csrf), be sure to list the URI as an exception in your `App\Http\Middleware\VerifyCsrfToken` middleware or list the route outside of the `web` middleware group:
 
     protected $except = [
         'paddle/*',
@@ -920,7 +920,7 @@ Since Paddle webhooks need to bypass Laravel's [CSRF protection](/docs/{{version
 
 ##### Webhooks & Local Development
 
-For Paddle to be able to send your application webhooks during local development, you will need to expose your application via a site sharing service such as [Ngrok](https://ngrok.com/) or [Expose](https://expose.dev/docs/introduction). If you are developing your application locally using [Laravel Sail](/docs/{{version}}/sail), you may use Sail's [site sharing command](/docs/{{version}}/sail#sharing-your-site).
+For Paddle to be able to send your application webhooks during local development, you will need to expose your application via a site sharing service such as [Ngrok](https://ngrok.com/) or [Expose](https://expose.dev/docs/introduction). If you are developing your application locally using [Laravel Sail](https://laravel.com/docs/sail), you may use Sail's [site sharing command](https://laravel.com/docs/sail#sharing-your-site).
 
 #### Defining Webhook Event Handlers
 
@@ -929,7 +929,7 @@ Cashier automatically handles subscription cancellation on failed charges and ot
 - `Laravel\Paddle\Events\WebhookReceived`
 - `Laravel\Paddle\Events\WebhookHandled`
 
-Both events contain the full payload of the Paddle webhook. For example, if you wish to handle the `invoice.payment_succeeded` webhook, you may register a [listener](/docs/{{version}}/events#defining-listeners) that will handle the event:
+Both events contain the full payload of the Paddle webhook. For example, if you wish to handle the `invoice.payment_succeeded` webhook, you may register a [listener](https://laravel.com/docs/events#defining-listeners) that will handle the event:
 
     <?php
 
@@ -1130,7 +1130,7 @@ Next payment: {{ $nextPayment->amount() }} due on {{ $nextPayment->date()->forma
 
 Subscription payments fail for various reasons, such as expired cards or a card having insufficient funds. When this happens, we recommend that you let Paddle handle payment failures for you. Specifically, you may [setup Paddle's automatic billing emails](https://vendors.paddle.com/subscription-settings) in your Paddle dashboard.
 
-Alternatively, you can perform more precise customization by [listening](/docs/{{version}}/events) for the `subscription_payment_failed` Paddle event via the `WebhookReceived` event dispatched by Cashier. You should also ensure the "Subscription Payment Failed" option is enabled in the Webhook settings of your Paddle dashboard:
+Alternatively, you can perform more precise customization by [listening](https://laravel.com/docs/events) for the `subscription_payment_failed` Paddle event via the `WebhookReceived` event dispatched by Cashier. You should also ensure the "Subscription Payment Failed" option is enabled in the Webhook settings of your Paddle dashboard:
 
     <?php
 
@@ -1174,7 +1174,7 @@ Once your listener has been defined, you should register it within your applicat
 
 While testing, you should manually test your billing flow to make sure your integration works as expected.
 
-For automated tests, including those executed within a CI environment, you may use [Laravel's HTTP Client](/docs/{{version}}/http-client#testing) to fake HTTP calls made to Paddle. Although this does not test the actual responses from Paddle, it does provide a way to test your application without actually calling Paddle's API.
+For automated tests, including those executed within a CI environment, you may use [Laravel's HTTP Client](https://laravel.com/docs/http-client#testing) to fake HTTP calls made to Paddle. Although this does not test the actual responses from Paddle, it does provide a way to test your application without actually calling Paddle's API.
 
 ## Contributing
 
