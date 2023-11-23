@@ -25,7 +25,7 @@ Laravel Cashier Paddle provides an expressive, fluent interface to [Paddle's](ht
 ## Introduction
 
 > **Warning**
-> These docs are for Cashier Paddle v2's integration with Paddle Billing. If you're still using Paddle Classic, you can use [Cashier Paddle v1](https://github.com/laravel/cashier-paddle/tree/1.x).
+> This documentation is for Cashier Paddle 2.x and its integration with Paddle Billing. If you're still using Paddle Classic, you should use [Cashier Paddle 1.x](https://github.com/laravel/cashier-paddle/tree/1.x).
 
 [Laravel Cashier Paddle](https://github.com/laravel/cashier-paddle) provides an expressive, fluent interface to [Paddle's](https://paddle.com) subscription billing services. It handles almost all of the boilerplate subscription billing code you are dreading. In addition to basic subscription management, Cashier can handle: swapping subscription, subscription "quantities", subscription pausing, cancelation grace periods, and more.
 
