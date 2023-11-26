@@ -73,7 +73,7 @@ class WebhookController extends Controller
             return;
         }
 
-        $customer = $customer->update([
+        $customer->update([
             'name' => $data['name'],
             'email' => $data['email'],
         ]);
