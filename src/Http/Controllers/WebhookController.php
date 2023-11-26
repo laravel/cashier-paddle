@@ -290,7 +290,7 @@ class WebhookController extends Controller
     /**
      * Get the customer instance by its Paddle customer ID.
      *
-     * @param  string  $paddleId
+     * @param  string  $customerId
      * @return \Laravel\Paddle\Billable|null
      */
     protected function findBillable($customerId)
