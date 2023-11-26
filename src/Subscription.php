@@ -882,4 +882,30 @@ class Subscription extends Model
             $this->immediatelyWithoutProrate();
         }
     }
+
+    /**
+     * Sync the subscription items with the latest data from Paddle.
+     *
+     * @param  array  $items
+     * @return void
+     */
+    protected function syncSubscriptionItems(array $items)
+    {
+        $prices = [];
+
+        foreach ($items as $item) {
+            $prices[] = $item['price']['id'];
+
+            $this->items()->updateOrCreate([
+                'price_id' => $item['price']['id'],
+            ], [
+                'product_id' => $item['price']['product_id'],
+                'status' => $item['status'],
+                'quantity' => $item['quantity'] ?? 1,
+            ]);
+        }
+
+        // Delete items that aren't attached to the subscription anymore...
+        $this->items()->whereNotIn('price_id', $prices)->delete();
+    }
 }
