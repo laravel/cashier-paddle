@@ -127,7 +127,7 @@ class WebhookController extends Controller
             return;
         }
 
-        $transaction = $transaction->update([
+        $transaction->update([
             'invoice_number' => $data['invoice_number'],
             'status' => $data['status'],
             'total' => $data['details']['totals']['total'],
@@ -290,7 +290,7 @@ class WebhookController extends Controller
     /**
      * Get the customer instance by its Paddle customer ID.
      *
-     * @param  string  $paddleId
+     * @param  string  $customerId
      * @return \Laravel\Paddle\Billable|null
      */
     protected function findBillable($customerId)
@@ -334,7 +334,7 @@ class WebhookController extends Controller
     /**
      * Find the first transaction matching a Paddle transaction ID.
      *
-     * @param  string  $subscriptionId
+     * @param  string  $transactionId
      * @return \Laravel\Paddle\Transaction|null
      */
     protected function findTransaction(string $transactionId)

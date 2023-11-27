@@ -13,6 +13,14 @@ use Money\Currency;
  */
 class Transaction extends Model
 {
+    const STATUS_DRAFT = 'draft';
+    const STATUS_READY = 'ready';
+    const STATUS_BILLED = 'billed';
+    const STATUS_PAID = 'paid';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_CANCELED = 'canceled';
+    const STATUS_PAST_DUE = 'past_due';
+
     /**
      * The attributes that are not mass assignable.
      *
