@@ -7,9 +7,9 @@ use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
 use Laravel\Paddle\Events\SubscriptionUpdated;
 use Laravel\Paddle\Events\TransactionCompleted;
+use Laravel\Paddle\Events\TransactionUpdated;
 use Laravel\Paddle\Subscription;
 use Laravel\Paddle\Transaction;
-use Laravel\Paddle\Events\TransactionUpdated;
 
 class WebhooksTest extends FeatureTestCase
 {
@@ -88,7 +88,7 @@ class WebhooksTest extends FeatureTestCase
                     'totals' => [
                         'total' => '1500',
                         'tax' => '300',
-                    ]
+                    ],
                 ],
                 'billed_at' => $billedAt = now()->addDay()->format('Y-m-d H:i:s'),
             ],
