@@ -61,6 +61,55 @@ class WebhooksTest extends FeatureTestCase
         });
     }
 
+    public function test_it_can_handle_a_transaction_updated_event()
+    {
+        Cashier::fake();
+
+        $user = $this->createBillable('taylor');
+
+        $user->transactions()->create([
+            'paddle_id' => 'txn_123456789',
+            'paddle_subscription_id' => 'sub_123456789',
+            'invoice_number' => null,
+            'status' => Transaction::STATUS_BILLED,
+            'total' => '3070166',
+            'tax' => '250266',
+            'currency' => 'USD',
+            'billed_at' => now(),
+        ]);
+
+        $this->postJson('paddle/webhook', [
+            'event_type' => 'transaction.updated',
+            'data' => [
+                'id' => 'txn_123456789',
+                'invoice_number' => 'test-123456789',
+                'status' => Transaction::STATUS_CANCELED,
+                'details' => [
+                    'totals' => [
+                        'total' => '1500',
+                        'tax' => '300',
+                    ]
+                ],
+                'billed_at' => $billedAt = now()->addDay()->format('Y-m-d H:i:s'),
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('transactions', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'paddle_id' => 'txn_123456789',
+            'status' => Transaction::STATUS_CANCELED,
+            'total' => '1500',
+            'tax' => '300',
+            'currency' => 'USD',
+            'billed_at' => $billedAt,
+        ]);
+
+        Cashier::assertTransactionUpdated(function (TransactionUpdated $event) {
+            return $event->transaction->paddle_id === 'txn_123456789';
+        });
+    }
+
     public function test_it_can_handle_a_subscription_created_event()
     {
         Cashier::fake();
@@ -332,54 +381,5 @@ class WebhooksTest extends FeatureTestCase
         ]);
 
         Cashier::assertSubscriptionNotCreated();
-    }
-
-    public function test_it_can_handle_a_transaction_updated_event()
-    {
-        Cashier::fake();
-
-        $user = $this->createBillable('taylor');
-
-        $user->transactions()->create([
-            'paddle_id' => 'txn_123456789',
-            'paddle_subscription_id' => 'sub_123456789',
-            'invoice_number' => null,
-            'status' => Transaction::STATUS_BILLED,
-            'total' => '3070166',
-            'tax' => '250266',
-            'currency' => 'USD',
-            'billed_at' => now('UTC')->format('Y-m-d H:i:s'),
-        ]);
-
-        $this->postJson('paddle/webhook', [
-            'event_type' => 'transaction.updated',
-            'data' => [
-                'id' => 'txn_123456789',
-                'invoice_number' => 'test-123456789',
-                'status' => Transaction::STATUS_CANCELED,
-                'details' => [
-                    'totals' => [
-                        'total' => '1500',
-                        'tax' => '300',
-                    ]
-                ],
-                'billed_at' => $billedAt = now('UTC')->addDay(2)->format('Y-m-d H:i:s'),
-            ],
-        ])->assertOk();
-
-        $this->assertDatabaseHas('transactions', [
-            'billable_id' => $user->id,
-            'billable_type' => $user->getMorphClass(),
-            'paddle_id' => 'txn_123456789',
-            'status' => Transaction::STATUS_CANCELED,
-            'total' => '1500',
-            'tax' => '300',
-            'currency' => 'USD',
-            'billed_at' => $billedAt,
-        ]);
-
-        Cashier::assertTransactionUpdated(function (TransactionUpdated $event) {
-            return $event->transaction->paddle_id === 'txn_123456789';
-        });
     }
 }
