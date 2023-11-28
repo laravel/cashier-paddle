@@ -760,16 +760,30 @@ class Subscription extends Model
     /**
      * Resume a paused subscription.
      *
+     * @param  \DateTimeInterface|string|null  $resumeAt
      * @return $this
+     *
+     * @throws \LogicException
      */
-    public function resume()
+    public function resume($resumeAt = null)
     {
-        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/resume")['data'];
+        if ($resumeAt) {
+            $effectiveFrom = Carbon::parse($resumeAt)->format(DateTimeInterface::RFC3339);
+        } elseif ($this->paused()) {
+            $effectiveFrom = 'immediately';
+        } elseif ($this->onPausedGracePeriod()) {
+            $effectiveFrom = 'next_billing_period';
+        } else {
+            throw new LogicException('Cannot resume a subscription that is not paused.');
+        }
+
+        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/resume", [
+            'effective_from' => $effectiveFrom,
+        ])['data'];
 
         $this->forceFill([
             'status' => $response['status'],
-            'ends_at' => null,
-            'paused_at' => null,
+            'paused_at' => $response['paused_at'] ? Carbon::parse($response['paused_at'], 'UTC') : null,
         ])->save();
 
         $this->syncSubscriptionItems($response['items']);
