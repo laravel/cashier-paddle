@@ -783,7 +783,7 @@ class Subscription extends Model
 
         $this->forceFill([
             'status' => $response['status'],
-            'paused_at' => $response['paused_at'] ? Carbon::parse($response['paused_at'], 'UTC') : null
+            'paused_at' => $response['paused_at'] ? Carbon::parse($response['paused_at'], 'UTC') : null,
         ])->save();
 
         $this->syncSubscriptionItems($response['items']);
