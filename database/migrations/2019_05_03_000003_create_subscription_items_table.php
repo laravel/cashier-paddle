@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('subscription_id');
             $table->string('product_id');
             $table->string('price_id');
+            $table->string('paddle_subscription_id');
             $table->string('status');
             $table->integer('quantity');
             $table->timestamps();
