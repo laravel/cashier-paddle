@@ -290,6 +290,17 @@ class Cashier
     }
 
     /**
+     * Set the subscription item model class name.
+     *
+     * @param  string  $subscriptionItemModel
+     * @return void
+     */
+    public static function useSubscriptionItemModel($subscriptionItemModel)
+    {
+        static::$subscriptionItemModel = $subscriptionItemModel;
+    }
+
+    /**
      * Set the transaction model class name.
      *
      * @param  string  $transactionModel
