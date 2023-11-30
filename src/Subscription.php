@@ -682,7 +682,7 @@ class Subscription extends Model
     }
 
     /**
-     * Get the raw Transaction used to update the payment method on file.
+     * Get the raw transaction used to update the payment method on file.
      *
      * @return array
      */
