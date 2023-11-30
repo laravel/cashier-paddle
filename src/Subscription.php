@@ -682,6 +682,16 @@ class Subscription extends Model
     }
 
     /**
+     * Get the raw Transaction used to update the payment method on file.
+     *
+     * @return array
+     */
+    public function paymentMethodUpdateTransaction()
+    {
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}/update-payment-method-transaction")['data'];
+    }
+
+    /**
      * Redirect the user to the Paddle cancel URL.
      *
      * @return \Illuminate\Http\RedirectResponse
@@ -853,27 +863,44 @@ class Subscription extends Model
     }
 
     /**
+     * Get the last payment for the subscription.
+     *
+     * @return \Laravel\Paddle\Payment
+     */
+    public function lastPayment()
+    {
+        $transaction = $this->transactions()->orderByDesc('billed_at')->first();
+
+        return new Payment($transaction->total, $transaction->currency, $transaction->billed_at);
+    }
+
+    /**
      * Get the next payment for the subscription.
      *
-     * @return \Carbon\Carbon|null
+     * @return \Laravel\Paddle\Payment|null
      */
-    public function nextBilledAt()
+    public function nextPayment()
     {
-        $paddleSubscription = $this->asPaddleSubscription();
-
-        return $paddleSubscription['next_billed_at']
-            ? Carbon::parse($paddleSubscription['next_billed_at'], 'UTC')
-            : null;
+        if ($transaction = $this->asPaddleSubscription('next_transaction')['next_transaction'] ?? null) {
+            return new Payment(
+                $transaction['details']['totals']['total'],
+                $transaction['details']['totals']['currency_code'],
+                Carbon::parse($transaction['billing_period']['starts_at'], 'UTC'),
+            );
+        }
     }
 
     /**
      * Get the subscription as a Paddle subscription response.
      *
+     * @param  string|null  $include
      * @return array
      */
-    public function asPaddleSubscription()
+    public function asPaddleSubscription(string $include = null)
     {
-        return Cashier::api('GET', "subscriptions/{$this->paddle_id}")['data'];
+        $include = $include ? ['include' => $include] : [];
+
+        return Cashier::api('GET', "subscriptions/{$this->paddle_id}", $include)['data'];
     }
 
     /**
