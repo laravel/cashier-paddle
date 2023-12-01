@@ -777,19 +777,19 @@ class Subscription extends Model
      */
     public function resume($resumeAt = null)
     {
-        if ($resumeAt) {
-            $effectiveFrom = Carbon::parse($resumeAt)->format(DateTimeInterface::RFC3339);
-        } elseif ($this->paused()) {
-            $effectiveFrom = 'immediately';
+        if ($this->paused()) {
+            $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/resume", [
+                'effective_from' => $resumeAt
+                    ? Carbon::parse($resumeAt)->format(DateTimeInterface::RFC3339)
+                    : 'immediately',
+            ])['data'];
         } elseif ($this->onPausedGracePeriod()) {
-            $effectiveFrom = 'next_billing_period';
+            $response = Cashier::api('PATCH', "subscriptions/{$this->paddle_id}", [
+                'scheduled_change' => null,
+            ])['data'];
         } else {
             throw new LogicException('Cannot resume a subscription that is not paused.');
         }
-
-        $response = Cashier::api('POST', "subscriptions/{$this->paddle_id}/resume", [
-            'effective_from' => $effectiveFrom,
-        ])['data'];
 
         $this->forceFill([
             'status' => $response['status'],
@@ -865,13 +865,13 @@ class Subscription extends Model
     /**
      * Get the last payment for the subscription.
      *
-     * @return \Laravel\Paddle\Payment
+     * @return \Laravel\Paddle\Payment|null
      */
     public function lastPayment()
     {
-        $transaction = $this->transactions()->orderByDesc('billed_at')->first();
-
-        return new Payment($transaction->total, $transaction->currency, $transaction->billed_at);
+        if ($transaction = $this->transactions()->orderByDesc('billed_at')->first()) {
+            return new Payment($transaction->total, $transaction->currency, $transaction->billed_at);
+        }
     }
 
     /**
