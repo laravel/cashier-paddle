@@ -14,9 +14,6 @@ use Laravel\Paddle\Events\SubscriptionUpdated;
 use Laravel\Paddle\Events\TransactionCompleted;
 use Laravel\Paddle\Events\TransactionUpdated;
 
-/**
- * @todo
- */
 class CashierFake
 {
     /**
