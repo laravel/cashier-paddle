@@ -1176,7 +1176,7 @@ You may use the `lastPayment` and `nextPayment` methods to retrieve and display 
     $lastPayment = $subscription->lastPayment();
     $nextPayment = $subscription->nextPayment();
 
-Both of these methods will return an instance of `Laravel\Paddle\Payment`; however, `lastPayment` will return `null` when transactions haven't been synced by webhooks yet and `nextPayment` will return `null` when the billing cycle has ended (such as when a subscription has been cancelled):
+Both of these methods will return an instance of `Laravel\Paddle\Payment`; however, `lastPayment` will return `null` when transactions have not been synced by webhooks yet, while `nextPayment` will return `null` when the billing cycle has ended (such as when a subscription has been canceled):
 
 ```blade
 Next payment: {{ $nextPayment->amount() }} due on {{ $nextPayment->date()->format('d/m/Y') }}
