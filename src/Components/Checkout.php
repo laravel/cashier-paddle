@@ -41,8 +41,8 @@ class Checkout extends Component
         $options['settings']['frameTarget'] = $this->id;
         $options['settings']['frameInitialHeight'] = $this->height;
 
-        unset($options['settings']['successUrl']);
+        $options['settings'] = array_filter(array_merge($options['settings'], $this->settings));
 
-        return array_filter(array_merge($options['settings'], $this->settings));
+        return $options;
     }
 }
