@@ -37,7 +37,7 @@ class Cashier
     public static $registersRoutes = true;
 
     /**
-     * Indicates if Cashier will mark past due subscriptions as inactive.
+     * Indicates if Cashier will mark past due subscriptions as invalid.
      *
      * @var bool
      */
