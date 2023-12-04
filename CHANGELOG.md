@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.9.2...master)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.0...master)
+
+## [v2.0.0](https://github.com/laravel/cashier-paddle/compare/v1.9.2...v2.0.0) - 2023-12-04
+
+* Paddle Billing support
 
 ## [v1.9.2](https://github.com/laravel/cashier-paddle/compare/v1.9.1...v1.9.2) - 2023-10-17
 
