@@ -45,17 +45,14 @@
     },
     "autoload": {
         "psr-4": {
-            "Laravel\\Paddle\\": "src/",
-            "Workbench\\App\\": "workbench/app/",
-            "Workbench\\Database\\Factories\\": "workbench/database/factories/"
+            "Laravel\\Paddle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/",
-            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
-            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/"
         }
     },
     "extra": {
