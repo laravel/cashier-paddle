@@ -2,16 +2,15 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Laravel\Paddle\Cashier;
-use Laravel\Paddle\CashierServiceProvider;
-use Orchestra\Testbench\Concerns\WithLaravelMigrations;
+use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
-use Tests\Fixtures\User;
+use Workbench\App\Models\User;
 
 abstract class FeatureTestCase extends TestCase
 {
-    use DatabaseMigrations, WithLaravelMigrations;
+    use LazilyRefreshDatabase, WithWorkbench;
 
     protected function createBillable($description = 'taylor', array $options = []): User
     {
@@ -39,10 +38,5 @@ abstract class FeatureTestCase extends TestCase
             'name' => 'Taylor Otwell',
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         ], $options));
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [CashierServiceProvider::class];
     }
 }

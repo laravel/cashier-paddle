@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
@@ -13,6 +14,8 @@ use Laravel\Paddle\Transaction;
 
 class WebhooksTest extends FeatureTestCase
 {
+    use LazilyRefreshDatabase;
+
     public function test_it_can_handle_a_transaction_completed_event()
     {
         Cashier::fake();
