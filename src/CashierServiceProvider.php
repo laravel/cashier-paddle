@@ -31,7 +31,6 @@ class CashierServiceProvider extends ServiceProvider
     {
         $this->bootRoutes();
         $this->bootResources();
-        $this->bootMigrations();
         $this->bootPublishing();
         $this->bootDirectives();
         $this->bootComponents();
@@ -63,18 +62,6 @@ class CashierServiceProvider extends ServiceProvider
     protected function bootResources()
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
-    }
-
-    /**
-     * Boot the package migrations.
-     *
-     * @return void
-     */
-    protected function bootMigrations()
-    {
-        if (Cashier::$runsMigrations && $this->app->runningInConsole()) {
-            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        }
     }
 
     /**
