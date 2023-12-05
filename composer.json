@@ -1,11 +1,7 @@
 {
     "name": "laravel/cashier-paddle",
     "description": "Cashier Paddle provides an expressive, fluent interface to Paddle's subscription billing services.",
-    "keywords": [
-        "laravel",
-        "paddle",
-        "billing"
-    ],
+    "keywords": ["laravel", "paddle", "billing"],
     "license": "MIT",
     "support": {
         "issues": "https://github.com/laravel/cashier-paddle/issues",
@@ -73,24 +69,8 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": [
-            "@clear",
-            "@prepare"
-        ],
-        "prepare": "@php vendor/bin/testbench package:discover --ansi",
-        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
-        "build": "@php vendor/bin/testbench workbench:build --ansi",
-        "serve": [
-            "Composer\\Config::disableProcessTimeout",
-            "@build",
-            "@php vendor/bin/testbench serve"
-        ],
-        "lint": [
-            "@php vendor/bin/phpstan analyse"
-        ],
-        "test": [
-            "@php vendor/bin/phpunit"
-        ]
+        "post-autoload-dump": "@prepare",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi"
     },
     "config": {
         "sort-packages": true
