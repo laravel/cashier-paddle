@@ -1,0 +1,8 @@
+providers:
+  - Laravel\Paddle\CashierServiceProvider
+
+migrations:
+  - database/migrations
+
+workbench:
+  install: true

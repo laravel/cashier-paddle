@@ -23,13 +23,6 @@ class Cashier
     protected static $formatCurrencyUsing;
 
     /**
-     * Indicates if Cashier migrations will be run.
-     *
-     * @var bool
-     */
-    public static $runsMigrations = true;
-
-    /**
      * Indicates if Cashier routes will be registered.
      *
      * @var bool
@@ -229,18 +222,6 @@ class Cashier
     public static function currencyUsesCents(Currency $currency)
     {
         return ! in_array($currency->getCode(), ['JPY', 'KRW'], true);
-    }
-
-    /**
-     * Configure Cashier to not register its migrations.
-     *
-     * @return static
-     */
-    public static function ignoreMigrations()
-    {
-        static::$runsMigrations = false;
-
-        return new static;
     }
 
     /**
