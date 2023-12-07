@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.2...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.3...2.x)
+
+## [v2.0.3](https://github.com/laravel/cashier-paddle/compare/v2.0.2...v2.0.3) - 2023-12-07
+
+* Fix Verification Webhook Signature by [@majdiyassin20](https://github.com/majdiyassin20) in https://github.com/laravel/cashier-paddle/pull/216
 
 ## [v2.0.2](https://github.com/laravel/cashier-paddle/compare/v2.0.1...v2.0.2) - 2023-12-07
 
