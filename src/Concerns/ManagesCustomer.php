@@ -25,6 +25,10 @@ trait ManagesCustomer
             $options['email'] = $email;
         }
 
+        $trialEndsAt = $options['trial_ends_at'] ?? null;
+
+        unset($options['trial_ends_at']);
+
         $response = Cashier::api('POST', 'customers', $options)['data'];
 
         $customer = $this->customer()->make();
@@ -32,7 +36,7 @@ trait ManagesCustomer
         $customer->paddle_id = $response['id'];
         $customer->name = $response['name'];
         $customer->email = $response['email'];
-        $customer->trial_ends_at = $options['trial_ends_at'] ?? null;
+        $customer->trial_ends_at = $trialEndsAt;
         $customer->save();
 
         $this->refresh();
