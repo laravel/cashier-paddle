@@ -51,8 +51,8 @@ class VerifyWebhookSignature
         if (empty($signature)) {
             return true;
         }
-
-        [$timestamp, $hashes] = $this->parseSignature($signature[0]);
+// $signature[0] to $signature
+        [$timestamp, $hashes] = $this->parseSignature($signature);
 
         if ($this->maximumVariance > 0 && time() > $timestamp + $this->maximumVariance) {
             return true;
