@@ -128,7 +128,7 @@ class Cashier
             ->$method("{$host}/{$uri}", $payload);
 
         if (isset($response['error'])) {
-            throw new PaddleException($response['error']['detail']);
+            throw new PaddleException(json_encode($response['error']));
         }
 
         return $response;
