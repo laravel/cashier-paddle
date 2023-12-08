@@ -128,7 +128,13 @@ class Cashier
             ->$method("{$host}/{$uri}", $payload);
 
         if (isset($response['error'])) {
-            throw new PaddleException(json_encode($response['error']));
+            $message = "Paddle API error '{$response['error']['detail']}' occurred";
+
+            if (isset($response['error']['errors'])) {
+                $message .= ' with validation errors ('.json_encode($response['error']['errors']).')';
+            }
+
+            throw new PaddleException($response['error']['detail']);
         }
 
         return $response;
