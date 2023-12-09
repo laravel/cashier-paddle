@@ -3,6 +3,7 @@
 namespace Laravel\Paddle\Concerns;
 
 use Laravel\Paddle\Cashier;
+use LogicException;
 
 trait ManagesCustomer
 {
@@ -23,6 +24,10 @@ trait ManagesCustomer
 
         if (! array_key_exists('email', $options) && $email = $this->paddleEmail()) {
             $options['email'] = $email;
+        }
+
+        if (! isset($options['email'])) {
+            throw new LogicException('Unable to create Paddle customer without an email.');
         }
 
         $trialEndsAt = $options['trial_ends_at'] ?? null;
