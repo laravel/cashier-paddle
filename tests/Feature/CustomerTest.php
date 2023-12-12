@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 
 class CustomerTest extends FeatureTestCase
@@ -11,12 +12,12 @@ class CustomerTest extends FeatureTestCase
         $user = $this->createUser();
 
         Cashier::fake([
-            'customers' => [
-                'data' => [
+            'customers*' => [
+                'data' => [[
                     'id' => 'cus_123456789',
                     'name' => $user->name,
                     'email' => $user->email,
-                ],
+                ]],
             ],
         ]);
 
@@ -46,12 +47,12 @@ class CustomerTest extends FeatureTestCase
         $user = $this->createUser();
 
         Cashier::fake([
-            'customers' => [
-                'data' => [
+            'customers*' => [
+                'data' => [[
                     'id' => 'cus_123456789',
                     'name' => $user->name,
                     'email' => $user->email,
-                ],
+                ]],
             ],
         ]);
 
