@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.3...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.4...2.x)
+
+## [v2.0.4](https://github.com/laravel/cashier-paddle/compare/v2.0.3...v2.0.4) - 2023-12-12
+
+* [2.x] Update Cashier::api error message by [@Ahmad-Alkaf](https://github.com/Ahmad-Alkaf) in https://github.com/laravel/cashier-paddle/pull/217
+* [2.x] Fix existing customers in Paddle issue by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/220
 
 ## [v2.0.3](https://github.com/laravel/cashier-paddle/compare/v2.0.2...v2.0.3) - 2023-12-07
 
