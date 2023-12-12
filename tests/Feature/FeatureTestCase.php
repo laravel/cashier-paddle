@@ -17,12 +17,12 @@ abstract class FeatureTestCase extends TestCase
         $user = $this->createUser($description);
 
         Cashier::fake([
-            'customers' => [
-                'data' => [
+            'customers*' => [
+                'data' => [[
                     'id' => 'cus_123456789',
                     'name' => $user->name,
                     'email' => $user->email,
-                ],
+                ]],
             ],
         ]);
 
