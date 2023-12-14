@@ -174,6 +174,8 @@ class WebhookController extends Controller
             ]);
         }
 
+        $billable->customer->update(['trial_ends_at' => null]);
+
         SubscriptionCreated::dispatch($billable, $subscription, $payload);
     }
 
