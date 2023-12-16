@@ -532,7 +532,7 @@ class Subscription extends Model
 
         $itemToUpdate = $price instanceof SubscriptionItem ? $price : $this->singleItemOrFail($price);
 
-        $items = $this->items()->get(['quantity', 'price_id'])->pluck(['quantity', 'price_id'])->toArray();
+        $items = $this->items()->get(['quantity', 'price_id'])->toArray();
 
         foreach ($items as $key => $item) {
             if ($item['price_id'] === $itemToUpdate->price_id) {
