@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.4...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.5...2.x)
+
+## [v2.0.5](https://github.com/laravel/cashier-paddle/compare/v2.0.4...v2.0.5) - 2023-12-19
+
+* [2.x] Clear generic trial for subscription creation by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/222
 
 ## [v2.0.4](https://github.com/laravel/cashier-paddle/compare/v2.0.3...v2.0.4) - 2023-12-12
 
