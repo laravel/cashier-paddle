@@ -514,7 +514,7 @@ class Subscription extends Model
     {
         $item = $this->singleItemOrFail($price);
 
-        return $this->updateQuantity(max(1, $item->quantity - $count));
+        return $this->updateQuantity(max(1, $item->quantity - $count), $item);
     }
 
     /**
