@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.5...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.6...2.x)
+
+## [v2.0.6](https://github.com/laravel/cashier-paddle/compare/v2.0.5...v2.0.6) - 2023-12-21
+
+* [2.x] Fix quantity method by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/226
 
 ## [v2.0.5](https://github.com/laravel/cashier-paddle/compare/v2.0.4...v2.0.5) - 2023-12-19
 
