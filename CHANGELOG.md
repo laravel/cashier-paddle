@@ -1,6 +1,28 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.1...master)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.6...2.x)
+
+## [v2.0.6](https://github.com/laravel/cashier-paddle/compare/v2.0.5...v2.0.6) - 2023-12-21
+
+* [2.x] Fix quantity method by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/226
+
+## [v2.0.5](https://github.com/laravel/cashier-paddle/compare/v2.0.4...v2.0.5) - 2023-12-19
+
+* [2.x] Clear generic trial for subscription creation by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/222
+
+## [v2.0.4](https://github.com/laravel/cashier-paddle/compare/v2.0.3...v2.0.4) - 2023-12-12
+
+* [2.x] Update Cashier::api error message by [@Ahmad-Alkaf](https://github.com/Ahmad-Alkaf) in https://github.com/laravel/cashier-paddle/pull/217
+* [2.x] Fix existing customers in Paddle issue by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/220
+
+## [v2.0.3](https://github.com/laravel/cashier-paddle/compare/v2.0.2...v2.0.3) - 2023-12-07
+
+* Fix Verification Webhook Signature by [@majdiyassin20](https://github.com/majdiyassin20) in https://github.com/laravel/cashier-paddle/pull/216
+
+## [v2.0.2](https://github.com/laravel/cashier-paddle/compare/v2.0.1...v2.0.2) - 2023-12-07
+
+* Update VerifyWebhookSignature.php by [@majdiyassin20](https://github.com/majdiyassin20) in https://github.com/laravel/cashier-paddle/pull/214
+* [2.x] Fix generic trial for customers by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/215
 
 ## [v2.0.1](https://github.com/laravel/cashier-paddle/compare/v2.0.0...v2.0.1) - 2023-12-05
 

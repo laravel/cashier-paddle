@@ -514,7 +514,7 @@ class Subscription extends Model
     {
         $item = $this->singleItemOrFail($price);
 
-        return $this->updateQuantity(max(1, $item->quantity - $count));
+        return $this->updateQuantity(max(1, $item->quantity - $count), $item);
     }
 
     /**
@@ -532,7 +532,15 @@ class Subscription extends Model
 
         $itemToUpdate = $price instanceof SubscriptionItem ? $price : $this->singleItemOrFail($price);
 
-        $items = $this->items()->get(['quantity', 'price_id'])->pluck(['quantity', 'price_id'])->toArray();
+        $items = $this->items()
+            ->get(['quantity', 'price_id'])
+            ->map(function ($item) {
+                return [
+                    'price_id' => $item['price_id'],
+                    'quantity' => $item['quantity'],
+                ];
+            })
+            ->toArray();
 
         foreach ($items as $key => $item) {
             if ($item['price_id'] === $itemToUpdate->price_id) {

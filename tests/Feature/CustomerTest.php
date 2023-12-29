@@ -11,12 +11,12 @@ class CustomerTest extends FeatureTestCase
         $user = $this->createUser();
 
         Cashier::fake([
-            'customers' => [
-                'data' => [
+            'customers*' => [
+                'data' => [[
                     'id' => 'cus_123456789',
                     'name' => $user->name,
                     'email' => $user->email,
-                ],
+                ]],
             ],
         ]);
 
@@ -46,12 +46,12 @@ class CustomerTest extends FeatureTestCase
         $user = $this->createUser();
 
         Cashier::fake([
-            'customers' => [
-                'data' => [
+            'customers*' => [
+                'data' => [[
                     'id' => 'cus_123456789',
                     'name' => $user->name,
                     'email' => $user->email,
-                ],
+                ]],
             ],
         ]);
 

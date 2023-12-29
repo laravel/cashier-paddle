@@ -43,16 +43,19 @@ class VerifyWebhookSignature
      * @param  string  $signature
      * @return bool
      */
+
+    //the signature is not $signature[0] it's $signature
+    //the true it's false and false it's true when if ($this->isInvalidSignature($request, $signature)) { throw new AccessDeniedHttpException('Invalid webhook signature.'); }
     protected function isInvalidSignature(Request $request, $signature)
     {
         if (empty($signature)) {
-            return false;
+            return true;
         }
 
-        [$timestamp, $hashes] = $this->parseSignature($signature[0]);
+        [$timestamp, $hashes] = $this->parseSignature($signature);
 
         if ($this->maximumVariance > 0 && time() > $timestamp + $this->maximumVariance) {
-            return false;
+            return true;
         }
 
         $secret = config('cashier.webhook_secret');
@@ -65,12 +68,12 @@ class VerifyWebhookSignature
 
             foreach ($possibleHashes as $possibleHash) {
                 if (hash_equals($hash, $possibleHash)) {
-                    return true;
+                    return false;
                 }
             }
         }
 
-        return false;
+        return true;
     }
 
     /**

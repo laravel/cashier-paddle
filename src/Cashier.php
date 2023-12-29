@@ -13,7 +13,7 @@ use NumberFormatter;
 
 class Cashier
 {
-    const VERSION = '2.0.1';
+    const VERSION = '2.0.6';
 
     /**
      * The custom currency formatter.
@@ -128,6 +128,12 @@ class Cashier
             ->$method("{$host}/{$uri}", $payload);
 
         if (isset($response['error'])) {
+            $message = "Paddle API error '{$response['error']['detail']}' occurred";
+
+            if (isset($response['error']['errors'])) {
+                $message .= ' with validation errors ('.json_encode($response['error']['errors']).')';
+            }
+
             throw new PaddleException($response['error']['detail']);
         }
 
