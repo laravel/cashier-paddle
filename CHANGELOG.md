@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.6...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.7...2.x)
+
+## [v2.0.7](https://github.com/laravel/cashier-paddle/compare/v2.0.6...v2.0.7) - 2024-01-09
+
+* [2.x] Fix next payment amount by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/231
 
 ## [v2.0.6](https://github.com/laravel/cashier-paddle/compare/v2.0.5...v2.0.6) - 2023-12-21
 
