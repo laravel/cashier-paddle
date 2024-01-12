@@ -8,8 +8,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | The Paddle seller ID and API key will allow your application to call
-    | the Paddle API. The "seller" key is typically used when interacting
-    | with Paddle.js while the "API" key accesses private endpoints.
+    | the Paddle API. The seller key is typically used when interacting
+    | with Paddle.js, while the "API" key accesses private endpoints.
     |
     */
 
