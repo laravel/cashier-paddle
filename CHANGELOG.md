@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.0.7...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.1.0...2.x)
+
+## [v2.1.0](https://github.com/laravel/cashier-paddle/compare/v2.0.7...v2.1.0) - 2024-01-12
+
+* [2.x] Use proper API Key naming by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/233
+* [2.x] Protect against duplication of customer by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/234
 
 ## [v2.0.7](https://github.com/laravel/cashier-paddle/compare/v2.0.6...v2.0.7) - 2024-01-09
 
