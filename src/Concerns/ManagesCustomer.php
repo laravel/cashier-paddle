@@ -46,7 +46,7 @@ trait ManagesCustomer
         }
 
         if (Cashier::$customerModel::where('paddle_id', $response['id'])->exists()) {
-            throw new LogicException('This Paddle customer already exists in the database.');
+            throw new LogicException("This Paddle customer ({$response['id']}' already exists in the database.");
         }
 
         $customer = $this->customer()->make();
