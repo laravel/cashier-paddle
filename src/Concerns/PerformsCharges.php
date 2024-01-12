@@ -30,6 +30,6 @@ trait PerformsCharges
      */
     public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE)
     {
-        return $this->checkout($prices, 1)->customData(['subscription_type' => $type]);
+        return $this->checkout($prices)->customData(['subscription_type' => $type]);
     }
 }
