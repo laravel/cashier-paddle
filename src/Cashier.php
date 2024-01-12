@@ -115,7 +115,7 @@ class Cashier
      */
     public static function api($method, $uri, array $payload = [])
     {
-        if (empty($apiKey = config('cashier.auth_code'))) {
+        if (empty($apiKey = config('cashier.api_key', config('cashier.auth_code')))) {
             throw new Exception('Paddle API key not set.');
         }
 

@@ -7,15 +7,15 @@ return [
     | Paddle Keys
     |--------------------------------------------------------------------------
     |
-    | The Paddle seller ID and auth code will allow your application to call
-    | the Paddle API. The "public" key is typically used when interacting
-    | with Paddle.js while the "secret" key accesses private endpoints.
+    | The Paddle seller ID and API key will allow your application to call
+    | the Paddle API. The "seller" key is typically used when interacting
+    | with Paddle.js while the "API" key accesses private endpoints.
     |
     */
 
     'seller_id' => env('PADDLE_SELLER_ID'),
 
-    'auth_code' => env('PADDLE_AUTH_CODE'),
+    'api_key' => env('PADDLE_AUTH_CODE') ?? env('PADDLE_API_KEY'),
 
     'retain_key' => env('PADDLE_RETAIN_KEY'),
 
