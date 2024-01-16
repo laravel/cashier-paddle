@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.1.0...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.2.0...2.x)
+
+## [v2.2.0](https://github.com/laravel/cashier-paddle/compare/v2.1.0...v2.2.0) - 2024-01-16
+
+* [2.x] Laravel v11 support by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-paddle/pull/237
 
 ## [v2.1.0](https://github.com/laravel/cashier-paddle/compare/v2.0.7...v2.1.0) - 2024-01-12
 
