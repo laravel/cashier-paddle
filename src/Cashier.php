@@ -13,7 +13,7 @@ use NumberFormatter;
 
 class Cashier
 {
-    const VERSION = '2.1.0';
+    const VERSION = '2.2.0';
 
     /**
      * The custom currency formatter.
