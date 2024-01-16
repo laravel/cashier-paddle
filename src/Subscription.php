@@ -891,7 +891,7 @@ class Subscription extends Model
     {
         if ($transaction = $this->asPaddleSubscription('next_transaction')['next_transaction'] ?? null) {
             return new Payment(
-                $transaction['details']['totals']['total'],
+                $transaction['details']['totals']['grand_total'],
                 $transaction['details']['totals']['currency_code'],
                 Carbon::parse($transaction['billing_period']['starts_at'], 'UTC'),
             );

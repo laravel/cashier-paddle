@@ -46,6 +46,6 @@ jobs:
         run: vendor/bin/phpunit
         env:
           PADDLE_SELLER_ID: ${{ secrets.PADDLE_SELLER_ID }}
-          PADDLE_AUTH_CODE: ${{ secrets.PADDLE_AUTH_CODE }}
+          PADDLE_API_KEY: ${{ secrets.PADDLE_API_KEY }}
           PADDLE_WEBHOOK_SECRET: ${{ secrets.PADDLE_WEBHOOK_SECRET }}
           PADDLE_TEST_PRICE: ${{ secrets.PADDLE_TEST_PRICE }}

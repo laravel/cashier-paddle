@@ -13,7 +13,7 @@ use NumberFormatter;
 
 class Cashier
 {
-    const VERSION = '2.0.6';
+    const VERSION = '2.1.0';
 
     /**
      * The custom currency formatter.
@@ -115,7 +115,7 @@ class Cashier
      */
     public static function api($method, $uri, array $payload = [])
     {
-        if (empty($apiKey = config('cashier.auth_code'))) {
+        if (empty($apiKey = config('cashier.api_key', config('cashier.auth_code')))) {
             throw new Exception('Paddle API key not set.');
         }
 
