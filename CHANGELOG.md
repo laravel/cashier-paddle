@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.10.0...1.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v1.11.0...1.x)
+
+## [v1.11.0](https://github.com/laravel/cashier-paddle/compare/v1.10.0...v1.11.0) - 2024-01-30
+
+* [1.x] Carbon v3 support by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-paddle/pull/242
 
 ## [v1.10.0](https://github.com/laravel/cashier-paddle/compare/v1.9.2...v1.10.0) - 2024-01-16
 
