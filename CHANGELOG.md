@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.3.0...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.3.1...2.x)
+
+## [v2.3.1](https://github.com/laravel/cashier-paddle/compare/v2.3.0...v2.3.1) - 2024-02-13
+
+Version
 
 ## [v2.3.0](https://github.com/laravel/cashier-paddle/compare/v2.2.1...v2.3.0) - 2024-02-13
 
