@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Carbon\Carbon;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Subscription;
@@ -293,13 +294,12 @@ class SubscriptionsTest extends FeatureTestCase
             removalProrationBehaviour: 'full_next_billing_period'
         );
 
-        $isFirst = true; // Flag to differentiate between the first and second requests
+        Http::assertSentInOrder([
+            // Additions and Quantity increase
+            function (Request $request) {
+                $data = $request->data();
 
-        Http::assertSent(function ($request) use (&$isFirst) {
-            $data = json_decode($request->body(), true);
-
-            if ($isFirst) {
-                $isFirst = false;
+                $this->assertEquals('prorated_immediately', $data['proration_billing_mode']);
 
                 $expectedItems = [
                     ['price_id' => 'price_id_to_be_updated', 'quantity' => 2],      // Quantity update 1 to 2
@@ -309,36 +309,41 @@ class SubscriptionsTest extends FeatureTestCase
                 ];
 
                 foreach ($expectedItems as $expected) {
-                    $found = collect($data['items'])->contains(
-                        fn($actual) => $actual['price_id'] === $expected['price_id'] && $actual['quantity'] === $expected['quantity']
+                    $this->assertTrue(
+                        collect($data['items'])->contains(
+                            fn($actual) => $actual['price_id'] === $expected['price_id'] && $actual['quantity'] === $expected['quantity']
+                        )
                     );
+                }
 
-                    $this->assertTrue($found);
+                return true;
+            },
+
+            // Removals and Quantity decrease
+            function (Request $request) {
+                $data = $request->data();
+
+                $this->assertEquals('full_next_billing_period', $data['proration_billing_mode']);
+
+                $expectedItems = [
+                    ['price_id' => 'price_id_to_be_updated', 'quantity' => 2],      // unchanged
+                    ['price_id' => 'price_id_to_be_added', 'quantity' => 1],        // unchanged
+                    ['price_id' => 'price_id_to_be_decremented', 'quantity' => 1],  // decremented
+                    ['price_id' => 'price_id_to_be_unchanged', 'quantity' => 1],    // unchanged
+                ];
+
+
+                foreach ($expectedItems as $expected) {
+                    $this->assertTrue(
+                        collect($data['items'])->contains(
+                            fn($actual) => $actual['price_id'] === $expected['price_id'] && $actual['quantity'] === $expected['quantity']
+                        )
+                    );
                 }
 
                 return true;
             }
-
-            $this->assertEquals('full_next_billing_period', $data['proration_billing_mode']);
-
-            $expectedItems = [
-                ['price_id' => 'price_id_to_be_updated', 'quantity' => 2],      // unchanged
-                ['price_id' => 'price_id_to_be_added', 'quantity' => 1],        // unchanged
-                ['price_id' => 'price_id_to_be_decremented', 'quantity' => 1],  // decremented
-                ['price_id' => 'price_id_to_be_unchanged', 'quantity' => 1],    // unchanged
-            ];
-
-
-            foreach ($expectedItems as $expected) {
-                $found = collect($data['items'])->contains(
-                    fn($actual) => $actual['price_id'] === $expected['price_id'] && $actual['quantity'] === $expected['quantity']
-                );
-
-                $this->assertTrue($found);
-            }
-
-            return true;
-        });
+        ]);
     }
 
 }
