@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Subscription;
 
 class SubscriptionsTest extends FeatureTestCase
@@ -221,4 +223,122 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($subscription->canceled());
         $this->assertFalse($subscription->onGracePeriod());
     }
+
+
+    public function test_subscription_items_are_updated_correctly_with_different_proration()
+    {
+        $billable = $this->createBillable('taylor');
+
+        $subscription = $billable->subscriptions()->create([
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
+            'status' => Subscription::STATUS_ACTIVE,
+        ]);
+
+        // Create initial items for the subscription
+        $subscription->items()->create([
+            'subscription_id' => $subscription->id,
+            'product_id' => 'pro_product_1',
+            'price_id' => 'price_id_to_be_updated',
+            'status' => 'active',
+            'quantity' => 1,
+        ]);
+
+        $subscription->items()->create([
+            'subscription_id' => $subscription->id,
+            'product_id' => 'pro_product_2',
+            'price_id' => 'price_id_to_be_unchanged',
+            'status' => 'active',
+            'quantity' => 1,
+        ]);
+
+        $subscription->items()->create([
+            'subscription_id' => $subscription->id,
+            'product_id' => 'pro_product_3',
+            'price_id' => 'price_id_to_be_removed',
+            'status' => 'active',
+            'quantity' => 1,
+        ]);
+
+        $subscription->items()->create([
+            'subscription_id' => $subscription->id,
+            'product_id' => 'pro_product_4',
+            'price_id' => 'price_id_to_be_decremented',
+            'status' => 'active',
+            'quantity' => 3,
+        ]);
+
+        // Prepare the update payload
+        Cashier::fake([
+            'subscriptions/sub_123456789' => [
+                'data' => [
+                    'subscription_id' => 'sub_test_123',
+                    'status' => 'active',
+                    "items" => [
+
+                    ]
+                ],
+            ],
+        ]);
+
+        // Call the method to update subscription items
+        $subscription->updateItemsWithDifferentProration(
+            items: [
+                ['price_id' => 'price_id_to_be_updated', 'quantity' => 2],      // Quantity update 1 to 2
+                ['price_id' => 'price_id_to_be_added', 'quantity' => 1],        // New item addition
+                ['price_id' => 'price_id_to_be_decremented', 'quantity' => 1],  // Quantity decrease from 3 to 1
+                ['price_id' => 'price_id_to_be_unchanged', 'quantity' => 1],          // no change
+            ],
+            additionProrationBehaviour: 'prorated_immediately',
+            removalProrationBehaviour: 'full_next_billing_period'
+        );
+
+        $isFirst = true; // Flag to differentiate between the first and second requests
+
+        Http::assertSent(function ($request) use (&$isFirst) {
+            $data = json_decode($request->body(), true);
+
+            if ($isFirst) {
+                $isFirst = false;
+
+                $expectedItems = [
+                    ['price_id' => 'price_id_to_be_updated', 'quantity' => 2],      // Quantity update 1 to 2
+                    ['price_id' => 'price_id_to_be_added', 'quantity' => 1],        // New item addition
+                    ['price_id' => 'price_id_to_be_decremented', 'quantity' => 3],  // unchanged
+                    ['price_id' => 'price_id_to_be_unchanged', 'quantity' => 1],    // unchanged
+                ];
+
+                foreach ($expectedItems as $expected) {
+                    $found = collect($data['items'])->contains(
+                        fn($actual) => $actual['price_id'] === $expected['price_id'] && $actual['quantity'] === $expected['quantity']
+                    );
+
+                    $this->assertTrue($found);
+                }
+
+                return true;
+            }
+
+            $this->assertEquals('full_next_billing_period', $data['proration_billing_mode']);
+
+            $expectedItems = [
+                ['price_id' => 'price_id_to_be_updated', 'quantity' => 2],      // unchanged
+                ['price_id' => 'price_id_to_be_added', 'quantity' => 1],        // unchanged
+                ['price_id' => 'price_id_to_be_decremented', 'quantity' => 1],  // decremented
+                ['price_id' => 'price_id_to_be_unchanged', 'quantity' => 1],    // unchanged
+            ];
+
+
+            foreach ($expectedItems as $expected) {
+                $found = collect($data['items'])->contains(
+                    fn($actual) => $actual['price_id'] === $expected['price_id'] && $actual['quantity'] === $expected['quantity']
+                );
+
+                $this->assertTrue($found);
+            }
+
+            return true;
+        });
+    }
+
 }

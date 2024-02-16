@@ -7,6 +7,7 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 use Laravel\Paddle\Concerns\Prorates;
+use Laravel\Paddle\Exceptions\PaddleException;
 use LogicException;
 
 /**
@@ -72,7 +73,7 @@ class Subscription extends Model
     /**
      * Get the subscription item for the given price.
      *
-     * @param  string  $price
+     * @param string $price
      * @return \Laravel\Paddle\SubscriptionItem
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
@@ -85,7 +86,7 @@ class Subscription extends Model
     /**
      * Retrieve a specific item by price or the single item on a subscription.
      *
-     * @param  string|null  $price
+     * @param string|null $price
      * @return \Laravel\Paddle\SubscriptionItem
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
@@ -130,13 +131,13 @@ class Subscription extends Model
      */
     public function hasSinglePrice()
     {
-        return ! $this->hasMultiplePrices();
+        return !$this->hasMultiplePrices();
     }
 
     /**
      * Determine if the subscription has a specific product.
      *
-     * @param  string  $product
+     * @param string $product
      * @return bool
      */
     public function hasProduct($product)
@@ -149,7 +150,7 @@ class Subscription extends Model
     /**
      * Determine if the subscription has a specific price.
      *
-     * @param  string  $price
+     * @param string $price
      * @return bool
      */
     public function hasPrice($price)
@@ -166,13 +167,13 @@ class Subscription extends Model
      */
     public function valid()
     {
-        return $this->onTrial() || $this->active() || (! Cashier::$deactivatePastDue && $this->pastDue());
+        return $this->onTrial() || $this->active() || (!Cashier::$deactivatePastDue && $this->pastDue());
     }
 
     /**
      * Filter query by valid.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeValid($query)
@@ -180,7 +181,7 @@ class Subscription extends Model
         $query->where('status', self::STATUS_TRIALING)
             ->orWhere('status', self::STATUS_ACTIVE);
 
-        if (! Cashier::$deactivatePastDue) {
+        if (!Cashier::$deactivatePastDue) {
             $query->orWhere('status', self::STATUS_PAST_DUE);
         }
     }
@@ -198,7 +199,7 @@ class Subscription extends Model
     /**
      * Filter query by on trial.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeOnTrial($query)
@@ -219,7 +220,7 @@ class Subscription extends Model
     /**
      * Filter query by expired trial.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeExpiredTrial($query)
@@ -230,7 +231,7 @@ class Subscription extends Model
     /**
      * Filter query by not on trial.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeNotOnTrial($query)
@@ -251,7 +252,7 @@ class Subscription extends Model
     /**
      * Filter query by active.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeActive($query)
@@ -266,13 +267,13 @@ class Subscription extends Model
      */
     public function recurring()
     {
-        return $this->active() && ! $this->onPausedGracePeriod() && ! $this->onGracePeriod();
+        return $this->active() && !$this->onPausedGracePeriod() && !$this->onGracePeriod();
     }
 
     /**
      * Filter query by recurring.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeRecurring($query)
@@ -293,7 +294,7 @@ class Subscription extends Model
     /**
      * Filter query by past due.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopePastDue($query)
@@ -314,7 +315,7 @@ class Subscription extends Model
     /**
      * Filter query by paused.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopePaused($query)
@@ -325,7 +326,7 @@ class Subscription extends Model
     /**
      * Filter query by not paused.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeNotPaused($query)
@@ -346,7 +347,7 @@ class Subscription extends Model
     /**
      * Filter query by on trial grace period.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeOnPausedGracePeriod($query)
@@ -357,7 +358,7 @@ class Subscription extends Model
     /**
      * Filter query by not on trial grace period.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeNotOnPausedGracePeriod($query)
@@ -378,7 +379,7 @@ class Subscription extends Model
     /**
      * Filter query by canceled.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeCanceled($query)
@@ -389,7 +390,7 @@ class Subscription extends Model
     /**
      * Filter query by not canceled.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeNotCanceled($query)
@@ -410,7 +411,7 @@ class Subscription extends Model
     /**
      * Filter query by on grace period.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeOnGracePeriod($query)
@@ -421,7 +422,7 @@ class Subscription extends Model
     /**
      * Filter query by not on grace period.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return void
      */
     public function scopeNotOnGracePeriod($query)
@@ -432,15 +433,15 @@ class Subscription extends Model
     /**
      * Bill for one-time charges on top of the subscription.
      *
-     * @param  string|array  $items
-     * @param  bool  $chargeNow
+     * @param string|array $items
+     * @param bool $chargeNow
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
     public function charge($items, bool $chargeNow = false)
     {
-        if (empty($items = (array) $items)) {
+        if (empty($items = (array)$items)) {
             throw new InvalidArgumentException('Please provide at least one item when charging one-time.');
         }
 
@@ -459,7 +460,7 @@ class Subscription extends Model
     /**
      * Bill for one-time charges on top of the subscription, and invoice immediately.
      *
-     * @param  string|array  $items
+     * @param string|array $items
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -474,8 +475,8 @@ class Subscription extends Model
     /**
      * Increment the quantity of a subscription item.
      *
-     * @param  int  $count
-     * @param  string|null  $price
+     * @param int $count
+     * @param string|null $price
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -490,8 +491,8 @@ class Subscription extends Model
     /**
      * Increment the quantity of the subscription, and invoice immediately.
      *
-     * @param  int  $count
-     * @param  string|null  $price
+     * @param int $count
+     * @param string|null $price
      * @return $this
      */
     public function incrementAndInvoice($count = 1, $price = null)
@@ -506,8 +507,8 @@ class Subscription extends Model
     /**
      * Decrement the quantity of a subscription item.
      *
-     * @param  int  $count
-     * @param  string|null  $price
+     * @param int $count
+     * @param string|null $price
      * @return $this
      */
     public function decrementQuantity($count = 1, $price = null)
@@ -520,8 +521,8 @@ class Subscription extends Model
     /**
      * Update the quantity of the subscription.
      *
-     * @param  int  $quantity
-     * @param  \Laravel\Paddle\SubscriptionItem|string|null  $price
+     * @param int $quantity
+     * @param \Laravel\Paddle\SubscriptionItem|string|null $price
      * @return $this
      */
     public function updateQuantity($quantity, $price = null)
@@ -566,10 +567,11 @@ class Subscription extends Model
         return $this;
     }
 
+
     /**
      * Extend the trial period of the subscription.
      *
-     * @param  \DateTimeInterface|string  $until
+     * @param \DateTimeInterface|string $until
      * @return $this
      */
     public function extendTrial($until)
@@ -611,15 +613,15 @@ class Subscription extends Model
     /**
      * Swap the subscription to new Paddle items.
      *
-     * @param  string|array  $items
-     * @param  array  $options
+     * @param string|array $items
+     * @param array $options
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
     public function swap($items, array $options = [])
     {
-        if (empty($items = (array) $items)) {
+        if (empty($items = (array)$items)) {
             throw new InvalidArgumentException('Please provide at least one item when swapping.');
         }
 
@@ -642,8 +644,8 @@ class Subscription extends Model
     /**
      * Swap the subscription to a new Paddle plan, and invoice immediately.
      *
-     * @param  string|array  $items
-     * @param  array  $options
+     * @param string|array $items
+     * @param array $options
      * @return $this
      */
     public function swapAndInvoice($items, array $options = [])
@@ -654,9 +656,76 @@ class Subscription extends Model
     }
 
     /**
+     * @param array $items
+     * @param string $additionProrationBehaviour
+     * @param string $removalProrationBehaviour
+     * @return $this
+     * @throws PaddleException
+     */
+    public function updateItemsWithDifferentProration(
+        array  $items,
+        string $additionProrationBehaviour = "prorated_immediately",
+        string $removalProrationBehaviour = "full_next_billing_period"
+    )
+    {
+        $existingItems = $this->items()
+            ->get(['quantity', 'price_id'])
+            ->mapWithKeys(function ($item) {
+                return [$item->price_id => $item->quantity];
+            });
+
+
+        $newItems = collect($items)
+            ->mapWithKeys(fn($item) => [$item['price_id'] => $item['quantity']]);
+
+        $itemsForFirstUpdate = $existingItems->mapWithKeys(function ($quantity, $priceId) use ($newItems) {
+            return [$priceId => [
+                'price_id' => $priceId,
+                'quantity' => max($quantity, $newItems->get($priceId, 0)),
+            ]];
+        });
+
+        foreach ($newItems as $priceId => $item) {
+            if (!$itemsForFirstUpdate->has($priceId)) {
+                $itemsForFirstUpdate[$priceId] = [
+                    'price_id' => $priceId,
+                    'quantity' => $newItems->get($priceId),
+                ];
+            }
+        }
+
+        $itemsForSecondUpdate = $newItems->mapWithKeys(fn($quantity, $priceId) => [
+            $priceId => [
+                'price_id' => $priceId,
+                'quantity' => $quantity,
+            ]
+        ])->values();
+
+        $updatedSubscription = $this->updatePaddleSubscription([
+            'items' => $itemsForFirstUpdate->values()->toArray(),
+            'proration_billing_mode' => $additionProrationBehaviour,
+        ]);
+
+
+        if (isset($updatedSubscription['error']) && $updatedSubscription['error']) {
+            throw new PaddleException($updatedSubscription['error']['message']);
+        }
+
+        if ($itemsForFirstUpdate->toArray() !== $itemsForSecondUpdate->toArray()) {
+            $updatedSubscriptionRemovals = $this->updatePaddleSubscription([
+                'items' => $itemsForSecondUpdate->toArray(),
+                'proration_billing_mode' => $removalProrationBehaviour,
+            ]);
+        }
+
+        return $this;
+    }
+
+
+    /**
      * Change the billing cycle anchor.
      *
-     * @param  \DateTimeInterface|string|null  $date
+     * @param \DateTimeInterface|string|null $date
      * @return $this
      */
     public function anchorBillingCycleOn($date)
@@ -722,8 +791,8 @@ class Subscription extends Model
     /**
      * Pause the subscription.
      *
-     * @param  bool  $pauseNow
-     * @param  \DateTimeInterface|string|null  $until
+     * @param bool $pauseNow
+     * @param \DateTimeInterface|string|null $until
      * @return $this
      */
     public function pause(bool $pauseNow = false, $until = null)
@@ -746,7 +815,7 @@ class Subscription extends Model
     /**
      * Pause the subscription until a certain date.
      *
-     * @param  \DateTimeInterface|string  $until
+     * @param \DateTimeInterface|string $until
      * @return $this
      */
     public function pauseUntil($until)
@@ -767,7 +836,7 @@ class Subscription extends Model
     /**
      * Pause the subscription immediately and until a certain date.
      *
-     * @param  \DateTimeInterface|string  $until
+     * @param \DateTimeInterface|string $until
      * @return $this
      */
     public function pauseNowUntil($until)
@@ -778,7 +847,7 @@ class Subscription extends Model
     /**
      * Resume a paused subscription.
      *
-     * @param  \DateTimeInterface|string|null  $resumeAt
+     * @param \DateTimeInterface|string|null $resumeAt
      * @return $this
      *
      * @throws \LogicException
@@ -812,7 +881,7 @@ class Subscription extends Model
     /**
      * Update the underlying Paddle subscription information for the model.
      *
-     * @param  array  $options
+     * @param array $options
      * @return array
      */
     public function updatePaddleSubscription(array $options)
@@ -823,7 +892,7 @@ class Subscription extends Model
     /**
      * Cancel the subscription at the end of the current billing period.
      *
-     * @param  bool  $cancelNow
+     * @param bool $cancelNow
      * @return $this
      */
     public function cancel(bool $cancelNow = false)
@@ -901,7 +970,7 @@ class Subscription extends Model
     /**
      * Get the subscription as a Paddle subscription response.
      *
-     * @param  string|null  $include
+     * @param string|null $include
      * @return array
      */
     public function asPaddleSubscription(string $include = null)
@@ -914,7 +983,7 @@ class Subscription extends Model
     /**
      * Dynamically set the proration behavior when invoicing immediately.
      *
-     * @param  string  $method
+     * @param string $method
      * @return void
      *
      * @throws \LogicException
@@ -935,7 +1004,7 @@ class Subscription extends Model
     /**
      * Sync the subscription items with the latest data from Paddle.
      *
-     * @param  array  $items
+     * @param array $items
      * @return void
      */
     protected function syncSubscriptionItems(array $items)
