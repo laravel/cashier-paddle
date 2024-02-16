@@ -656,9 +656,9 @@ class Subscription extends Model
     }
 
     /**
-     * @param array $items
-     * @param string $additionProrationBehaviour
-     * @param string $removalProrationBehaviour
+     * @param array $items The items to update the subscription with.
+     * @param string $additionProrationBehaviour The proration behaviour to use when adding or increasing the quantity of an item.
+     * @param string $removalProrationBehaviour The proration behaviour to use when removing or decreasing the quantity of an item.
      * @return $this
      * @throws PaddleException
      */
@@ -675,8 +675,7 @@ class Subscription extends Model
             });
 
 
-        $newItems = collect($items)
-            ->mapWithKeys(fn($item) => [$item['price_id'] => $item['quantity']]);
+        $newItems = collect($items)->mapWithKeys(fn($item) => [$item['price_id'] => $item['quantity']]);
 
         $itemsForFirstUpdate = $existingItems->mapWithKeys(function ($quantity, $priceId) use ($newItems) {
             return [$priceId => [
@@ -694,15 +693,11 @@ class Subscription extends Model
             }
         }
 
-        $itemsForSecondUpdate = $newItems->mapWithKeys(fn($quantity, $priceId) => [
-            $priceId => [
-                'price_id' => $priceId,
-                'quantity' => $quantity,
-            ]
-        ])->values();
+
+        $itemsForFirstUpdate = $itemsForFirstUpdate->values()->toArray();
 
         $updatedSubscription = $this->updatePaddleSubscription([
-            'items' => $itemsForFirstUpdate->values()->toArray(),
+            'items' => $itemsForFirstUpdate,
             'proration_billing_mode' => $additionProrationBehaviour,
         ]);
 
@@ -711,9 +706,16 @@ class Subscription extends Model
             throw new PaddleException($updatedSubscription['error']['message']);
         }
 
-        if ($itemsForFirstUpdate->toArray() !== $itemsForSecondUpdate->toArray()) {
-            $updatedSubscriptionRemovals = $this->updatePaddleSubscription([
-                'items' => $itemsForSecondUpdate->toArray(),
+        $itemsForSecondUpdate = $newItems->map(fn($quantity, $priceId) => [
+            'price_id' => $priceId,
+            'quantity' => $quantity,
+        ])->values()->toArray();
+
+
+        // Only perform the second update if there are any items that need to be removed or have their quantity decremented.
+        if ($itemsForFirstUpdate !== $itemsForSecondUpdate) {
+            $this->updatePaddleSubscription([
+                'items' => $itemsForSecondUpdate,
                 'proration_billing_mode' => $removalProrationBehaviour,
             ]);
         }
