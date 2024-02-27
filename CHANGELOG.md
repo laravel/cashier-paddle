@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.3.1...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.4.0...2.x)
+
+## [v2.4.0](https://github.com/laravel/cashier-paddle/compare/v2.3.1...v2.4.0) - 2024-02-27
+
+* [2.x] Add the ability to get the paddle error by [@bensherred](https://github.com/bensherred) in https://github.com/laravel/cashier-paddle/pull/248
 
 ## [v2.3.1](https://github.com/laravel/cashier-paddle/compare/v2.3.0...v2.3.1) - 2024-02-13
 
