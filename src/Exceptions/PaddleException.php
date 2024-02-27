@@ -14,6 +14,16 @@ class PaddleException extends Exception
     protected array $error = [];
 
     /**
+     * Get the error response from Paddle.
+     *
+     * @return array
+     */
+    public function getError(): array
+    {
+        return $this->error;
+    }
+
+    /**
      * Set the error response from Paddle.
      *
      * @param  array  $error
@@ -24,15 +34,5 @@ class PaddleException extends Exception
         $this->error = $error;
 
         return $this;
-    }
-
-    /**
-     * Get the error response from Paddle.
-     *
-     * @return array
-     */
-    public function getError(): array
-    {
-        return $this->error;
     }
 }
