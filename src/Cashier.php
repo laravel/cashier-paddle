@@ -134,7 +134,7 @@ class Cashier
                 $message .= ' with validation errors ('.json_encode($response['error']['errors']).')';
             }
 
-            throw new PaddleException($response['error']['detail']);
+            throw (new PaddleException($message))->setError($response['error']);
         }
 
         return $response;
