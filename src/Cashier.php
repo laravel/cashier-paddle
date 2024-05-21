@@ -125,7 +125,7 @@ class Cashier
         $response = Http::withToken($apiKey)
             ->withUserAgent('Laravel\Paddle/'.static::VERSION)
             ->withHeaders(['Paddle-Version' => 1])
-            ->$method("{$host}/{$uri}", is_null($payload) && $method !== 'GET' ? '{}' : $payload);
+            ->$method("{$host}/{$uri}", $payload);
 
         if (isset($response['error'])) {
             $message = "Paddle API error '{$response['error']['detail']}' occurred";
