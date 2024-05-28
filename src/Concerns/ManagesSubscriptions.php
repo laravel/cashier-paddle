@@ -126,13 +126,13 @@ trait ManagesSubscriptions
     /**
      * Determine if the customer has a given subscription.
      *
-     * @param  string  $name
+     * @param  string  $type
      * @param  string|null  $price
      * @return bool
      */
-    public function subscribed($name = 'default', $price = null)
+    public function subscribed($type = 'default', $price = null)
     {
-        $subscription = $this->subscription($name);
+        $subscription = $this->subscription($type);
 
         if (! $subscription || ! $subscription->valid()) {
             return false;
@@ -145,12 +145,12 @@ trait ManagesSubscriptions
      * Determine if the customer is actively subscribed to one of the given products.
      *
      * @param  string|string[]  $products
-     * @param  string  $name
+     * @param  string  $type
      * @return bool
      */
-    public function subscribedToProduct($products, $name = 'default')
+    public function subscribedToProduct($products, $type = 'default')
     {
-        $subscription = $this->subscription($name);
+        $subscription = $this->subscription($type);
 
         if (! $subscription || ! $subscription->valid()) {
             return false;
@@ -169,12 +169,12 @@ trait ManagesSubscriptions
      * Determine if the customer is actively subscribed to one of the given prices.
      *
      * @param  string|string[]  $prices
-     * @param  string  $name
+     * @param  string  $type
      * @return bool
      */
-    public function subscribedToPrice($prices, $name = 'default')
+    public function subscribedToPrice($prices, $type = 'default')
     {
-        $subscription = $this->subscription($name);
+        $subscription = $this->subscription($type);
 
         if (! $subscription || ! $subscription->valid()) {
             return false;
