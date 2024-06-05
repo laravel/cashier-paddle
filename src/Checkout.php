@@ -19,33 +19,33 @@ class Checkout
     /**
      * Flag to determinate if operation is for catalog products or not
      */
-    protected bool $isNonCatalog = false;
+    protected bool $isFromCatalog = true;
 
     /**
      * Create a new checkout instance.
      */
-    public function __construct(protected ?Customer $customer, protected array $items = [], $isNonCatalog = false)
+    public function __construct(protected ?Customer $customer, protected array $items = [], $isFromCatalog = true)
     {
-        $priceKey = ($isNonCatalog) ? 'price': 'priceId';
+        $priceKey = $isFromCatalog ? 'priceId': 'price';
 
-        $this->isNonCatalog = $isNonCatalog;
+        $this->isFromCatalog = $isFromCatalog;
         $this->items = Cashier::normalizeItems($items, $priceKey);
     }
 
     /**
      * Create a new checkout instance for a guest.
      */
-    public static function guest(array $items = [], $isNonCatalog = false): self
+    public static function guest(array $items = [], $isFromCatalog = true): self
     {
-        return new static(null, $items, $isNonCatalog);
+        return new static(null, $items, $isFromCatalog);
     }
 
     /**
      * Create a new checkout instance for an existing customer.
      */
-    public static function customer(Customer $customer, array $items = [], $isNonCatalog = false): self
+    public static function customer(Customer $customer, array $items = [], $isFromCatalog = true): self
     {
-        return new static($customer, $items, $isNonCatalog);
+        return new static($customer, $items, $isFromCatalog);
     }
 
     /**
@@ -130,8 +130,8 @@ class Checkout
         return $this->returnTo;
     }
 
-    public function getIsNonCatalog(): bool {
-        return $this->isNonCatalog;
+    public function getIsFromCatalog(): bool {
+        return $this->isFromCatalog;
     }
 
     /**

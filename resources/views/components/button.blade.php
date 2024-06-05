@@ -1,5 +1,5 @@
 <?php
-$transactionId = $checkout->getIsNonCatalog() ? $checkout->getTransactionId() : null;
+$transactionId = $checkout->getIsFromCatalog() ? null : $checkout->getTransactionId();
 $items = $checkout->getItems();
 $customer = $checkout->getCustomer();
 $custom = $checkout->getCustomData();

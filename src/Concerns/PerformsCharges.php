@@ -13,13 +13,14 @@ trait PerformsCharges
      *
      * @param  string|array  $prices
      * @param  int  $quantity
+     * @param  bool  $isFromCatalog
      * @return \Laravel\Paddle\Checkout
      */
-    public function checkout($prices, int $quantity = 1, bool $isNonCatalog)
+    public function checkout($prices, int $quantity = 1, bool $isFromCatalog)
     {
         $customer = $this->createAsCustomer();
 
-        return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity], $isNonCatalog);
+        return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity], $isFromCatalog);
     }
 
     /**
@@ -27,10 +28,11 @@ trait PerformsCharges
      *
      * @param  string|array  $prices
      * @param  string  $type
+     * @param  bool  $isFromCatalog
      * @return \Laravel\Paddle\Checkout
      */
-    public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE, bool $isNonCatalog = false)
+    public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE, bool $isFromCatalog = false)
     {
-        return $this->checkout($prices, 1, $isNonCatalog)->customData(['subscription_type' => $type]);
+        return $this->checkout($prices, 1, $isFromCatalog)->customData(['subscription_type' => $type]);
     }
 }
