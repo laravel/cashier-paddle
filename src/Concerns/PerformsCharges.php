@@ -3,7 +3,6 @@
 namespace Laravel\Paddle\Concerns;
 
 use Laravel\Paddle\Checkout;
-use Laravel\Paddle\NonCatalogCheckout;
 use Laravel\Paddle\Subscription;
 
 trait PerformsCharges
@@ -13,14 +12,14 @@ trait PerformsCharges
      *
      * @param  string|array  $prices
      * @param  int  $quantity
-     * @param  bool  $isFromCatalog
+     * @param  array  $options
      * @return \Laravel\Paddle\Checkout
      */
-    public function checkout($prices, int $quantity = 1, bool $isFromCatalog)
+    public function checkout($prices, int $quantity = 1, array $options)
     {
         $customer = $this->createAsCustomer();
 
-        return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity], $isFromCatalog);
+        return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity], $options);
     }
 
     /**
@@ -28,11 +27,12 @@ trait PerformsCharges
      *
      * @param  string|array  $prices
      * @param  string  $type
-     * @param  bool  $isFromCatalog
+     * @param  array  $options
      * @return \Laravel\Paddle\Checkout
      */
-    public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE, bool $isFromCatalog = false)
+    public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE, array $options = [])
     {
-        return $this->checkout($prices, 1, $isFromCatalog)->customData(['subscription_type' => $type]);
+        data_set($options, 'is_subscription', true);
+        return $this->checkout($prices, 1, $options)->customData(['subscription_type' => $type]);
     }
 }
