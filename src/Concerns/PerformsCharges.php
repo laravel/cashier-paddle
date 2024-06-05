@@ -32,7 +32,7 @@ trait PerformsCharges
      */
     public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE, array $options = [])
     {
-        data_set($options, 'is_subscription', true);
+        data_set($options, 'is_subscription', true, overwrite: false);
         return $this->checkout($prices, 1, $options)->customData(['subscription_type' => $type]);
     }
 }

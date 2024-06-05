@@ -24,7 +24,7 @@ class Checkout
         $priceKey = data_get($options, 'is_from_catalog', true) ? 'priceId': 'price';
 
         $this->options = $options;
-        $this->items = Cashier::normalizeItems($items, $priceKey);
+        $this->items = Cashier::normalizeItems($items, $priceKey, $options);
     }
 
     /**
