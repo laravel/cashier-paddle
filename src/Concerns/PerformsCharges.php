@@ -15,7 +15,7 @@ trait PerformsCharges
      * @param  array  $options
      * @return \Laravel\Paddle\Checkout
      */
-    public function checkout($prices, int $quantity = 1, array $options)
+    public function checkout($prices, int $quantity = 1, array $options = [])
     {
         $customer = $this->createAsCustomer();
 
