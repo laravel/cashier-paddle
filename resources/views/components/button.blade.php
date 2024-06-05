@@ -1,4 +1,5 @@
 <?php
+$transactionId = $checkout->getIsNonCatalog() ? $checkout->getTransactionId() : null;
 $items = $checkout->getItems();
 $customer = $checkout->getCustomer();
 $custom = $checkout->getCustomData();
@@ -6,7 +7,11 @@ $custom = $checkout->getCustomData();
 
 <a
     href='#!'
-    data-items='{!! json_encode($items) !!}'
+    @if($transactionId)
+        data-transaction-id='{{$transactionId}}'
+    @else
+        data-items='{!! json_encode($items) !!}'
+    @endif
     data-allow-logout='false'
     @if ($customer) data-customer-id='{{ $customer->paddle_id }}' @endif
     @if ($custom) data-custom-data='{{ json_encode($custom) }}' @endif

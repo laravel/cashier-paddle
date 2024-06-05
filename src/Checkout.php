@@ -17,27 +17,35 @@ class Checkout
     protected ?string $returnTo = null;
 
     /**
+     * Flag to determinate if operation is for catalog products or not
+     */
+    protected bool $isNonCatalog = false;
+
+    /**
      * Create a new checkout instance.
      */
-    public function __construct(protected ?Customer $customer, protected array $items = [])
+    public function __construct(protected ?Customer $customer, protected array $items = [], $isNonCatalog = false)
     {
-        $this->items = Cashier::normalizeItems($items, 'priceId');
+        $priceKey = ($isNonCatalog) ? 'price': 'priceId';
+
+        $this->isNonCatalog = $isNonCatalog;
+        $this->items = Cashier::normalizeItems($items, $priceKey);
     }
 
     /**
      * Create a new checkout instance for a guest.
      */
-    public static function guest(array $items = []): self
+    public static function guest(array $items = [], $isNonCatalog = false): self
     {
-        return new static(null, $items);
+        return new static(null, $items, $isNonCatalog);
     }
 
     /**
      * Create a new checkout instance for an existing customer.
      */
-    public static function customer(Customer $customer, array $items = []): self
+    public static function customer(Customer $customer, array $items = [], $isNonCatalog = false): self
     {
-        return new static($customer, $items);
+        return new static($customer, $items, $isNonCatalog);
     }
 
     /**
@@ -120,5 +128,21 @@ class Checkout
     public function getReturnUrl(): ?string
     {
         return $this->returnTo;
+    }
+
+    public function getIsNonCatalog(): bool {
+        return $this->isNonCatalog;
+    }
+
+    /**
+     * Get the transaction id.
+     */
+    public function getTransactionId(): ?string
+    {
+        $response = Cashier::api('POST', "transactions", [
+            'items' => $this->getItems(),
+        ]);
+
+        return data_get($response, 'data.id', null);
     }
 }
