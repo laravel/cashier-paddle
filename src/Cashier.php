@@ -166,9 +166,9 @@ class Cashier
                         'frequency' => data_get($options, 'billing_frequency', 1),
                         'interval' => data_get($options, 'billing_interval', 'month'),
                     ], overwrite:false);
-
-                    data_set($item, 'quantity', 1, overwrite: false);
                 }
+
+                data_set($item, 'quantity', 1, overwrite: false);
 
                 return $item;
             }
