@@ -24,5 +24,5 @@ if (isset($seller['pwAuth']) && Auth::check() && $customer = Auth::user()->custo
 @endif
 
 <script type="text/javascript">
-    Paddle.Setup(@json($seller));
+    Paddle.Initialize(@json($seller));
 </script>
