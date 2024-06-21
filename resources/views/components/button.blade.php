@@ -1,5 +1,5 @@
 <?php
-$transaction = $checkout->getTransaction();
+$transaction = $checkout->getPaddleTransaction();
 $items = $checkout->getItems();
 $customer = $checkout->getCustomer();
 $custom = $checkout->getCustomData();
