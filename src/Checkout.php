@@ -140,6 +140,6 @@ class Checkout
      */
     public static function fromTransaction(array $params, ?Customer $customer = null): self
     {
-        return new static($customer, [], Cashier::api('POST', "transactions", $params));
+        return new static($customer, [], Cashier::api('POST', 'transactions', $params));
     }
 }
