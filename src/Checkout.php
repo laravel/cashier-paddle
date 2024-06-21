@@ -20,7 +20,7 @@ class Checkout
     /**
      * Create a new checkout instance.
      */
-    public function __construct(protected ?Customer $customer, protected array $items = [], protected ?Response $paddleTtransaction = null)
+    public function __construct(protected ?Customer $customer, protected array $items = [], protected ?Response $paddleTransaction = null)
     {
         $this->items = Cashier::normalizeItems($items, 'priceId');
     }
@@ -124,11 +124,11 @@ class Checkout
     }
 
     /**
-     * Get the paddle response transaction object.
+     * Get the paddle transaction response object.
      */
     public function getPaddleTransaction(): ?Response
     {
-        return $this->paddleTtransaction;
+        return $this->paddleTransaction;
     }
 
     /**
