@@ -34,28 +34,26 @@ trait PerformsCharges
     }
 
     /**
-     * Get a checkout instance for a given list of prices.
+     * Creates a transaction on paddle and returns a checkout instance.
      *
-     * @param  string|array  $prices
-     * @param  int  $quantity
+     * @param  array  $transactionParams
      * @return \Laravel\Paddle\Checkout
      */
-    public function checkoutFromTransaction($params)
+    public function checkoutFromTransaction(array $transactionParams)
     {
         $customer = $this->createAsCustomer();
 
-        return Checkout::fromTransaction($params, $customer);
+        return Checkout::fromTransaction($transactionParams, $customer);
     }
 
     /**
-     * Subscribe the customer to a new plan variant.
+     * Subscribe the customer based on a custom paddle transaction.
      *
-     * @param  string|array  $prices
-     * @param  string  $type
+     * @param  array  $transactionParams
      * @return \Laravel\Paddle\Checkout
      */
-    public function subscribeFromTransaction($params, string $type = Subscription::DEFAULT_TYPE)
+    public function subscribeFromTransaction(array $transactionParams, string $type = Subscription::DEFAULT_TYPE)
     {
-        return $this->checkoutFromTransaction($params)->customData(['subscription_type' => $type]);
+        return $this->checkoutFromTransaction($transactionParams)->customData(['subscription_type' => $type]);
     }
 }
