@@ -10,7 +10,7 @@ class Button extends Component
     /**
      * Initialise the Button component class.
      */
-    public function __construct(public PaddleCheckout $checkout)
+    public function __construct(public PaddleCheckout $checkout, public ?string $transactionId = null)
     {
         //
     }

@@ -3,6 +3,7 @@
 namespace Laravel\Paddle;
 
 use LogicException;
+use Illuminate\Http\Client\Response;
 
 class Checkout
 {
@@ -123,14 +124,10 @@ class Checkout
     }
 
     /**
-     * Get the transaction id.
+     * Create a transaction on paddle.
      */
-    public function getTransactionId(): ?string
+    public function createTransaction(array $params): Response
     {
-        $response = Cashier::api('POST', "transactions", [
-            'items' => $this->getItems(),
-        ]);
-
-        return data_get($response, 'data.id', null);
+        return Cashier::api('POST', "transactions", $params);
     }
 }
