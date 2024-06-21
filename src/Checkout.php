@@ -22,7 +22,7 @@ class Checkout
      */
     public function __construct(protected ?Customer $customer, protected array $items = [])
     {
-        $this->items = Cashier::normalizeItems($items);
+        $this->items = Cashier::normalizeItems($items, 'priceId');
     }
 
     /**
