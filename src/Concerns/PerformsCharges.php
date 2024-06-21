@@ -32,4 +32,30 @@ trait PerformsCharges
     {
         return $this->checkout($prices)->customData(['subscription_type' => $type]);
     }
+
+    /**
+     * Get a checkout instance for a given list of prices.
+     *
+     * @param  string|array  $prices
+     * @param  int  $quantity
+     * @return \Laravel\Paddle\Checkout
+     */
+    public function checkoutFromTransaction($params)
+    {
+        $customer = $this->createAsCustomer();
+
+        return Checkout::fromTransaction($params, $customer);
+    }
+
+    /**
+     * Subscribe the customer to a new plan variant.
+     *
+     * @param  string|array  $prices
+     * @param  string  $type
+     * @return \Laravel\Paddle\Checkout
+     */
+    public function subscribeFromTransaction($params, string $type = Subscription::DEFAULT_TYPE)
+    {
+        return $this->checkoutFromTransaction($params)->customData(['subscription_type' => $type]);
+    }
 }

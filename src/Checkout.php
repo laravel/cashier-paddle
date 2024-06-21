@@ -20,7 +20,7 @@ class Checkout
     /**
      * Create a new checkout instance.
      */
-    public function __construct(protected ?Customer $customer, protected array $items = [])
+    public function __construct(protected ?Customer $customer, protected array $items = [], protected ?Response $paddleTtransaction = null)
     {
         $this->items = Cashier::normalizeItems($items, 'priceId');
     }
@@ -124,10 +124,21 @@ class Checkout
     }
 
     /**
-     * Create a transaction on paddle.
+     * Get the paddle response transaction object
      */
-    public function createTransaction(array $params): Response
+    public function getPaddleTransaction(): ?Response
     {
-        return Cashier::api('POST', "transactions", $params);
+        return $this->paddleTtransaction;
+    }
+
+    /**
+     * Create a new checkout instance from a transaction.
+     *
+     * @param  string|array  $prices
+     * @param  string  $type
+     * @return \Laravel\Paddle\Checkout
+     */
+    public static function fromTransaction(array $params, ?Customer $customer = null) : self {
+        return new static($customer, [], Cashier::api('POST', "transactions", $params));
     }
 }
