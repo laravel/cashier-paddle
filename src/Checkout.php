@@ -19,28 +19,25 @@ class Checkout
     /**
      * Create a new checkout instance.
      */
-    public function __construct(protected ?Customer $customer, protected array $items = [], protected array $options = [])
+    public function __construct(protected ?Customer $customer, protected array $items = [])
     {
-        $priceKey = data_get($options, 'is_from_catalog', true) ? 'priceId': 'price';
-
-        $this->options = $options;
-        $this->items = Cashier::normalizeItems($items, $priceKey, $options);
+        $this->items = Cashier::normalizeItems($items);
     }
 
     /**
      * Create a new checkout instance for a guest.
      */
-    public static function guest(array $items = [], $options = []): self
+    public static function guest(array $items = []): self
     {
-        return new static(null, $items, $options);
+        return new static(null, $items);
     }
 
     /**
      * Create a new checkout instance for an existing customer.
      */
-    public static function customer(Customer $customer, array $items = [], $options = []): self
+    public static function customer(Customer $customer, array $items = []): self
     {
-        return new static($customer, $items, $options);
+        return new static($customer, $items);
     }
 
     /**
@@ -123,10 +120,6 @@ class Checkout
     public function getReturnUrl(): ?string
     {
         return $this->returnTo;
-    }
-
-    public function getOptions(): array {
-        return $this->options;
     }
 
     /**

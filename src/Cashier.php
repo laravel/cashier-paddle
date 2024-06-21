@@ -157,19 +157,10 @@ class Cashier
      * @param  string  $priceKey
      * @return array
      */
-    public static function normalizeItems($items, string $priceKey = 'price_id', array $options = []): array
+    public static function normalizeItems($items, string $priceKey = 'price_id'): array
     {
-        return collect($items)->map(function ($item, $key) use ($priceKey, $options) {
+        return collect($items)->map(function ($item, $key) use ($priceKey) {
             if (is_array($item)) {
-                if(data_get($options, 'is_subscription', false)) {
-                    data_set($item, 'price.billing_cycle', [
-                        'frequency' => data_get($options, 'billing_frequency', 1),
-                        'interval' => data_get($options, 'billing_interval', 'month'),
-                    ], overwrite:false);
-                }
-
-                data_set($item, 'quantity', 1, overwrite: false);
-
                 return $item;
             }
 

@@ -12,14 +12,13 @@ trait PerformsCharges
      *
      * @param  string|array  $prices
      * @param  int  $quantity
-     * @param  array  $options
      * @return \Laravel\Paddle\Checkout
      */
-    public function checkout($prices, int $quantity = 1, array $options = [])
+    public function checkout($prices, int $quantity = 1)
     {
         $customer = $this->createAsCustomer();
 
-        return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity], $options);
+        return Checkout::customer($customer, is_array($prices) ? $prices : [$prices => $quantity]);
     }
 
     /**
@@ -27,12 +26,10 @@ trait PerformsCharges
      *
      * @param  string|array  $prices
      * @param  string  $type
-     * @param  array  $options
      * @return \Laravel\Paddle\Checkout
      */
-    public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE, array $options = [])
+    public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE)
     {
-        data_set($options, 'is_subscription', true, overwrite: false);
-        return $this->checkout($prices, 1, $options)->customData(['subscription_type' => $type]);
+        return $this->checkout($prices)->customData(['subscription_type' => $type]);
     }
 }
