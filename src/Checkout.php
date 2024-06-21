@@ -132,14 +132,10 @@ class Checkout
     }
 
     /**
-     * Create a new checkout instance from a transaction.
-     *
-     * @param  string|array  $prices
-     * @param  string  $type
-     * @return \Laravel\Paddle\Checkout
+     * Creates a new transaction on paddle and returns a new checkout instance.
      */
-    public static function fromTransaction(array $params, ?Customer $customer = null): self
+    public static function fromTransaction(array $transactionParams, ?Customer $customer = null): self
     {
-        return new static($customer, [], Cashier::api('POST', 'transactions', $params));
+        return new static($customer, [], Cashier::api('POST', 'transactions', $transactionParams));
     }
 }
