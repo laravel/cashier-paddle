@@ -2,8 +2,8 @@
 
 namespace Laravel\Paddle;
 
-use LogicException;
 use Illuminate\Http\Client\Response;
+use LogicException;
 
 class Checkout
 {
@@ -124,7 +124,7 @@ class Checkout
     }
 
     /**
-     * Get the paddle response transaction object
+     * Get the paddle response transaction object.
      */
     public function getPaddleTransaction(): ?Response
     {
@@ -138,7 +138,8 @@ class Checkout
      * @param  string  $type
      * @return \Laravel\Paddle\Checkout
      */
-    public static function fromTransaction(array $params, ?Customer $customer = null) : self {
+    public static function fromTransaction(array $params, ?Customer $customer = null): self
+    {
         return new static($customer, [], Cashier::api('POST', "transactions", $params));
     }
 }
