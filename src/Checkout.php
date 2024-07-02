@@ -2,7 +2,6 @@
 
 namespace Laravel\Paddle;
 
-use Illuminate\Http\Client\Response;
 use LogicException;
 
 class Checkout
@@ -20,8 +19,11 @@ class Checkout
     /**
      * Create a new checkout instance.
      */
-    public function __construct(protected ?Customer $customer, protected array $items = [], protected ?Response $paddleTransaction = null)
-    {
+    public function __construct(
+        protected ?Customer $customer,
+        protected array $items = [],
+        protected array $transaction = []
+    ) {
         $this->items = Cashier::normalizeItems($items, 'priceId');
     }
 
@@ -39,6 +41,14 @@ class Checkout
     public static function customer(Customer $customer, array $items = []): self
     {
         return new static($customer, $items);
+    }
+
+    /**
+     * Create a new transaction on paddle and returns a new checkout instance.
+     */
+    public static function transaction(array $transaction, ?Customer $customer = null): self
+    {
+        return new static($customer, [], $transaction);
     }
 
     /**
@@ -108,6 +118,14 @@ class Checkout
     }
 
     /**
+     * Get the Paddle transaction data.
+     */
+    public function getTransaction(): array
+    {
+        return $this->transaction;
+    }
+
+    /**
      * Get the custom data for the checkout.
      */
     public function getCustomData(): array
@@ -121,21 +139,5 @@ class Checkout
     public function getReturnUrl(): ?string
     {
         return $this->returnTo;
-    }
-
-    /**
-     * Get the paddle transaction response object.
-     */
-    public function getPaddleTransaction(): ?Response
-    {
-        return $this->paddleTransaction;
-    }
-
-    /**
-     * Creates a new transaction on paddle and returns a new checkout instance.
-     */
-    public static function fromTransaction(array $transactionParams, ?Customer $customer = null): self
-    {
-        return new static($customer, [], Cashier::api('POST', 'transactions', $transactionParams));
     }
 }

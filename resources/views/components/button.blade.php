@@ -1,5 +1,5 @@
 <?php
-$transaction = $checkout->getPaddleTransaction();
+$transaction = $checkout->getTransaction();
 $items = $checkout->getItems();
 $customer = $checkout->getCustomer();
 $custom = $checkout->getCustomData();
@@ -7,8 +7,8 @@ $custom = $checkout->getCustomData();
 
 <a
     href='#!'
-    @if($transaction)
-        data-transaction-id='{{data_get($transaction, 'data.id', null)}}'
+    @if ($transaction)
+        data-transaction-id='{{ $transaction['id'] }}'
     @else
         data-items='{!! json_encode($items) !!}'
     @endif
