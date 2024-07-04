@@ -21,41 +21,6 @@ class SubscriptionBuilder
     protected $interval = Subscription::INTERVAL_MONTH;
 
     /**
-     * The days until the trial will expire.
-     *
-     * @var int|null
-     */
-    protected $trialDays;
-
-    /**
-     * Indicates that the trial should end immediately.
-     *
-     * @var bool
-     */
-    protected $skipTrial = false;
-
-    /**
-     * The coupon code being applied to the customer.
-     *
-     * @var string|null
-     */
-    protected $coupon;
-
-    /**
-     * The metadata to apply to the subscription.
-     *
-     * @var array
-     */
-    protected $metadata = [];
-
-    /**
-     * The return url which will be triggered upon starting the subscription.
-     *
-     * @var string|null
-     */
-    protected $returnTo;
-
-    /**
      * Create a new subscription builder instance.
      *
      * @param  \Laravel\Paddle\Billable  $billable
