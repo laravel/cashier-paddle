@@ -24,15 +24,15 @@ class SubscriptionBuilder
      * Create a new subscription builder instance.
      *
      * @param  \Laravel\Paddle\Billable  $billable
-     * @param  string  $name
      * @param  int  $amount
+     * @param  string  $name
      * @param  string  $type
      * @return void
      */
     public function __construct(
         protected $billable,
-        protected string $name,
         protected int $amount,
+        protected string $name,
         protected string $type = Subscription::DEFAULT_TYPE
     ) {}
 

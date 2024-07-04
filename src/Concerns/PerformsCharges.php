@@ -80,13 +80,13 @@ trait PerformsCharges
     /**
      * Subscribe the customer to a new plan variant.
      *
-     * @param  string  $name
      * @param  int  $amount
+     * @param  string  $name
      * @param  string  $type
      * @return \Laravel\Paddle\SubscriptionBuilder
      */
-    public function newSubscription($name, $amount, string $type = Subscription::DEFAULT_TYPE)
+    public function newSubscription(int $amount, string $name, string $type = Subscription::DEFAULT_TYPE)
     {
-        return new SubscriptionBuilder($this, $name, $amount, $type);
+        return new SubscriptionBuilder($this, $amount, $name, $type);
     }
 }
