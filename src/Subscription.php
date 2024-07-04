@@ -22,6 +22,11 @@ class Subscription extends Model
     const STATUS_PAUSED = 'paused';
     const STATUS_CANCELED = 'canceled';
 
+    const INTERVAL_DAY = 'day';
+    const INTERVAL_WEEK = 'week';
+    const INTERVAL_MONTH = 'month';
+    const INTERVAL_YEAR = 'year';
+
     const DEFAULT_TYPE = 'default';
 
     /**
