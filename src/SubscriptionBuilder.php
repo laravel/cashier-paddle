@@ -33,6 +33,7 @@ class SubscriptionBuilder
         protected $billable,
         protected int $amount,
         protected string $name,
+        protected string $price_description,
         protected string $type = Subscription::DEFAULT_TYPE
     ) {}
 
@@ -102,16 +103,25 @@ class SubscriptionBuilder
      */
     public function checkout(array $options = [])
     {
-        return $this->billable->charge($this->amount, $this->name, array_merge([
-            'quantity' => $this->quantity,
-        ], $options), [
-            'name' => $this->interval === Subscription::INTERVAL_DAY
-                ? 'Daily'
-                : ucfirst($this->interval).'ly',
-            'billing_cycle' => [
-                'interval' => $this->interval,
-                'frequency' => $options['frequency'] ?? 1,
-            ],
-        ])->customData(['subscription_type' => $this->type]);
+        return $this->billable->charge(
+            $this->amount,
+            $this->name,
+            $this->price_description,
+            array_merge(
+                [
+                    'quantity' => $this->quantity,
+                ],
+                $options
+            ),
+            [
+                'name' => $this->interval === Subscription::INTERVAL_DAY
+                    ? 'Daily'
+                    : ucfirst($this->interval).'ly',
+                'billing_cycle' => [
+                    'interval' => $this->interval,
+                    'frequency' => $options['frequency'] ?? 1,
+                ],
+            ]
+        )->customData(['subscription_type' => $this->type]);
     }
 }

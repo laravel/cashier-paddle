@@ -44,12 +44,12 @@ trait PerformsCharges
      * @param  array  $priceData
      * @return \Laravel\Paddle\Checkout
      */
-    public function charge(int $amount, string $name, array $options = [], array $priceData = [])
+    public function charge(int $amount, string $name, string $price_description, array $options = [], array $priceData = [])
     {
         return $this->chargeMany([[
             'price' => array_merge([
                 'name' => $options['price_name'] ?? null,
-                'description' => $options['price_description'] ?? null,
+                'description' => $price_description,
                 'unit_price' => [
                     'amount' => (string) $amount,
                     'currency_code' => $options['currency'] ?? config('cashier.currency'),
@@ -87,8 +87,8 @@ trait PerformsCharges
      * @param  string  $type
      * @return \Laravel\Paddle\SubscriptionBuilder
      */
-    public function newSubscription(int $amount, string $name, string $type = Subscription::DEFAULT_TYPE)
+    public function newSubscription(int $amount, string $name, string $price_description, string $type = Subscription::DEFAULT_TYPE)
     {
-        return new SubscriptionBuilder($this, $amount, $name, $type);
+        return new SubscriptionBuilder($this, $amount, $name, $price_description, $type);
     }
 }
