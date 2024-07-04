@@ -2,8 +2,6 @@
 
 namespace Laravel\Paddle;
 
-use Spatie\Url\Url;
-
 class SubscriptionBuilder
 {
     /**
@@ -35,7 +33,8 @@ class SubscriptionBuilder
         protected string $name,
         protected string $price_description,
         protected string $type = Subscription::DEFAULT_TYPE
-    ) {}
+    ) {
+    }
 
     /**
      * Specify the quantity of the subscription.
