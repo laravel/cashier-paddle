@@ -47,7 +47,9 @@ trait PerformsCharges
     public function charge(int $amount, string $name, array $options = [], array $priceData = [])
     {
         return $this->chargeMany([[
-            'price' => array_filter(array_merge([
+            'price' => array_merge([
+                'name' => $options['price_name'] ?? null,
+                'description' => $options['price_description'] ?? null,
                 'unit_price' => [
                     'amount' => (string) $amount,
                     'currency_code' => $options['currency'] ?? config('cashier.currency'),
@@ -57,7 +59,7 @@ trait PerformsCharges
                     'tax_category' => $options['tax_category'] ?? 'standard',
                     'description' => $options['description'] ?? null,
                 ]),
-            ]), $priceData),
+            ], $priceData),
             'quantity' => $options['quantity'] ?? 1,
         ]]);
     }
