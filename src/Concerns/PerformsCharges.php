@@ -39,7 +39,8 @@ trait PerformsCharges
      * Creates a transaction for a "one off" charge for the given amount and returns a checkout instance.
      *
      * @param  int  $amount
-     * @param  string  $title
+     * @param  string  $name
+     * @param  string  $price_description
      * @param  array  $options
      * @param  array  $priceData
      * @return \Laravel\Paddle\Checkout
@@ -84,6 +85,7 @@ trait PerformsCharges
      *
      * @param  int  $amount
      * @param  string  $name
+     * @param  string  $price_description
      * @param  string  $type
      * @return \Laravel\Paddle\SubscriptionBuilder
      */

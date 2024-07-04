@@ -24,6 +24,7 @@ class SubscriptionBuilder
      * @param  \Laravel\Paddle\Billable  $billable
      * @param  int  $amount
      * @param  string  $name
+     * @param  string  $price_description
      * @param  string  $type
      * @return void
      */
@@ -98,6 +99,7 @@ class SubscriptionBuilder
     /**
      * Return a new checkout instance for the fresh subscription.
      *
+     * @param  array  $options
      * @return \Laravel\Paddle\Checkout
      */
     public function checkout(array $options = [])
