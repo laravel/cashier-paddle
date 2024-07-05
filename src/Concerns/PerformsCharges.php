@@ -36,6 +36,19 @@ trait PerformsCharges
     }
 
     /**
+     * Subscribe the customer to a new product.
+     *
+     * @param  int  $amount
+     * @param  string  $name
+     * @param  string  $type
+     * @return \Laravel\Paddle\SubscriptionBuilder
+     */
+    public function newSubscription(int $amount, string $name, string $type = Subscription::DEFAULT_TYPE)
+    {
+        return new SubscriptionBuilder($this, $amount, $name, $type);
+    }
+
+    /**
      * Creates a transaction for a "one off" charge for the given amount and returns a checkout instance.
      *
      * @param  int  $amount
@@ -59,19 +72,6 @@ trait PerformsCharges
             ],
             'quantity' => 1,
         ], $options)]);
-    }
-
-    /**
-     * Subscribe the customer to a new product.
-     *
-     * @param  int  $amount
-     * @param  string  $name
-     * @param  string  $type
-     * @return \Laravel\Paddle\SubscriptionBuilder
-     */
-    public function newSubscription(int $amount, string $name, string $type = Subscription::DEFAULT_TYPE)
-    {
-        return new SubscriptionBuilder($this, $amount, $name, $type);
     }
 
     /**
