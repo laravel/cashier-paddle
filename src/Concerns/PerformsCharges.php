@@ -40,29 +40,38 @@ trait PerformsCharges
      *
      * @param  int  $amount
      * @param  string  $name
-     * @param  string  $price_description
      * @param  array  $options
-     * @param  array  $priceData
      * @return \Laravel\Paddle\Checkout
      */
-    public function charge(int $amount, string $name, string $price_description, array $options = [], array $priceData = [])
+    public function charge(int $amount, string $name, array $options = [])
     {
-        return $this->chargeMany([[
-            'price' => array_merge([
-                'name' => $options['price_name'] ?? null,
-                'description' => $price_description,
+        return $this->chargeMany([array_replace_recursive([
+            'price' => [
+                'description' => "$name Custom Price",
                 'unit_price' => [
                     'amount' => (string) $amount,
-                    'currency_code' => $options['currency'] ?? config('cashier.currency'),
+                    'currency_code' => config('cashier.currency'),
                 ],
-                'product' => array_filter([
+                'product' => [
                     'name' => $name,
-                    'tax_category' => $options['tax_category'] ?? 'standard',
-                    'description' => $options['description'] ?? null,
-                ]),
-            ], $priceData),
-            'quantity' => $options['quantity'] ?? 1,
-        ]]);
+                    'tax_category' => 'standard',
+                ],
+            ],
+            'quantity' => 1,
+        ], $options)]);
+    }
+
+    /**
+     * Subscribe the customer to a new product.
+     *
+     * @param  int  $amount
+     * @param  string  $name
+     * @param  string  $type
+     * @return \Laravel\Paddle\SubscriptionBuilder
+     */
+    public function newSubscription(int $amount, string $name, string $type = Subscription::DEFAULT_TYPE)
+    {
+        return new SubscriptionBuilder($this, $amount, $name, $type);
     }
 
     /**
@@ -75,22 +84,8 @@ trait PerformsCharges
     {
         $customer = $this->createAsCustomer();
 
-        $transaction = Cashier::api('POST', 'transactions', ['items' => $items])->json();
+        $transaction = Cashier::api('POST', 'transactions', ['items' => $items])->json()['data'];
 
         return Checkout::transaction($transaction, $customer);
-    }
-
-    /**
-     * Subscribe the customer to a new plan variant.
-     *
-     * @param  int  $amount
-     * @param  string  $name
-     * @param  string  $price_description
-     * @param  string  $type
-     * @return \Laravel\Paddle\SubscriptionBuilder
-     */
-    public function newSubscription(int $amount, string $name, string $price_description, string $type = Subscription::DEFAULT_TYPE)
-    {
-        return new SubscriptionBuilder($this, $amount, $name, $price_description, $type);
     }
 }

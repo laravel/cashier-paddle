@@ -24,7 +24,6 @@ class SubscriptionBuilder
      * @param  \Laravel\Paddle\Billable  $billable
      * @param  int  $amount
      * @param  string  $name
-     * @param  string  $price_description
      * @param  string  $type
      * @return void
      */
@@ -32,7 +31,6 @@ class SubscriptionBuilder
         protected $billable,
         protected int $amount,
         protected string $name,
-        protected string $price_description,
         protected string $type = Subscription::DEFAULT_TYPE
     ) {
     }
@@ -107,22 +105,18 @@ class SubscriptionBuilder
         return $this->billable->charge(
             $this->amount,
             $this->name,
-            $this->price_description,
-            array_merge(
-                [
-                    'quantity' => $this->quantity,
+            array_replace_recursive([
+                'price' => [
+                    'description' => $this->interval === Subscription::INTERVAL_DAY
+                        ? "{$this->name} Daily"
+                        : $this->name.' '.ucfirst($this->interval).'ly',
+                    'billing_cycle' => [
+                        'interval' => $this->interval,
+                        'frequency' => $options['frequency'] ?? 1,
+                    ],
                 ],
-                $options
-            ),
-            [
-                'name' => $this->interval === Subscription::INTERVAL_DAY
-                    ? 'Daily'
-                    : ucfirst($this->interval).'ly',
-                'billing_cycle' => [
-                    'interval' => $this->interval,
-                    'frequency' => $options['frequency'] ?? 1,
-                ],
-            ]
+                'quantity' => $this->quantity,
+            ], $options)
         )->customData(['subscription_type' => $this->type]);
     }
 }

@@ -8,7 +8,7 @@ $custom = $checkout->getCustomData();
 <a
     href='#!'
     @if ($transaction)
-        data-transaction-id='{{ $transaction['data']['id'] }}'
+        data-transaction-id='{{ $transaction['id'] }}'
     @else
         data-items='{!! json_encode($items) !!}'
     @endif
