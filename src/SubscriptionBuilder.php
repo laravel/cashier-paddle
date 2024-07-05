@@ -95,7 +95,7 @@ class SubscriptionBuilder
     }
 
     /**
-     * Return a new checkout instance for the fresh subscription.
+     * Get a new checkout instance for the subscription.
      *
      * @param  array  $options
      * @return \Laravel\Paddle\Checkout
