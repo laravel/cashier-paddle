@@ -44,7 +44,7 @@ class Checkout
     }
 
     /**
-     * Create a new transaction on paddle and return a new checkout instance.
+     * Create a new transaction on Paddle and return a new checkout instance.
      */
     public static function transaction(array $transaction, ?Customer $customer = null): self
     {
