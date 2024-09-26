@@ -1,18 +1,10 @@
-<p align="center"><img src="/art/logo.svg" alt="Logo Laravel Cashier Paddle"></p>
+<p align="center"><img width="355" height="62" src="/art/logo.svg" alt="Logo Laravel Cashier Paddle"></p>
 
 <p align="center">
-    <a href="https://github.com/laravel/cashier-paddle/actions">
-        <img src="https://github.com/laravel/cashier-paddle/workflows/tests/badge.svg" alt="Build Status">
-    </a>
-    <a href="https://packagist.org/packages/laravel/cashier-paddle">
-        <img src="https://img.shields.io/packagist/dt/laravel/cashier-paddle" alt="Total Downloads">
-    </a>
-    <a href="https://packagist.org/packages/laravel/cashier-paddle">
-        <img src="https://img.shields.io/packagist/v/laravel/cashier-paddle" alt="Latest Stable Version">
-    </a>
-    <a href="https://packagist.org/packages/laravel/cashier-paddle">
-        <img src="https://img.shields.io/packagist/l/laravel/cashier-paddle" alt="License">
-    </a>
+<a href="https://github.com/laravel/cashier-paddle/actions"><img src="https://github.com/laravel/cashier-paddle/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/cashier-paddle"><img src="https://img.shields.io/packagist/dt/laravel/cashier-paddle" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/cashier-paddle"><img src="https://img.shields.io/packagist/v/laravel/cashier-paddle" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/cashier-paddle"><img src="https://img.shields.io/packagist/l/laravel/cashier-paddle" alt="License"></a>
 </p>
 
 ## Introduction
