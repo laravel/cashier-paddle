@@ -29,7 +29,8 @@ class SubscriptionBuilder
         protected int $amount,
         protected string $name,
         protected string $type = Subscription::DEFAULT_TYPE
-    ) {}
+    ) {
+    }
 
     /**
      * Specify the quantity of the subscription.
