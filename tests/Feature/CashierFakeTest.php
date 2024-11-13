@@ -68,6 +68,10 @@ class CashierFakeTest extends FeatureTestCase
     }
 }
 
-class CapturedTestEvent {}
+class CapturedTestEvent
+{
+}
 
-class UncapturedTestEvent {}
+class UncapturedTestEvent
+{
+}
