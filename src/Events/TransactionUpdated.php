@@ -35,9 +35,6 @@ class TransactionUpdated
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $billable
-     * @param  \Laravel\Paddle\Transaction  $transaction
-     * @param  array  $payload
      * @return void
      */
     public function __construct(Model $billable, Transaction $transaction, array $payload)

@@ -35,9 +35,6 @@ class CustomerUpdated
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $billable
-     * @param  \Laravel\Paddle\Customer  $customer
-     * @param  array  $payload
      * @return void
      */
     public function __construct(Model $billable, Customer $customer, array $payload)

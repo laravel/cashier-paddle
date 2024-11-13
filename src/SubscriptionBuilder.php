@@ -22,9 +22,6 @@ class SubscriptionBuilder
      * Create a new subscription builder instance.
      *
      * @param  \Laravel\Paddle\Billable  $billable
-     * @param  int  $amount
-     * @param  string  $name
-     * @param  string  $type
      * @return void
      */
     public function __construct(
@@ -32,8 +29,7 @@ class SubscriptionBuilder
         protected int $amount,
         protected string $name,
         protected string $type = Subscription::DEFAULT_TYPE
-    ) {
-    }
+    ) {}
 
     /**
      * Specify the quantity of the subscription.
@@ -97,7 +93,6 @@ class SubscriptionBuilder
     /**
      * Get a new checkout instance for the subscription.
      *
-     * @param  array  $options
      * @return \Laravel\Paddle\Checkout
      */
     public function checkout(array $options = [])

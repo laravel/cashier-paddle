@@ -37,7 +37,6 @@ class WebhookController extends Controller
     /**
      * Handle a Paddle webhook call.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function __invoke(Request $request)
@@ -56,13 +55,12 @@ class WebhookController extends Controller
             return new Response('Webhook Handled');
         }
 
-        return new Response();
+        return new Response;
     }
 
     /**
      * Handle customer updated.
      *
-     * @param  array  $payload
      * @return void
      */
     protected function handleCustomerUpdated(array $payload)
@@ -84,7 +82,6 @@ class WebhookController extends Controller
     /**
      * Handle transaction completed.
      *
-     * @param  array  $payload
      * @return void
      */
     protected function handleTransactionCompleted(array $payload)
@@ -116,7 +113,6 @@ class WebhookController extends Controller
     /**
      * Handle transaction updated.
      *
-     * @param  array  $payload
      * @return void
      */
     protected function handleTransactionUpdated(array $payload)
@@ -141,7 +137,6 @@ class WebhookController extends Controller
     /**
      * Handle subscription created.
      *
-     * @param  array  $payload
      * @return void
      */
     protected function handleSubscriptionCreated(array $payload)
@@ -182,7 +177,6 @@ class WebhookController extends Controller
     /**
      * Handle subscription updated.
      *
-     * @param  array  $payload
      * @return void
      */
     protected function handleSubscriptionUpdated(array $payload)
@@ -242,7 +236,6 @@ class WebhookController extends Controller
     /**
      * Handle subscription paused.
      *
-     * @param  array  $payload
      * @return void
      */
     protected function handleSubscriptionPaused(array $payload)
@@ -267,7 +260,6 @@ class WebhookController extends Controller
     /**
      * Handle subscription canceled.
      *
-     * @param  array  $payload
      * @return void
      */
     protected function handleSubscriptionCanceled(array $payload)
@@ -303,7 +295,6 @@ class WebhookController extends Controller
     /**
      * Find the first customer matching a Paddle customer ID.
      *
-     * @param  string  $customerId
      * @return \Laravel\Paddle\Customer|null
      */
     protected function findCustomer(string $customerId)
@@ -314,7 +305,6 @@ class WebhookController extends Controller
     /**
      * Find the first subscription matching a Paddle subscription ID.
      *
-     * @param  string  $subscriptionId
      * @return \Laravel\Paddle\Subscription|null
      */
     protected function findSubscription(string $subscriptionId)
@@ -325,7 +315,6 @@ class WebhookController extends Controller
     /**
      * Determine if a subscription with a given Paddle ID already exists.
      *
-     * @param  string  $subscriptionId
      * @return bool
      */
     protected function subscriptionExists(string $subscriptionId)
@@ -336,7 +325,6 @@ class WebhookController extends Controller
     /**
      * Find the first transaction matching a Paddle transaction ID.
      *
-     * @param  string  $transactionId
      * @return \Laravel\Paddle\Transaction|null
      */
     protected function findTransaction(string $transactionId)
@@ -347,7 +335,6 @@ class WebhookController extends Controller
     /**
      * Determine if a transaction with a given ID already exists.
      *
-     * @param  string  $transactionId
      * @return bool
      */
     protected function transactionExists(string $transactionId)

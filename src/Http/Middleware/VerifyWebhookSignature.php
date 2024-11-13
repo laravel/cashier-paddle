@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class VerifyWebhookSignature
 {
     public const SIGNATURE_HEADER = 'Paddle-Signature';
+
     public const HASH_ALGORITHM_1 = 'h1';
 
     protected ?int $maximumVariance = 5;
@@ -19,8 +20,6 @@ class VerifyWebhookSignature
     /**
      * Handle the incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return \Illuminate\Http\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
@@ -39,7 +38,6 @@ class VerifyWebhookSignature
     /**
      * Validate signature.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $signature
      * @return bool
      */
@@ -78,9 +76,6 @@ class VerifyWebhookSignature
 
     /**
      * Parse the signature header.
-     *
-     * @param  string  $header
-     * @return array
      */
     public function parseSignature(string $header): array
     {

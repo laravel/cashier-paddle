@@ -75,7 +75,6 @@ trait ManagesCustomer
      * Get price previews for a set of price ids for this billable model.
      *
      * @param  array|string  $items
-     * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
     public function previewPrices($items, array $options = [])

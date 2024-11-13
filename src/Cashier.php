@@ -68,7 +68,6 @@ class Cashier
      * Preview prices for a given set of items.
      *
      * @param  array|string  $items
-     * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
     public static function previewPrices($items, array $options = [])
@@ -108,7 +107,6 @@ class Cashier
      *
      * @param  string  $method
      * @param  string  $uri
-     * @param  array|null  $payload
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Laravel\Paddle\Exceptions\PaddleException
@@ -154,8 +152,6 @@ class Cashier
      * Normalize the given items to a Paddle accepted format.
      *
      * @param  array|string  $items
-     * @param  string  $priceKey
-     * @return array
      */
     public static function normalizeItems($items, string $priceKey = 'price_id'): array
     {
@@ -181,7 +177,6 @@ class Cashier
     /**
      * Set the custom currency formatter.
      *
-     * @param  callable  $callback
      * @return void
      */
     public static function formatCurrencyUsing(callable $callback)
@@ -195,7 +190,6 @@ class Cashier
      * @param  int  $amount
      * @param  string  $currency
      * @param  string|null  $locale
-     * @param  array  $options
      * @return string
      */
     public static function formatAmount($amount, $currency, $locale = null, array $options = [])
@@ -214,7 +208,7 @@ class Cashier
             $numberFormatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $options['min_fraction_digits']);
         }
 
-        $moneyFormatter = new IntlMoneyFormatter($numberFormatter, new ISOCurrencies());
+        $moneyFormatter = new IntlMoneyFormatter($numberFormatter, new ISOCurrencies);
 
         return $moneyFormatter->format($money);
     }
@@ -222,7 +216,6 @@ class Cashier
     /**
      * Determine if the given currency uses cents.
      *
-     * @param  \Money\Currency  $currency
      * @return bool
      */
     public static function currencyUsesCents(Currency $currency)

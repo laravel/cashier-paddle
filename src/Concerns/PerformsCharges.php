@@ -13,7 +13,6 @@ trait PerformsCharges
      * Get a checkout instance for a given list of prices.
      *
      * @param  string|array  $prices
-     * @param  int  $quantity
      * @return \Laravel\Paddle\Checkout
      */
     public function checkout($prices, int $quantity = 1)
@@ -27,7 +26,6 @@ trait PerformsCharges
      * Subscribe the customer to a new plan variant.
      *
      * @param  string|array  $prices
-     * @param  string  $type
      * @return \Laravel\Paddle\Checkout
      */
     public function subscribe($prices, string $type = Subscription::DEFAULT_TYPE)
@@ -38,9 +36,6 @@ trait PerformsCharges
     /**
      * Subscribe the customer to a new product.
      *
-     * @param  int  $amount
-     * @param  string  $name
-     * @param  string  $type
      * @return \Laravel\Paddle\SubscriptionBuilder
      */
     public function newSubscription(int $amount, string $name, string $type = Subscription::DEFAULT_TYPE)
@@ -51,9 +46,6 @@ trait PerformsCharges
     /**
      * Creates a transaction for a "one off" charge for the given amount and returns a checkout instance.
      *
-     * @param  int  $amount
-     * @param  string  $name
-     * @param  array  $options
      * @return \Laravel\Paddle\Checkout
      */
     public function charge(int $amount, string $name, array $options = [])
@@ -77,7 +69,6 @@ trait PerformsCharges
     /**
      * Creates a transaction for a "one off" charge for the given items and returns a checkout instance.
      *
-     * @param  array  $items
      * @return \Laravel\Paddle\Checkout
      */
     public function chargeMany(array $items)

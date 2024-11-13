@@ -26,7 +26,6 @@ class CashierFake
     /**
      * Initialize the fake instance and fake Cashier's events and API calls.
      *
-     * @param  array  $endpoints
      * @param  string|array  $events
      * @return void
      */
@@ -65,8 +64,6 @@ class CashierFake
     /**
      * Set the successful response for a given endpoint.
      *
-     * @param  string  $endpoint
-     * @param  array  $data
      * @return self
      */
     public function response(string $endpoint, array $data)
@@ -81,7 +78,6 @@ class CashierFake
     /**
      * Set an error response for a given endpoint.
      *
-     * @param  string  $endpoint
      * @param  string  $message
      * @param  int  $code
      * @return self
@@ -100,7 +96,6 @@ class CashierFake
     /**
      * Fake the given endpoint with the provided response.
      *
-     * @param  string  $endpoint
      * @param  mixed  $response
      * @return void
      */
@@ -119,9 +114,6 @@ class CashierFake
 
     /**
      * Format the given path into a full API url.
-     *
-     * @param  string  $path
-     * @return string
      */
     public static function getFormattedApiUrl(string $path): string
     {

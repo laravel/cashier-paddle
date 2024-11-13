@@ -17,14 +17,21 @@ class Subscription extends Model
     use Prorates;
 
     const STATUS_ACTIVE = 'active';
+
     const STATUS_TRIALING = 'trialing';
+
     const STATUS_PAST_DUE = 'past_due';
+
     const STATUS_PAUSED = 'paused';
+
     const STATUS_CANCELED = 'canceled';
 
     const INTERVAL_DAY = 'day';
+
     const INTERVAL_WEEK = 'week';
+
     const INTERVAL_MONTH = 'month';
+
     const INTERVAL_YEAR = 'year';
 
     const DEFAULT_TYPE = 'default';
@@ -438,7 +445,6 @@ class Subscription extends Model
      * Bill for one-time charges on top of the subscription.
      *
      * @param  string|array  $items
-     * @param  bool  $chargeNow
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -617,7 +623,6 @@ class Subscription extends Model
      * Swap the subscription to new Paddle items.
      *
      * @param  string|array  $items
-     * @param  array  $options
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -648,7 +653,6 @@ class Subscription extends Model
      * Swap the subscription to a new Paddle plan, and invoice immediately.
      *
      * @param  string|array  $items
-     * @param  array  $options
      * @return $this
      */
     public function swapAndInvoice($items, array $options = [])
@@ -727,7 +731,6 @@ class Subscription extends Model
     /**
      * Pause the subscription.
      *
-     * @param  bool  $pauseNow
      * @param  \DateTimeInterface|string|null  $until
      * @return $this
      */
@@ -819,7 +822,6 @@ class Subscription extends Model
     /**
      * Update the underlying Paddle subscription information for the model.
      *
-     * @param  array  $options
      * @return array
      */
     public function updatePaddleSubscription(array $options)
@@ -830,7 +832,6 @@ class Subscription extends Model
     /**
      * Cancel the subscription at the end of the current billing period.
      *
-     * @param  bool  $cancelNow
      * @return $this
      */
     public function cancel(bool $cancelNow = false)
@@ -908,7 +909,6 @@ class Subscription extends Model
     /**
      * Get the subscription as a Paddle subscription response.
      *
-     * @param  string|null  $include
      * @return array
      */
     public function asPaddleSubscription(?string $include = null)
@@ -922,7 +922,6 @@ class Subscription extends Model
      * Dynamically set the proration behavior when invoicing immediately.
      *
      * @param  string  $method
-     * @return void
      *
      * @throws \LogicException
      */
@@ -942,7 +941,6 @@ class Subscription extends Model
     /**
      * Sync the subscription items with the latest data from Paddle.
      *
-     * @param  array  $items
      * @return void
      */
     protected function syncSubscriptionItems(array $items)

@@ -16,7 +16,6 @@ class Price
     /**
      * Create a new Price instance.
      *
-     * @param  array  $price
      * @return void
      */
     public function __construct(array $price)
@@ -66,8 +65,6 @@ class Price
 
     /**
      * Get the used currency for the price.
-     *
-     * @return \Money\Currency
      */
     public function currency(): Currency
     {

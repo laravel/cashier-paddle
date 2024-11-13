@@ -68,8 +68,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the currency used for the payment.
-     *
-     * @return \Money\Currency
      */
     public function currency(): Currency
     {

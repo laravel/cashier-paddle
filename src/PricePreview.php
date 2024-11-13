@@ -19,7 +19,6 @@ class PricePreview implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new PricePreview instance.
      *
-     * @param  array  $item
      * @return void
      */
     public function __construct(array $item)
@@ -109,8 +108,6 @@ class PricePreview implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the used currency for the price preview.
-     *
-     * @return \Money\Currency
      */
     public function currency(): Currency
     {
