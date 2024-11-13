@@ -1,0 +1,11 @@
+name: fix code styling
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  pint:
+    uses: laravel/.github/.github/workflows/coding-standards.yml@main
+    with:
+      message: "Pint: fix code styling"
