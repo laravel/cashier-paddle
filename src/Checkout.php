@@ -76,6 +76,7 @@ class Checkout
                 'displayMode' => 'inline',
                 'frameStyle' => 'width: 100%; background-color: transparent; border: none;',
                 'successUrl' => $this->returnTo,
+                'allowLogout' => false,
             ]),
             'items' => $this->items,
         ];
