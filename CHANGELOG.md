@@ -1,6 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.5.2...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.5.5...2.x)
+
+## [v2.5.5](https://github.com/laravel/cashier-paddle/compare/v2.5.4...v2.5.5) - 2025-01-14
+
+* Prevent customer from logging out in inline checkout by [@carlosmintfan](https://github.com/carlosmintfan) in https://github.com/laravel/cashier-paddle/pull/291
+
+## [v2.5.4](https://github.com/laravel/cashier-paddle/compare/v2.5.3...v2.5.4) - 2024-12-12
+
+* Fix search of customers by email by [@Rydgel](https://github.com/Rydgel) in https://github.com/laravel/cashier-paddle/pull/288
+
+## [v2.5.3](https://github.com/laravel/cashier-paddle/compare/v2.5.2...v2.5.3) - 2024-11-26
+
+* Update logo to support dark/light theme by [@milewski](https://github.com/milewski) in https://github.com/laravel/cashier-paddle/pull/282
+* [2.x] Supports PHP 8.4 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/cashier-paddle/pull/285
 
 ## [v2.5.2](https://github.com/laravel/cashier-paddle/compare/v2.5.1...v2.5.2) - 2024-08-20
 

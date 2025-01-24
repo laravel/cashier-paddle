@@ -37,7 +37,7 @@ trait ManagesCustomer
         // Attempt to find the customer by email address first...
         $response = Cashier::api('GET', 'customers', [
             'status' => 'active,archived',
-            'search' => $options['email'],
+            'email' => $options['email'],
         ])['data'][0] ?? null;
 
         // If we can't find the customer by email, we'll create them on Paddle...

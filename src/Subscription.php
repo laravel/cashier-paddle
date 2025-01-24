@@ -911,7 +911,7 @@ class Subscription extends Model
      * @param  string|null  $include
      * @return array
      */
-    public function asPaddleSubscription(string $include = null)
+    public function asPaddleSubscription(?string $include = null)
     {
         $include = $include ? ['include' => $include] : [];
 
