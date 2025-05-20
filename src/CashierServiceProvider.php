@@ -94,7 +94,8 @@ class CashierServiceProvider extends ServiceProvider
     protected function bootDirectives()
     {
         Blade::directive('paddleJS', function ($expression) {
-            return "<?php echo view('cashier::js', ['nonce' => {$expression}['nonce'] ?? '']); ?>";
+            $expression = $expression ?: '[]';
+            return '<?php echo view("cashier::js", ["nonce" => ' . $expression . '["nonce"] ?? ""]); ?>';
         });
     }
 
