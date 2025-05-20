@@ -95,6 +95,7 @@ class CashierServiceProvider extends ServiceProvider
     {
         Blade::directive('paddleJS', function ($expression) {
             $expression = $expression ?: '[]';
+
             return '<?php echo view("cashier::js", ["nonce" => '.$expression.'["nonce"] ?? ""]); ?>';
         });
     }
