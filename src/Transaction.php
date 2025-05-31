@@ -94,6 +94,10 @@ class Transaction extends Model
      */
     public function invoicePdf()
     {
+        if (! $this->invoice_number) {
+            return null;
+        }
+
         return Cashier::api('GET', "transactions/{$this->paddle_id}/invoice")['data']['url'] ?? null;
     }
 
