@@ -59,7 +59,7 @@ class Customer extends Model
      * Generate a customer authentication token.
      *
      * @return string
-    */
+     */
     public function authToken()
     {
         return Cashier::api('POST', "customers/{$this->paddle_id}/auth-token")->json('data.customer_auth_token');
