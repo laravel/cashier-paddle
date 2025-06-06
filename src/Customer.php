@@ -54,4 +54,14 @@ class Customer extends Model
     {
         return $this->trial_ends_at && $this->trial_ends_at->isPast();
     }
+
+    /**
+     * Generate a customer authentication token.
+     *
+     * @return string
+    */
+    public function authToken()
+    {
+        return Cashier::api('POST', "customers/{$this->paddle_id}/auth-token")->json('data.customer_auth_token');
+    }
 }
