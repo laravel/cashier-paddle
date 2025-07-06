@@ -15,6 +15,8 @@ trait ManagesCustomer
     public function createAsCustomer(array $options = [])
     {
         if ($customer = $this->customer) {
+            $customer->update($options);
+            
             return $customer;
         }
 
