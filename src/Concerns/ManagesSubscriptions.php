@@ -25,7 +25,11 @@ trait ManagesSubscriptions
      */
     public function subscription($type = 'default')
     {
-        return $this->subscriptions->where('type', $type)->first();
+        $subscriptions = $this->subscriptions->where('type', $type);
+
+        return $subscriptions->first(function (Subscription $subscription) {
+            return $subscription->valid();
+        }) ?? $subscriptions->first();
     }
 
     /**
