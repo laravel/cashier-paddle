@@ -221,4 +221,228 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($subscription->canceled());
         $this->assertFalse($subscription->onGracePeriod());
     }
+
+    public function test_subscription_method_prioritizes_valid_subscriptions_over_invalid_ones()
+    {
+        $billable = $this->createBillable('taylor');
+
+        // Create a canceled subscription first
+        $canceledSubscription = $billable->subscriptions()->create([
+            'type' => 'default',
+            'paddle_id' => 'sub_canceled',
+            'status' => Subscription::STATUS_CANCELED,
+            'ends_at' => Carbon::yesterday(),
+            'created_at' => Carbon::now()->subDays(2),
+        ]);
+
+        $canceledSubscription->items()->create([
+            'subscription_id' => $canceledSubscription->id,
+            'product_id' => 'pro_123',
+            'price_id' => 'pri_123',
+            'status' => 'canceled',
+            'quantity' => 1,
+        ]);
+
+        // Create an active subscription
+        $activeSubscription = $billable->subscriptions()->create([
+            'type' => 'default',
+            'paddle_id' => 'sub_active',
+            'status' => Subscription::STATUS_ACTIVE,
+            'created_at' => Carbon::now()->subDay(),
+        ]);
+
+        $activeSubscription->items()->create([
+            'subscription_id' => $activeSubscription->id,
+            'product_id' => 'pro_456',
+            'price_id' => 'pri_456',
+            'status' => 'active',
+            'quantity' => 1,
+        ]);
+
+        // Refresh to reload subscriptions collection
+        $billable = $billable->fresh();
+
+        // The subscription() method should return the active one, not the canceled one
+        $subscription = $billable->subscription('default');
+
+        $this->assertNotNull($subscription);
+        $this->assertEquals('sub_active', $subscription->paddle_id);
+        $this->assertTrue($subscription->valid());
+        $this->assertTrue($subscription->active());
+    }
+
+    public function test_subscription_method_prioritizes_trialing_subscriptions_over_canceled_ones()
+    {
+        $billable = $this->createBillable('taylor');
+
+        // Create a canceled subscription
+        $canceledSubscription = $billable->subscriptions()->create([
+            'type' => 'default',
+            'paddle_id' => 'sub_canceled',
+            'status' => Subscription::STATUS_CANCELED,
+            'ends_at' => Carbon::yesterday(),
+            'created_at' => Carbon::now()->subDays(2),
+        ]);
+
+        $canceledSubscription->items()->create([
+            'subscription_id' => $canceledSubscription->id,
+            'product_id' => 'pro_123',
+            'price_id' => 'pri_123',
+            'status' => 'canceled',
+            'quantity' => 1,
+        ]);
+
+        // Create a trialing subscription
+        $trialingSubscription = $billable->subscriptions()->create([
+            'type' => 'default',
+            'paddle_id' => 'sub_trialing',
+            'status' => Subscription::STATUS_TRIALING,
+            'trial_ends_at' => Carbon::tomorrow(),
+            'created_at' => Carbon::now()->subDay(),
+        ]);
+
+        $trialingSubscription->items()->create([
+            'subscription_id' => $trialingSubscription->id,
+            'product_id' => 'pro_789',
+            'price_id' => 'pri_789',
+            'status' => 'trialing',
+            'quantity' => 1,
+        ]);
+
+        // Refresh to reload subscriptions collection
+        $billable = $billable->fresh();
+
+        // The subscription() method should return the trialing one
+        $subscription = $billable->subscription('default');
+
+        $this->assertNotNull($subscription);
+        $this->assertEquals('sub_trialing', $subscription->paddle_id);
+        $this->assertTrue($subscription->valid());
+        $this->assertTrue($subscription->onTrial());
+    }
+
+    public function test_subscription_method_falls_back_to_first_subscription_when_none_are_valid()
+    {
+        $billable = $this->createBillable('taylor');
+
+        // Create multiple canceled subscriptions
+        $firstCanceled = $billable->subscriptions()->create([
+            'type' => 'default',
+            'paddle_id' => 'sub_first_canceled',
+            'status' => Subscription::STATUS_CANCELED,
+            'ends_at' => Carbon::yesterday(),
+            'created_at' => Carbon::now()->subDays(3),
+        ]);
+
+        $firstCanceled->items()->create([
+            'subscription_id' => $firstCanceled->id,
+            'product_id' => 'pro_111',
+            'price_id' => 'pri_111',
+            'status' => 'canceled',
+            'quantity' => 1,
+        ]);
+
+        $secondCanceled = $billable->subscriptions()->create([
+            'type' => 'default',
+            'paddle_id' => 'sub_second_canceled',
+            'status' => Subscription::STATUS_CANCELED,
+            'ends_at' => Carbon::yesterday(),
+            'created_at' => Carbon::now()->subDays(2),
+        ]);
+
+        $secondCanceled->items()->create([
+            'subscription_id' => $secondCanceled->id,
+            'product_id' => 'pro_222',
+            'price_id' => 'pri_222',
+            'status' => 'canceled',
+            'quantity' => 1,
+        ]);
+
+        // Refresh to reload subscriptions collection
+        $billable = $billable->fresh();
+
+        // When no valid subscriptions exist, it should fall back to first one
+        // Since subscriptions are ordered by created_at DESC, the second_canceled should be first
+        $subscription = $billable->subscription('default');
+
+        $this->assertNotNull($subscription);
+        $this->assertEquals('sub_second_canceled', $subscription->paddle_id);
+        $this->assertFalse($subscription->valid());
+    }
+
+    public function test_subscription_method_returns_null_when_no_subscriptions_of_type_exist()
+    {
+        $billable = $this->createBillable('taylor');
+
+        // Create a subscription of a different type
+        $subscription = $billable->subscriptions()->create([
+            'type' => 'main',
+            'paddle_id' => 'sub_main',
+            'status' => Subscription::STATUS_ACTIVE,
+        ]);
+
+        $subscription->items()->create([
+            'subscription_id' => $subscription->id,
+            'product_id' => 'pro_123',
+            'price_id' => 'pri_123',
+            'status' => 'active',
+            'quantity' => 1,
+        ]);
+
+        // Refresh to reload subscriptions collection
+        $billable = $billable->fresh();
+
+        // Requesting a subscription of type 'default' should return null
+        $result = $billable->subscription('default');
+
+        $this->assertNull($result);
+    }
+
+    public function test_subscription_method_returns_first_valid_when_multiple_valid_subscriptions_exist()
+    {
+        $billable = $this->createBillable('taylor');
+
+        // Create first active subscription
+        $firstActive = $billable->subscriptions()->create([
+            'type' => 'default',
+            'paddle_id' => 'sub_first_active',
+            'status' => Subscription::STATUS_ACTIVE,
+            'created_at' => Carbon::now()->subDays(2),
+        ]);
+
+        $firstActive->items()->create([
+            'subscription_id' => $firstActive->id,
+            'product_id' => 'pro_111',
+            'price_id' => 'pri_111',
+            'status' => 'active',
+            'quantity' => 1,
+        ]);
+
+        // Create second active subscription (newer)
+        $secondActive = $billable->subscriptions()->create([
+            'type' => 'default',
+            'paddle_id' => 'sub_second_active',
+            'status' => Subscription::STATUS_ACTIVE,
+            'created_at' => Carbon::now()->subDay(),
+        ]);
+
+        $secondActive->items()->create([
+            'subscription_id' => $secondActive->id,
+            'product_id' => 'pro_222',
+            'price_id' => 'pri_222',
+            'status' => 'active',
+            'quantity' => 1,
+        ]);
+
+        // Refresh to reload subscriptions collection
+        $billable = $billable->fresh();
+
+        // Should return the first valid subscription it finds
+        // Since subscriptions are ordered by created_at DESC, it should return the second_active
+        $subscription = $billable->subscription('default');
+
+        $this->assertNotNull($subscription);
+        $this->assertEquals('sub_second_active', $subscription->paddle_id);
+        $this->assertTrue($subscription->valid());
+    }
 }
