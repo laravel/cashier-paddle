@@ -144,11 +144,19 @@ class Checkout implements Arrayable, JsonSerializable
         return $this->returnTo;
     }
 
+    /**
+     * Get the checkout's JSON serializable attributes.
+     */
     public function jsonSerialize(): mixed
     {
         return $this->options();
     }
 
+    /**
+     * Convert the checkout to its array representation.
+     *
+     * @return array
+     */
     public function toArray()
     {
         return $this->options();
