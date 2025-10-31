@@ -2,9 +2,11 @@
 
 namespace Laravel\Paddle;
 
+use Illuminate\Contracts\Support\Arrayable;
+use JsonSerializable;
 use LogicException;
 
-class Checkout
+class Checkout implements Arrayable, JsonSerializable
 {
     /**
      * The custom data for the checkout.
@@ -140,5 +142,23 @@ class Checkout
     public function getReturnUrl(): ?string
     {
         return $this->returnTo;
+    }
+
+    /**
+     * Get the checkout's JSON serializable attributes.
+     */
+    public function jsonSerialize(): mixed
+    {
+        return $this->options();
+    }
+
+    /**
+     * Convert the checkout to its array representation.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->options();
     }
 }
