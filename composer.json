@@ -35,10 +35,8 @@
         "symfony/polyfill-intl-icu": "^1.22.1"
     },
     "require-dev": {
-        "mockery/mockery": "^1.5.1",
-        "orchestra/testbench": "^8.14|^9.0|^10.0",
-        "phpstan/phpstan": "^1.10",
-        "phpunit/phpunit": "^10.4|^11.5"
+        "orchestra/testbench": "^8.36|^9.15|^10.8",
+        "phpstan/phpstan": "^1.10"
     },
     "suggest": {
         "ext-intl": "Allows for more locales besides the default \"en\" when formatting money values."
@@ -70,6 +68,9 @@
         "prepare": "@php vendor/bin/testbench package:discover --ansi"
     },
     "config": {
+        "audit": {
+            "block-insecure": false
+        },
         "sort-packages": true
     },
     "minimum-stability": "dev",
