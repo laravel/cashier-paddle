@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.6.2...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.6.3...2.x)
+
+## [v2.6.3](https://github.com/laravel/cashier-paddle/compare/v2.6.2...v2.6.3) - 2025-11-25
+
+* Make Checkout object Arrayable by [@mpociot](https://github.com/mpociot) in https://github.com/laravel/cashier-paddle/pull/304
+* [2.x] PHP 8.5 Compatibility by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/cashier-paddle/pull/305
 
 ## [v2.6.2](https://github.com/laravel/cashier-paddle/compare/v2.6.1...v2.6.2) - 2025-06-10
 
