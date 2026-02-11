@@ -633,6 +633,7 @@ class Subscription extends Model
         $response = $this->updatePaddleSubscription(array_merge($options, [
             'items' => $items,
             'proration_billing_mode' => $this->prorationBehavior,
+            'scheduled_change' => null,
         ]));
 
         $this->forceFill([
