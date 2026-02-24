@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.6.3...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.7.0...2.x)
+
+## [v2.7.0](https://github.com/laravel/cashier-paddle/compare/v2.6.3...v2.7.0) - 2026-02-24
+
+* Laravel 13.x Compatibility by [@laravel-shift](https://github.com/laravel-shift) in https://github.com/laravel/cashier-paddle/pull/307
 
 ## [v2.6.3](https://github.com/laravel/cashier-paddle/compare/v2.6.2...v2.6.3) - 2025-11-25
 
