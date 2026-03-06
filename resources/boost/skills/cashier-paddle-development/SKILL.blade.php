@@ -80,7 +80,7 @@ Add `@paddleJS` to your layout so Paddle's JavaScript is loaded for the overlay 
 
 ### Creating a Subscription
 
-Cashier Paddle uses a checkout-based flow. `subscribe()` returns a `Checkout` instance that is passed to a Blade component — there is no direct API call for subscription creation.
+Cashier Paddle uses a checkout-based flow. `subscribe()` returns a `Checkout` instance that is passed to a Blade component. There is no direct API call for subscription creation.
 
 @boostsnippet("Subscription Checkout Route", "php")
 Route::get('/subscribe', function (Request $request) {
@@ -98,7 +98,7 @@ Route::get('/subscribe', function (Request $request) {
 </x-paddle-button>
 @endboostsnippet
 
-For **named subscriptions** (e.g. a user can hold multiple subscription types), pass `subscription_type` as custom data. Cashier reads this from the webhook to set the local `type` column. Without it, every subscription defaults to `'default'`.
+For named subscriptions, pass `subscription_type` in custom data so Cashier can set the local `type` column from the webhook. Without it, all subscriptions are stored as `'default'`.
 
 @boostsnippet("Named Subscription with Custom Data", "php")
 $checkout = $request->user()
@@ -112,17 +112,17 @@ $checkout = $request->user()
 1. Run migrations and confirm the `customers`, `subscriptions`, `subscription_items`, and `transactions` tables exist
 2. Confirm `paddle/*` is excluded from CSRF protection and `PADDLE_WEBHOOK_SECRET` is set
 3. Enable the required webhook event types in Paddle Dashboard > Notifications: `subscription.created`, `subscription.updated`, `subscription.paused`, `subscription.canceled`, `transaction.completed`, `transaction.updated`, `customer.updated`
-4. Test webhook delivery using the Paddle Dashboard notification log — a 419 means CSRF is blocking, a 403 means the secret is wrong
+4. Test webhook delivery using the Paddle Dashboard notification log. A 419 response means CSRF is blocking. A 403 response means the secret is wrong.
 5. Confirm `$user->subscribed()` returns the expected value after a subscription is created
 
 ## Common Pitfalls
 
-- `subscribed('premium')` returns false even though the user subscribed — the argument is the local subscription `type`, not the Paddle plan name. The `type` is set from `custom_data.subscription_type` in the webhook. If `customData(['subscription_type' => 'premium'])` was not passed during checkout, every subscription is stored as `'default'`.
-- Webhooks returning 419 — the `paddle/*` route is not excluded from CSRF middleware. Without this exclusion, all Paddle POST requests are rejected.
-- Webhooks returning 403 — `PADDLE_WEBHOOK_SECRET` is wrong or not set. Without a matching secret, signature verification fails silently and blocks all events.
-- `subscribed()` returns true after calling `cancel()` — expected. The subscription stays valid during the grace period. Use `onGracePeriod()` to distinguish.
-- `paused()` returns false even though pause was requested — if `paused_at` is set but in the future, the subscription is on a pause grace period. Use `onPausedGracePeriod()` to check.
-- Subscription active in Paddle but not in app — webhooks are not reaching the controller. Check Paddle's delivery log for HTTP status codes, confirm `subscription.created` is enabled in Notifications, and verify the customer record exists locally.
-- Cannot remove the last price from a multi-product subscription — swap to a single price or cancel instead.
-- Currency formatting broken for non-English locales — install the `ext-intl` PHP extension.
+- `subscribed('premium')` checks the local `type` column, not the Paddle plan name. The `type` is populated from `custom_data.subscription_type` in the webhook payload. If `customData(['subscription_type' => 'premium'])` was not passed during checkout, all subscriptions are stored as `'default'`.
+- A 419 response from the webhook endpoint means `paddle/*` is not excluded from CSRF middleware. All Paddle POST requests will be rejected until this is configured.
+- A 403 response means `PADDLE_WEBHOOK_SECRET` is wrong or missing. Signature verification will silently block all events.
+- `subscribed()` returns true immediately after calling `cancel()`. The subscription stays valid during the grace period. Use `onGracePeriod()` to distinguish canceled subscriptions that still have access.
+- `paused()` returns false while a pause is scheduled but not yet in effect. If `paused_at` is in the future, use `onPausedGracePeriod()` instead.
+- A subscription active in Paddle but missing from the app means webhooks are not reaching the controller. Check Paddle's delivery log for HTTP status codes, confirm `subscription.created` is enabled in Notifications, and verify the customer record exists locally.
+- The last price on a multi-product subscription cannot be removed. Swap to a single price or cancel the subscription instead.
+- Currency formatting is broken for non-English locales if the `ext-intl` PHP extension is not installed.
 - Always use `search-docs` for the latest Cashier Paddle documentation rather than relying on this skill alone.
