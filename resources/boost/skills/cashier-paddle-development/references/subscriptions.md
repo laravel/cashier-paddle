@@ -9,7 +9,7 @@ Use `search-docs` for authoritative documentation on subscriptions.
 | `$user->subscribed('default')` | Active, trialing, or on grace period |
 | `->onTrial()` | Trial period active |
 | `->onGracePeriod()` | Canceled, billing period not yet ended |
-| `->canceled()` | `ends_at` is set (may still have access) |
+| `->canceled()` | Status is `canceled` |
 | `->recurring()` | Active and not on trial |
 | `->pastDue()` | Payment overdue |
 | `->paused()` | `paused_at` is in the past |
@@ -98,7 +98,6 @@ $user->subscription()->findItemOrFail('pri_addon');
 ```php
 // Create named subscriptions
 $checkout = $user->subscribe('pri_gym', 'gym')
-    ->customData(['subscription_type' => 'gym'])
     ->returnTo(route('home'));
 
 // Access them independently
@@ -106,6 +105,8 @@ $user->subscription('gym')->swap('pri_gym_yearly');
 $user->subscription('gym')->cancel();
 $user->subscribed('gym');
 ```
+
+Cashier sets `custom_data.subscription_type` from the second argument to `subscribe()` automatically. If you call `customData()` for other metadata, do not overwrite that key.
 
 ## Pausing
 

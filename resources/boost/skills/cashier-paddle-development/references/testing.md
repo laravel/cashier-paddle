@@ -101,10 +101,10 @@ Cashier::assertSubscriptionCanceled(function ($event) {
 
 ## Simulating Webhooks
 
-To test code that reacts to Cashier webhook events, post a payload directly to the webhook route:
+To test code that reacts to Cashier webhook events, post a payload directly to the webhook route. If your test environment sets `cashier.webhook_secret`, either unset it for the test or send a valid `Paddle-Signature` header.
 
 ```php
-$this->postJson('paddle/webhook', [
+$payload = [
     'event_type' => 'transaction.completed',
     'data' => [
         'id'          => 'txn_test',
@@ -115,7 +115,24 @@ $this->postJson('paddle/webhook', [
         'currency_code' => 'USD',
         'billed_at'   => now()->toISOString(),
     ],
-])->assertOk();
+];
+
+config()->set('cashier.webhook_secret', null);
+
+$this->postJson('paddle/webhook', $payload)->assertOk();
+```
+
+If you want to keep signature verification enabled, sign the exact JSON body you send:
+
+```php
+$payload = ['event_type' => 'transaction.completed', 'data' => [...]];
+$json = json_encode($payload, JSON_THROW_ON_ERROR);
+$timestamp = time();
+$signature = hash_hmac('sha256', "{$timestamp}:{$json}", config('cashier.webhook_secret'));
+
+$this->withHeader('Paddle-Signature', "ts={$timestamp};h1={$signature}")
+    ->call('POST', 'paddle/webhook', [], [], [], ['CONTENT_TYPE' => 'application/json'], $json)
+    ->assertOk();
 ```
 
 ## Setup Notes

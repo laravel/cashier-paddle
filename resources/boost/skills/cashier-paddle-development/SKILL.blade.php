@@ -63,12 +63,19 @@ class User extends Authenticatable
 }
 @endboostsnippet
 
-For a non-User model, register it in a service provider:
+If you bill a non-`User` model, add the `Billable` trait to that model as well:
 
 @boostsnippet("Custom Billable Model", "php")
-// In AppServiceProvider::boot()
-Cashier::useCustomerModel(Team::class);
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Paddle\Billable;
+
+class Team extends Model
+{
+    use Billable;
+}
 @endboostsnippet
+
+No extra Cashier registration call is required for additional billable models.
 
 Add `@paddleJS` to your layout so Paddle's JavaScript is loaded for the overlay checkout:
 
@@ -98,12 +105,11 @@ Route::get('/subscribe', function (Request $request) {
 </x-paddle-button>
 @endboostsnippet
 
-For named subscriptions, pass `subscription_type` in custom data so Cashier can set the local `type` column from the webhook. Without it, all subscriptions are stored as `'default'`.
+For named subscriptions, pass the desired type as the second argument to `subscribe()`. Cashier stores `custom_data.subscription_type` automatically from that value; if you omit it, the local type defaults to `'default'`.
 
-@boostsnippet("Named Subscription with Custom Data", "php")
+@boostsnippet("Named Subscription Checkout", "php")
 $checkout = $request->user()
     ->subscribe('pri_premium_monthly', 'premium')
-    ->customData(['subscription_type' => 'premium'])
     ->returnTo(route('dashboard'));
 @endboostsnippet
 
@@ -117,7 +123,7 @@ $checkout = $request->user()
 
 ## Common Pitfalls
 
-- `subscribed('premium')` checks the local `type` column, not the Paddle plan name. The `type` is populated from `custom_data.subscription_type` in the webhook payload. If `customData(['subscription_type' => 'premium'])` was not passed during checkout, all subscriptions are stored as `'default'`.
+- `subscribed('premium')` checks the local `type` column, not the Paddle plan name. Pass the desired type as the second argument to `subscribe()`. Cashier writes `custom_data.subscription_type` automatically, so if you attach extra custom data, do not overwrite that key.
 - A 419 response from the webhook endpoint means `paddle/*` is not excluded from CSRF middleware. All Paddle POST requests will be rejected until this is configured.
 - A 403 response means `PADDLE_WEBHOOK_SECRET` is wrong or missing. Signature verification will silently block all events.
 - `subscribed()` returns true immediately after calling `cancel()`. The subscription stays valid during the grace period. Use `onGracePeriod()` to distinguish canceled subscriptions that still have access.
