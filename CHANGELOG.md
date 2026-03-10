@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.7.0...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.8.0...2.x)
+
+## [v2.8.0](https://github.com/laravel/cashier-paddle/compare/v2.7.0...v2.8.0) - 2026-03-10
+
+* Add Cashier Paddle Boost skill  by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/cashier-paddle/pull/309
 
 ## [v2.7.0](https://github.com/laravel/cashier-paddle/compare/v2.6.3...v2.7.0) - 2026-02-24
 
