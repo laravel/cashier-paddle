@@ -11,17 +11,6 @@ metadata:
 
 # Cashier Paddle Development
 
-## When to Apply
-
-Activate this skill when:
-
-- Installing or configuring Laravel Cashier Paddle
-- Setting up subscriptions, trials, quantities, or plan swapping
-- Handling webhooks or subscription state sync issues
-- Working with Paddle Checkout, transactions, or one-time charges
-- Testing billing scenarios with CashierFake
-- Debugging `subscribed()` returning false or subscription type mismatches
-
 ## Documentation
 
 Use `search-docs` for detailed Cashier Paddle patterns and documentation covering subscriptions, webhooks, Paddle Checkout, transactions, payment methods, and testing.
