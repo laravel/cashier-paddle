@@ -346,6 +346,158 @@ class WebhooksTest extends FeatureTestCase
         });
     }
 
+    public function test_it_can_handle_a_duplicated_transaction_completed_event()
+    {
+        Cashier::fake();
+
+        $user = $this->createBillable();
+
+        $payload = [
+            'event_type' => 'transaction_completed',
+            'occurred_at' => $billedAt = now()->addDay()->format('Y-m-d H:i:s'),
+            'data' => [
+                'id' => 'txn_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => 'completed',
+                'subscription_id' => 'sub_123456789',
+                'invoice_number' => 'foo',
+                'currency_code' => 'EUR',
+                'details' => [
+                    'totals' => [
+                        'total' => '1255',
+                        'tax' => '434',
+                    ],
+                ],
+                'billed_at' => $billedAt,
+            ],
+        ];
+
+        // First webhook should succeed.
+        $this->postJson('paddle/webhook', $payload)->assertOk();
+
+        // Duplicate webhook (race condition) should not throw a unique constraint error.
+        $this->postJson('paddle/webhook', $payload)->assertOk();
+
+        $this->assertDatabaseCount('transactions', 1);
+
+        $this->assertDatabaseHas('transactions', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'paddle_id' => 'txn_123456789',
+        ]);
+    }
+
+    public function test_stale_transaction_updated_webhook_does_not_overwrite_newer_data()
+    {
+        Cashier::fake();
+
+        $user = $this->createBillable('taylor');
+
+        $newerTimestamp = now('UTC');
+
+        $user->transactions()->create([
+            'paddle_id' => 'txn_123456789',
+            'paddle_subscription_id' => 'sub_123456789',
+            'invoice_number' => 'latest-invoice',
+            'status' => Transaction::STATUS_COMPLETED,
+            'total' => '2000',
+            'tax' => '400',
+            'currency' => 'USD',
+            'billed_at' => now(),
+            'updated_at' => $newerTimestamp,
+        ]);
+
+        // Send a webhook with an older updated_at timestamp.
+        $this->postJson('paddle/webhook', [
+            'event_type' => 'transaction.updated',
+            'data' => [
+                'id' => 'txn_123456789',
+                'invoice_number' => 'stale-invoice',
+                'status' => Transaction::STATUS_BILLED,
+                'updated_at' => $newerTimestamp->copy()->subMinutes(5)->format('Y-m-d H:i:s'),
+                'details' => [
+                    'totals' => [
+                        'total' => '1000',
+                        'tax' => '200',
+                    ],
+                ],
+                'billed_at' => now()->subDay()->format('Y-m-d H:i:s'),
+            ],
+        ])->assertOk();
+
+        // Verify the record was NOT updated with stale data.
+        $this->assertDatabaseHas('transactions', [
+            'paddle_id' => 'txn_123456789',
+            'invoice_number' => 'latest-invoice',
+            'status' => Transaction::STATUS_COMPLETED,
+            'total' => '2000',
+            'tax' => '400',
+        ]);
+
+    }
+
+    public function test_stale_subscription_updated_webhook_does_not_overwrite_newer_data()
+    {
+        Cashier::fake();
+
+        $user = $this->createBillable('taylor');
+
+        $newerTimestamp = now('UTC');
+
+        $subscription = $user->subscriptions()->create([
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
+            'status' => Subscription::STATUS_ACTIVE,
+            'updated_at' => $newerTimestamp,
+        ]);
+
+        $subscription->items()->create([
+            'subscription_id' => 1,
+            'product_id' => 'pro_123456789',
+            'price_id' => 'pri_123456789',
+            'status' => 'active',
+            'quantity' => 1,
+        ]);
+
+        // Send a webhook with an older updated_at timestamp.
+        $this->postJson('paddle/webhook', [
+            'event_type' => 'subscription_updated',
+            'data' => [
+                'id' => 'sub_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => Subscription::STATUS_PAUSED,
+                'updated_at' => $newerTimestamp->copy()->subMinutes(5)->format('Y-m-d H:i:s'),
+                'paused_at' => now('UTC')->addDays(5)->format('Y-m-d H:i:s'),
+                'custom_data' => [
+                    'subscription_type' => 'main',
+                ],
+                'items' => [
+                    [
+                        'price' => [
+                            'id' => 'pri_123456789',
+                            'product_id' => 'pro_123456789',
+                        ],
+                        'status' => 'active',
+                        'quantity' => 3,
+                    ],
+                ],
+            ],
+        ])->assertOk();
+
+        // Verify the subscription was NOT updated with stale data.
+        $this->assertDatabaseHas('subscriptions', [
+            'paddle_id' => 'sub_123456789',
+            'status' => Subscription::STATUS_ACTIVE,
+        ]);
+
+        // Items should remain unchanged.
+        $this->assertDatabaseHas('subscription_items', [
+            'subscription_id' => 1,
+            'quantity' => 1,
+        ]);
+
+    }
+
     public function test_subscription_created_event_without_a_matching_customer_is_ignored()
     {
         Cashier::fake();
