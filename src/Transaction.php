@@ -35,6 +35,7 @@ class Transaction extends Model
      */
     protected $casts = [
         'billed_at' => 'datetime',
+        'paddle_updated_at' => 'datetime',
     ];
 
     /**

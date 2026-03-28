@@ -110,6 +110,9 @@ class WebhookController extends Controller
                 'tax' => $data['details']['totals']['tax'],
                 'currency' => $data['currency_code'],
                 'billed_at' => Carbon::parse($data['billed_at'], 'UTC'),
+                'paddle_updated_at' => isset($data['updated_at'])
+                    ? Carbon::parse($data['updated_at'], 'UTC')
+                    : null,
             ]);
         } catch (UniqueConstraintViolationException $e) {
             return;
@@ -133,11 +136,11 @@ class WebhookController extends Controller
         }
 
         // Prevent older webhooks from overwriting newer data by comparing
-        // the Paddle updated_at timestamp against the local record's timestamp.
+        // the Paddle updated_at timestamp against the stored Paddle timestamp.
         if (isset($data['updated_at'])) {
             $webhookUpdatedAt = Carbon::parse($data['updated_at'], 'UTC');
 
-            if ($transaction->updated_at && $transaction->updated_at->greaterThan($webhookUpdatedAt)) {
+            if ($transaction->paddle_updated_at && $transaction->paddle_updated_at->greaterThanOrEqualTo($webhookUpdatedAt)) {
                 return;
             }
         }
@@ -148,6 +151,9 @@ class WebhookController extends Controller
             'total' => $data['details']['totals']['total'],
             'tax' => $data['details']['totals']['tax'],
             'billed_at' => Carbon::parse($data['billed_at'], 'UTC'),
+            'paddle_updated_at' => isset($data['updated_at'])
+                ? Carbon::parse($data['updated_at'], 'UTC')
+                : null,
         ]);
 
         TransactionUpdated::dispatch($transaction->billable, $transaction, $payload);
@@ -178,6 +184,9 @@ class WebhookController extends Controller
                 'status' => $data['status'],
                 'trial_ends_at' => $data['status'] === Subscription::STATUS_TRIALING
                     ? Carbon::parse($data['next_billed_at'], 'UTC')
+                    : null,
+                'paddle_updated_at' => isset($data['updated_at'])
+                    ? Carbon::parse($data['updated_at'], 'UTC')
                     : null,
             ]);
         } catch (UniqueConstraintViolationException $e) {
@@ -213,11 +222,11 @@ class WebhookController extends Controller
         }
 
         // Prevent older webhooks from overwriting newer data by comparing
-        // the Paddle updated_at timestamp against the local record's timestamp.
+        // the Paddle updated_at timestamp against the stored Paddle timestamp.
         if (isset($data['updated_at'])) {
             $webhookUpdatedAt = Carbon::parse($data['updated_at'], 'UTC');
 
-            if ($subscription->updated_at && $subscription->updated_at->greaterThan($webhookUpdatedAt)) {
+            if ($subscription->paddle_updated_at && $subscription->paddle_updated_at->greaterThanOrEqualTo($webhookUpdatedAt)) {
                 return;
             }
         }
@@ -244,6 +253,10 @@ class WebhookController extends Controller
             $subscription->ends_at = Carbon::parse($data['scheduled_change']['effective_at'], 'UTC');
         } else {
             $subscription->ends_at = null;
+        }
+
+        if (isset($data['updated_at'])) {
+            $subscription->paddle_updated_at = Carbon::parse($data['updated_at'], 'UTC');
         }
 
         $subscription->save();
