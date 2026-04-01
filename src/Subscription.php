@@ -52,6 +52,7 @@ class Subscription extends Model
         'trial_ends_at' => 'datetime',
         'paused_at' => 'datetime',
         'ends_at' => 'datetime',
+        'paddle_updated_at' => 'datetime',
     ];
 
     /**

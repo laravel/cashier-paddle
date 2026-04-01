@@ -56,7 +56,7 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
         env:
-          PADDLE_SELLER_ID: ${{ secrets.PADDLE_SELLER_ID }}
-          PADDLE_API_KEY: ${{ secrets.PADDLE_API_KEY }}
-          PADDLE_WEBHOOK_SECRET: ${{ secrets.PADDLE_WEBHOOK_SECRET }}
-          PADDLE_TEST_PRICE: ${{ secrets.PADDLE_TEST_PRICE }}
+          PADDLE_SELLER_ID: ${{ secrets.PADDLE_SELLER_ID || '' }}
+          PADDLE_API_KEY: ${{ secrets.PADDLE_API_KEY || 'fake' }}
+          PADDLE_WEBHOOK_SECRET: ${{ secrets.PADDLE_WEBHOOK_SECRET || '' }}
+          PADDLE_TEST_PRICE: ${{ secrets.PADDLE_TEST_PRICE || '' }}
