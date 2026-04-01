@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.8.0...2.x)
+## [Unreleased](https://github.com/laravel/cashier-paddle/compare/v2.8.1...2.x)
+
+## [v2.8.1](https://github.com/laravel/cashier-paddle/compare/v2.8.0...v2.8.1) - 2026-04-01
+
+* Remove redundant "When to Apply" section from skill body by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/cashier-paddle/pull/311
+* Update Symfony deps versions to support v8 by [@HichemTab-tech](https://github.com/HichemTab-tech) in https://github.com/laravel/cashier-paddle/pull/312
+* [2.x] Fix workflow YAML syntax — quote *.x branch pattern by [@JoshSalway](https://github.com/JoshSalway) in https://github.com/laravel/cashier-paddle/pull/315
 
 ## [v2.8.0](https://github.com/laravel/cashier-paddle/compare/v2.7.0...v2.8.0) - 2026-03-10
 
