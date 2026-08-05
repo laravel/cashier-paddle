@@ -160,9 +160,7 @@ class WebhookController extends Controller
             'type' => $data['custom_data']['subscription_type'] ?? Subscription::DEFAULT_TYPE,
             'paddle_id' => $data['id'],
             'status' => $data['status'],
-            'trial_ends_at' => $data['status'] === Subscription::STATUS_TRIALING
-                ? Carbon::parse($data['next_billed_at'], 'UTC')
-                : null,
+            'trial_ends_at' => $this->trialEndsAt($data),
         ]);
 
         foreach ($data['items'] as $item) {
@@ -195,11 +193,7 @@ class WebhookController extends Controller
 
         $subscription->status = $data['status'];
 
-        if ($data['status'] === Subscription::STATUS_TRIALING) {
-            $subscription->trial_ends_at = Carbon::parse($data['next_billed_at'], 'UTC');
-        } else {
-            $subscription->trial_ends_at = null;
-        }
+        $subscription->trial_ends_at = $this->trialEndsAt($data);
 
         if (isset($data['paused_at'])) {
             $subscription->paused_at = Carbon::parse($data['paused_at'], 'UTC');
@@ -353,5 +347,29 @@ class WebhookController extends Controller
     protected function transactionExists(string $transactionId)
     {
         return Cashier::$transactionModel::where('paddle_id', $transactionId)->count() > 0;
+    }
+
+    /**
+     * Determine when the trial ends for the given subscription payload.
+     *
+     * @param  array  $data
+     * @return \Carbon\Carbon|null
+     */
+    protected function trialEndsAt(array $data)
+    {
+        if ($data['status'] !== Subscription::STATUS_TRIALING) {
+            return null;
+        }
+
+        if (isset($data['next_billed_at'])) {
+            return Carbon::parse($data['next_billed_at'], 'UTC');
+        }
+
+        $trialEndsAt = collect($data['items'] ?? [])
+            ->pluck('trial_dates.ends_at')
+            ->filter()
+            ->max();
+
+        return $trialEndsAt ? Carbon::parse($trialEndsAt, 'UTC') : null;
     }
 }

@@ -166,6 +166,143 @@ class WebhooksTest extends FeatureTestCase
         });
     }
 
+    public function test_it_can_handle_a_cardless_trial_subscription_created_event()
+    {
+        Cashier::fake();
+
+        $user = $this->createBillable();
+
+        $this->postJson('paddle/webhook', [
+            'event_type' => 'subscription_created',
+            'data' => [
+                'id' => 'sub_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => Subscription::STATUS_TRIALING,
+                'next_billed_at' => null,
+                'custom_data' => [
+                    'subscription_type' => 'main',
+                ],
+                'items' => [
+                    [
+                        'price' => [
+                            'id' => 'pri_123456789',
+                            'product_id' => 'pro_123456789',
+                        ],
+                        'status' => 'trialing',
+                        'quantity' => 1,
+                        'trial_dates' => [
+                            'starts_at' => now('UTC')->format('Y-m-d H:i:s'),
+                            'ends_at' => ($trialEndsAt = now('UTC')->addDays(14))->format('Y-m-d H:i:s'),
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
+            'status' => Subscription::STATUS_TRIALING,
+            'trial_ends_at' => $trialEndsAt,
+        ]);
+    }
+
+    public function test_it_can_handle_a_cardless_trial_subscription_updated_event()
+    {
+        Cashier::fake();
+
+        $user = $this->createBillable('taylor');
+
+        $subscription = $user->subscriptions()->create([
+            'type' => 'main',
+            'paddle_id' => 'sub_123456789',
+            'status' => Subscription::STATUS_TRIALING,
+        ]);
+
+        $subscription->items()->create([
+            'subscription_id' => 1,
+            'product_id' => 'pro_123456789',
+            'price_id' => 'pri_123456789',
+            'status' => 'trialing',
+            'quantity' => 1,
+        ]);
+
+        $this->postJson('paddle/webhook', [
+            'event_type' => 'subscription_updated',
+            'data' => [
+                'id' => 'sub_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => Subscription::STATUS_TRIALING,
+                'next_billed_at' => null,
+                'custom_data' => [
+                    'subscription_type' => 'main',
+                ],
+                'items' => [
+                    [
+                        'price' => [
+                            'id' => 'pri_123456789',
+                            'product_id' => 'pro_123456789',
+                        ],
+                        'status' => 'trialing',
+                        'quantity' => 1,
+                        'trial_dates' => [
+                            'starts_at' => now('UTC')->format('Y-m-d H:i:s'),
+                            'ends_at' => ($trialEndsAt = now('UTC')->addDays(14))->format('Y-m-d H:i:s'),
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'paddle_id' => 'sub_123456789',
+            'status' => Subscription::STATUS_TRIALING,
+            'trial_ends_at' => $trialEndsAt,
+        ]);
+    }
+
+    public function test_it_can_handle_a_card_required_trial_subscription_created_event()
+    {
+        Cashier::fake();
+
+        $user = $this->createBillable();
+
+        $this->postJson('paddle/webhook', [
+            'event_type' => 'subscription_created',
+            'data' => [
+                'id' => 'sub_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => Subscription::STATUS_TRIALING,
+                'next_billed_at' => ($trialEndsAt = now('UTC')->addDays(14))->format('Y-m-d H:i:s'),
+                'custom_data' => [
+                    'subscription_type' => 'main',
+                ],
+                'items' => [
+                    [
+                        'price' => [
+                            'id' => 'pri_123456789',
+                            'product_id' => 'pro_123456789',
+                        ],
+                        'status' => 'trialing',
+                        'quantity' => 1,
+                    ],
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'billable_id' => $user->id,
+            'billable_type' => $user->getMorphClass(),
+            'paddle_id' => 'sub_123456789',
+            'status' => Subscription::STATUS_TRIALING,
+            'trial_ends_at' => $trialEndsAt,
+        ]);
+    }
+
     public function test_it_can_handle_a_duplicated_subscription_created_event()
     {
         Cashier::fake();
