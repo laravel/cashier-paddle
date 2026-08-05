@@ -284,33 +284,6 @@ class WebhookController extends Controller
     }
 
     /**
-     * Determine when the trial ends for the given subscription payload.
-     *
-     * Cardless trials never have a next billing date, since there's no payment method to
-     * charge, so the trial end is taken from the subscription items instead.
-     *
-     * @param  array  $data
-     * @return \Carbon\Carbon|null
-     */
-    protected function trialEndsAt(array $data)
-    {
-        if ($data['status'] !== Subscription::STATUS_TRIALING) {
-            return null;
-        }
-
-        if (isset($data['next_billed_at'])) {
-            return Carbon::parse($data['next_billed_at'], 'UTC');
-        }
-
-        $trialEndsAt = collect($data['items'] ?? [])
-            ->pluck('trial_dates.ends_at')
-            ->filter()
-            ->max();
-
-        return $trialEndsAt ? Carbon::parse($trialEndsAt, 'UTC') : null;
-    }
-
-    /**
      * Get the customer instance by its Paddle customer ID.
      *
      * @param  string  $customerId
@@ -374,5 +347,29 @@ class WebhookController extends Controller
     protected function transactionExists(string $transactionId)
     {
         return Cashier::$transactionModel::where('paddle_id', $transactionId)->count() > 0;
+    }
+
+    /**
+     * Determine when the trial ends for the given subscription payload.
+     *
+     * @param  array  $data
+     * @return \Carbon\Carbon|null
+     */
+    protected function trialEndsAt(array $data)
+    {
+        if ($data['status'] !== Subscription::STATUS_TRIALING) {
+            return null;
+        }
+
+        if (isset($data['next_billed_at'])) {
+            return Carbon::parse($data['next_billed_at'], 'UTC');
+        }
+
+        $trialEndsAt = collect($data['items'] ?? [])
+            ->pluck('trial_dates.ends_at')
+            ->filter()
+            ->max();
+
+        return $trialEndsAt ? Carbon::parse($trialEndsAt, 'UTC') : null;
     }
 }
