@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Event;
 use Laravel\Paddle\Cashier;
 use Laravel\Paddle\Events\SubscriptionCanceled;
 use Laravel\Paddle\Events\SubscriptionCreated;
@@ -108,6 +109,63 @@ class WebhooksTest extends FeatureTestCase
         Cashier::assertTransactionUpdated(function (TransactionUpdated $event) {
             return $event->transaction->paddle_id === 'txn_123456789';
         });
+    }
+
+    public function test_an_older_paid_update_does_not_overwrite_a_completed_transaction()
+    {
+        Cashier::fake();
+
+        $this->createBillable();
+
+        $completedAt = now('UTC');
+        $billedAt = $completedAt->copy()->subMinute()->format('Y-m-d H:i:s');
+
+        $this->postJson('paddle/webhook', [
+            'event_type' => 'transaction.completed',
+            'occurred_at' => $completedAt->format('Y-m-d\TH:i:s.u\Z'),
+            'data' => [
+                'id' => 'txn_123456789',
+                'customer_id' => 'cus_123456789',
+                'status' => Transaction::STATUS_COMPLETED,
+                'subscription_id' => 'sub_123456789',
+                'invoice_number' => 'test-123456789',
+                'currency_code' => 'USD',
+                'details' => [
+                    'totals' => [
+                        'total' => '1500',
+                        'tax' => '300',
+                    ],
+                ],
+                'billed_at' => $billedAt,
+            ],
+        ])->assertOk();
+
+        $this->postJson('paddle/webhook', [
+            'event_type' => 'transaction.updated',
+            'occurred_at' => $completedAt->copy()->subSecond()->format('Y-m-d\TH:i:s.u\Z'),
+            'data' => [
+                'id' => 'txn_123456789',
+                'invoice_number' => null,
+                'status' => Transaction::STATUS_PAID,
+                'details' => [
+                    'totals' => [
+                        'total' => '1255',
+                        'tax' => '250',
+                    ],
+                ],
+                'billed_at' => $billedAt,
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('transactions', [
+            'paddle_id' => 'txn_123456789',
+            'invoice_number' => 'test-123456789',
+            'status' => Transaction::STATUS_COMPLETED,
+            'total' => '1500',
+            'tax' => '300',
+        ]);
+
+        Event::assertNotDispatched(TransactionUpdated::class);
     }
 
     public function test_it_can_handle_a_subscription_created_event()
