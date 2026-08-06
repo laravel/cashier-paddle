@@ -18,6 +18,7 @@ use Laravel\Paddle\Events\WebhookHandled;
 use Laravel\Paddle\Events\WebhookReceived;
 use Laravel\Paddle\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Paddle\Subscription;
+use Laravel\Paddle\Transaction;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
@@ -124,6 +125,13 @@ class WebhookController extends Controller
         $data = $payload['data'];
 
         if (! $transaction = $this->findTransaction($data['id'])) {
+            return;
+        }
+
+        if (
+            $transaction->status === Transaction::STATUS_COMPLETED &&
+            $data['status'] !== Transaction::STATUS_COMPLETED
+        ) {
             return;
         }
 
