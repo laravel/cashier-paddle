@@ -25,7 +25,7 @@
         "php": "^8.1",
         "ext-json": "*",
         "ext-openssl": "*",
-        "guzzlehttp/guzzle": "^7.4.5",
+        "guzzlehttp/guzzle": "^7.4.5|^8.0",
         "illuminate/contracts": "^10.0|^11.0|^12.0|^13.0",
         "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
         "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
@@ -39,7 +39,7 @@
         "symfony/polyfill-intl-icu": "^1.22.1"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.36|^9.15|^10.8|^11.0",
+        "orchestra/testbench": "^8.38|^9.15|^10.8|^11.0",
         "phpstan/phpstan": "^1.10"
     },
     "suggest": {
