@@ -39,7 +39,7 @@
         "symfony/polyfill-intl-icu": "^1.22.1"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.36|^9.15|^10.8|^11.0",
+        "orchestra/testbench": "^8.38|^9.15|^10.8|^11.0",
         "phpstan/phpstan": "^1.10"
     },
     "suggest": {
