@@ -79,7 +79,7 @@ class Checkout implements Arrayable, JsonSerializable
                 'frameStyle' => 'width: 100%; background-color: transparent; border: none;',
                 'successUrl' => $this->returnTo,
                 'allowLogout' => false,
-            ]),
+            ], fn ($value) => ! is_null($value)),
             'items' => $this->items,
         ];
 
